@@ -3,6 +3,7 @@ imports:
     - { resource: security.yml }
     - { resource: services.yml }
     - { resource: "@GedBundle/Resources/config/services.yml" }
+    - { resource: "@GedBundle/Resources/config/admin.yml"}
 
 # Put parameters here that don't need to change on each machine where the app is deployed
 # http://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
@@ -10,9 +11,9 @@ parameters:
     locale: en
 
     # Sonata User & Group parameters
-    sonata.user.admin.user.entity:  Application\Sonata\UserBundle\Entity\User
-    sonata.user.admin.user.class:   Application\Sonata\UserBundle\Admin\UserAdmin
-    sonata.user.admin.group.entity: Application\Sonata\UserBundle\Entity\Group
+    sonata.user.admin.user.entity:  GedBundle\Entity\User
+    sonata.user.admin.user.class:   GedBundle\Admin\UserAdmin
+    sonata.user.admin.group.entity: GedBundle\Entity\Group
 
 framework:
     #esi:             ~
@@ -70,7 +71,7 @@ doctrine:
         entity_managers:
             default:
                 mappings:
-                    ApplicationSonataUserBundle: ~
+                    GedBundle: ~
                     SonataUserBundle: ~
                     FOSUserBundle: ~
                     gedmo_tree:
@@ -106,10 +107,6 @@ fos_user:
     firewall_name: main
     user_class: %sonata.user.admin.user.entity%
 
-    group:
-        group_class: %sonata.user.admin.group.entity%
-        group_manager: sonata.user.orm.group_manager
-
     service:
         user_manager: sonata.user.orm.user_manager
 
@@ -124,3 +121,11 @@ stof_doctrine_extensions:
 sonata_user:
     manager_type: orm
 
+services:
+    sonata.user.admin.group:
+        abstract: true
+        public:   false
+
+    sonata.user.orm.group_manager:
+        abstract: true
+        public:   false

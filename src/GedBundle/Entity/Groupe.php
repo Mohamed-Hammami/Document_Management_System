@@ -23,7 +23,7 @@ class Groupe
     private $id;
 
     /**
-     * @var \Doctrine\Common\Collections\ArrayCollection@
+     * @var \Doctrine\Common\Collections\ArrayCollection
      *
      * @ORM\ManyToMany(targetEntity="User",mappedBy="groupes")
      * @ORM\JoinTable(name="groupe_user",

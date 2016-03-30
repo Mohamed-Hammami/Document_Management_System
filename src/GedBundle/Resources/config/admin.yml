@@ -1,0 +1,10 @@
+# Sonata admin configurations
+services:
+    ged.admin.departement:
+        class: GedBundle\Admin\DepartementAdmin
+        tags:
+            - {name: sonata.admin, manager_type: orm, group: 'GED INTERFACE ADMINISTRATEUR', label: 'Departement'}
+        arguments:
+            - ~
+            - GedBundle\Entity\Departement
+            - ~

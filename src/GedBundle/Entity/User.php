@@ -4,7 +4,9 @@ namespace GedBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-use FOS\UserBundle\Model\User as BaseUser;
+use Sonata\UserBundle\Entity\BaseUser as BaseUser;
+
+
 
 /**
  * User
@@ -26,13 +28,20 @@ class User extends BaseUser
     /**
      *  @var \Doctrine\Common\Collections\ArrayCollection
      *
-     * @ORM\ManyToMany(targetEntity="User", inversedBy="groupes")
+     * @ORM\ManyToMany(targetEntity="Groupe", inversedBy="users")
      * @ORM\JoinTable(name="groupe_user",
      *     joinColumns={ @ORM\JoinColumn(name="groupe_id", referencedColumnName="id") },
      *     inverseJoinColumns={ @ORM\JoinColumn(name="user_id", referencedColumnName="id") }
      *              )
      */
     protected $groupes;
+
+    /**
+     * @var Departement
+     *
+     * @ORM\ManyToOne(targetEntity="Departement")
+     */
+    private $departement;
 
     /**
      * Get id
@@ -42,6 +51,22 @@ class User extends BaseUser
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * @return Departement
+     */
+    public function getDepartement()
+    {
+        return $this->departement;
+    }
+
+    /**
+     * @param Departement $departement
+     */
+    public function setDepartement($departement)
+    {
+        $this->departement = $departement;
     }
 
     public function addGroupes(Groupe $groupe)
