@@ -15,8 +15,8 @@ use GedBundle\Utils\BatchActionDescription;
 class FolderController extends CRUDController
 {
 
-    private $folderActionsValues = array("Delete");
-    private $fileActionsValues = array("Delete");
+    private $folderActionsValues = array("Delete", "Modify");
+    private $fileActionsValues = array("Delete", "Modify");
 
     private $folderHeader = array();
     private $folderMappedFields = array();
@@ -58,12 +58,14 @@ class FolderController extends CRUDController
         dump($files);
 
         $this->addFolderHeader('Name', 'text');
+        $this->addFolderHeader('Description', 'text');
         $this->addFolderHeader('Created at', 'datetime');
         $this->addFolderHeader('Updated at', 'datetime');
         $this->addFolderHeader('Created by', 'string');
         $this->addFolderHeader('Last updated by', 'string');
 
         $this->addFolderMappedField('name');
+        $this->addFolderMappedField('description');
         $this->addFolderMappedField('created');
         $this->addFolderMappedField('updated');
         $this->addFolderMappedField('createdBy');
@@ -100,7 +102,7 @@ class FolderController extends CRUDController
             'file_fields'    => $this->fileMappedFields,
 
             'folder_actions'   => $this->folderActions,
-            'file_actons'      => $this->fileActions,
+            'file_actions'      => $this->fileActions,
         ));
     }
 
@@ -248,9 +250,7 @@ class FolderController extends CRUDController
             $data        = $request->request->all();
         }
 
-
-        dump($action);
-        dump($this->folderActionsValues);
+        dump($data);
 
         if( !in_array($this->camelize($action), $this->folderActionsValues) )
         {
@@ -312,10 +312,127 @@ class FolderController extends CRUDController
                 $em->flush();
             } else
             {
-                $children = $folderRepository->getChildren($id, true);
+
+                $folder = $folderRepository->find($id);
+                $children = $folderRepository->getChildren($folder, true);
                 foreach( $children as $child)
                 {
                     $em->remove($child);
+                }
+
+                $em->flush();
+            }
+
+            $this->addFlash('sonata_flash_success', 'flash_batch_delete_success');
+
+        } catch( ModelManagerException $ex )
+        {
+            $this->addFlash('sonata_flash_error', 'flash_batch_delete_error');
+        }
+
+        return new RedirectResponse(
+            $this->generateUrl('admin_ged_folder_folderList', array('id' => $id))
+        );
+
+    }
+
+    public function fileBatchAction(Request $request = null)
+    {
+        // Checks for the form method
+
+        if (Request::getHttpMethodParameterOverride() || !$request->request->has('_method')) {
+            $restMethod = $request->getMethod();
+        } else {
+            $restMethod = $request->request->get('_method');
+        }
+
+        if ('POST' !== $restMethod) {
+            throw $this->createNotFoundException(sprintf('Invalid request type "%s", POST expected', $restMethod));
+        }
+
+        if ($data = json_decode($request->get('data'), true)) {
+            $id          = $data['id'];
+            $action      = $data['action'];
+            $idx         = $data['idx'];
+            $allElements = $data['all_elements'];
+            $request->request->replace(array_merge($request->request->all(), $data));
+        } else {
+            $request->request->set('idx', $request->get('idx', array()));
+            $request->request->set('all_elements', $request->get('all_elements', false));
+
+            $id          = $request->get('currentFolder');
+            $action      = $request->get('action');
+            $idx         = $request->get('idx');
+            $allElements = $request->get('all_elements');
+            $data        = $request->request->all();
+        }
+
+        dump($data);
+
+        if( !in_array($this->camelize($action), $this->fileActionsValues) )
+        {
+            throw $this->createNotFoundException('This batch does not exist');
+        }
+
+        // at least one item must be checked
+        $nonRelevent = (count($idx) < 1 && !$allElements);
+
+        dump($nonRelevent);
+
+        if( $nonRelevent )
+        {
+            $nonRelevantMessage = 'flash_batch_empty';
+            $this->addFlash('sonata_flash_info', $nonRelevantMessage);
+
+            return new RedirectResponse(
+                $this->generateUrl('admin_ged_folder_folderList', array('id' => $id))
+            );
+        }
+
+        $finalAction = sprintf('batchFile%s', $action);
+
+        if (!is_callable(array($this, $finalAction))) {
+            throw new \RuntimeException(sprintf('A `%s::%s` method must be callable', get_class($this), $finalAction));
+        }
+
+        dump($data);
+
+        return call_user_func(array($this, $finalAction), $data, $id, $request);
+
+    }
+
+    public function batchFileDelete(array $data, $id, Request $request = null)
+    {
+        // Control security with $this->admin->checkAccess do it below !!!
+
+        // I have also to add a model manager exception
+
+        $fileRepository = $this->getDoctrine()->getRepository('GedBundle:File');
+        $em = $this->getDoctrine()->getManager();
+
+
+        try{
+
+            if( !$data['all_elements'] )
+            {
+                foreach( $data['idx'] as $value )
+                {
+                    if( !($file = $fileRepository->find($value)) )
+                    {
+                        $this->createNotFoundException(sprintf("There's no file with %d id"), $value);
+                    } else
+                    {
+                        $em->remove($file);
+                    }
+                }
+
+                $em->flush();
+            } else
+            {
+                $files = $fileRepository->findByFolderId($id);
+                foreach( $files as $file)
+                {
+                    $em->remove($file);
                 }
 
                 $em->flush();
