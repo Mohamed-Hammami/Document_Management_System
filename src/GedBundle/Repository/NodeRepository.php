@@ -12,4 +12,18 @@ use Doctrine\ORM\EntityRepository;
  */
 class NodeRepository extends EntityRepository
 {
+    public function findNode($id)
+    {
+        $qb = $this->createQueryBuilder('no')
+            ->where('no.id = :id')
+            ->leftJoin('no.createdBy', 'crt')
+            ->leftJoin('no.updatedBy', 'upd')
+            ->addSelect('crt')
+            ->addSelect('upd')
+            ->setParameter('id', $id)
+        ;
+
+        return $qb->getQuery()
+            ->getResult();
+    }
 }

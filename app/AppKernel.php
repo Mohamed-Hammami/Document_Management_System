@@ -29,6 +29,11 @@ class AppKernel extends Kernel
             # new Sonata\UserBundle\SonataUserBundle(),
             new Stof\DoctrineExtensionsBundle\StofDoctrineExtensionsBundle(),
             new Sonata\EasyExtendsBundle\SonataEasyExtendsBundle(),
+            new Vich\UploaderBundle\VichUploaderBundle(),
+
+            new Avanzu\AdminThemeBundle\AvanzuAdminThemeBundle(),
+            new Symfony\Bundle\AsseticBundle\AsseticBundle(),
+
             # new Application\Sonata\UserBundle\ApplicationSonataUserBundle(),
 
             new GedBundle\GedBundle(),

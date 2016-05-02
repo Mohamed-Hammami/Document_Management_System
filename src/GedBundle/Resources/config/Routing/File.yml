@@ -1,0 +1,8 @@
+
+file_create:
+    path: /{id}/create
+    defaults: { _controller: 'GedBundle:File:create'}
+
+file_show:
+    path: /{id}/show
+    defaults: { _controller: 'GedBundle:File:show'}

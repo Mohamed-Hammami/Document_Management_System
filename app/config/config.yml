@@ -121,6 +121,9 @@ stof_doctrine_extensions:
 sonata_user:
     manager_type: orm
 
+sonata_admin:
+    title:  DMS
+
 services:
     sonata.user.admin.group:
         abstract: true
@@ -129,3 +132,17 @@ services:
     sonata.user.orm.group_manager:
         abstract: true
         public:   false
+
+# Vich uploader config
+vich_uploader:
+    db_driver: orm
+
+    mappings:
+        file_version:
+            uri_prefix:         /files/versions
+            upload_destination: %kernel.root_dir%/../web/files/versions
+
+            delete_on_remove: true
+
+assetic:
+    use_controller: false

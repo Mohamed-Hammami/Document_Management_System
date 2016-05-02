@@ -1,0 +1,7 @@
+folder_show:
+    path: /{id}/show
+    defaults: { _controller: 'GedBundle:Folder:show'}
+
+folder_create:
+    path: /{id}/create
+    defaults: { _controller: 'GedBundle:Folder:create'}

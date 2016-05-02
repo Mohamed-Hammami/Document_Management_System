@@ -47,11 +47,32 @@ class File extends Node
      *
      * @var ArrayCollection
      *
-     * @ORM\OneToMany(targetEntity="Version", mappedBy="file")
-     * @ORM\JoinColumn(referencedColumnName="id", onDelete="Cascade")
+     * @ORM\OneToMany(targetEntity="Version", mappedBy="file", cascade={"persist", "remove"})
+     * @ORM\JoinColumn(referencedColumnName="id", onDelete="CASCADE")
      */
     private $versions;
 
+    /**
+     * @var ArrayCollection
+     *
+     * @ORM\OneToMany(targetEntity="Comment", mappedBy="file", cascade={"persist", "remove"})
+     * @ORM\JoinColumn()referencedColumnName="id", onDelete="CASCADE")
+     */
+    private $comments;
+
+    /**
+     * @var Nature
+     *
+     * @ORM\ManyToOne(targetEntity="Nature", inversedBy="files")
+     */
+    private $nature;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $expiration;
     /**
      * Get id
      *
@@ -94,9 +115,34 @@ class File extends Node
         $this->description = $description;
     }
 
-    public function __construct()
+    /**
+     * @return ArrayCollection
+     */
+    public function getComments()
     {
-        $this->versions = new ArrayCollection();
+        return $this->comments;
+    }
+
+    /**
+     * @param ArrayCollection $comments
+     */
+    public function setComments($comments)
+    {
+        $this->comments = $comments;
+    }
+
+    public function addComment(Comment $comment)
+    {
+        $comment->setFile($this);
+        $this->comments->add($comment);
+
+        return $this;
+    }
+
+    public function removeComment(Comment $comment)
+    {
+        $comment->setFile(null);
+        $this->comments->removeElement($comment);
     }
 
     public function addVersion(Version $version)
@@ -130,6 +176,62 @@ class File extends Node
         $this->versions = $versions;
     }
 
+
+    /**
+     * @return Nature
+     */
+    public function getNature()
+    {
+        return $this->nature;
+    }
+
+    /**
+     * @param Nature $nature
+     */
+    public function setNature(Nature $nature)
+    {
+        $nature->addFile($this);
+        $this->nature = $nature;
+    }
+
+    /**
+     * @param Nature $nature
+     */
+    public function removeNature(Nature $nature)
+    {
+        $nature->removeFile($this);
+        $this->setNature(null);
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getExpiration()
+    {
+        return $this->expiration;
+    }
+
+    /**
+     * @param \DateTime $expiration
+     */
+    public function setExpiration($expiration)
+    {
+        $this->expiration = $expiration;
+    }
+
+
+
+    public function __toString()
+    {
+        return $this->getName();
+    }
+
+
+    public function __construct()
+    {
+        $this->versions = new ArrayCollection();
+        $this->comments = new ArrayCollection();
+    }
 
 
 }

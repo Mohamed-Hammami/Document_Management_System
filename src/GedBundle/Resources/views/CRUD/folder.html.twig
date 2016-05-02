@@ -1,0 +1,367 @@
+{% extends '@Ged/starter.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <!-- DataTables -->
+    <link rel="stylesheet" href="{{ asset('bundles/ged/AdminLTE2/plugins/datatables/dataTables.bootstrap.css') }}">
+    <!-- iCheck -->
+    <link rel="stylesheet" href="{{ asset('bundles/ged/AdminLTE2/plugins/iCheck/all.css') }}">
+
+{% endblock %}
+
+{% block header %}
+    {{ parent() }}
+{% endblock %}
+
+{% block main_content%}
+
+        <section class="content">
+
+        {# Displaying FlashBag #}
+        <div class="col-xs-12">
+            <div class="row">
+                {{ include('@Ged/Utils/flashBag.html.twig', {'flashbag' : app.session.flashbag}) }}
+            </div>
+        </div>
+
+        {# Displaying Folders #}
+        <div class="col-xs-12">
+            <div class="row">
+                <nav class="navbar navbar-default" role="navigation">
+                    <div class="container-fluid">
+                        <div class="navbar-header">
+                            <a class="navbar-brand" href="#">Folders</a>
+                        </div>
+                        <div class="navbar-collapse">
+                            <ul class="nav navbar-nav navbar-right">
+                                {% if children|length %}
+                                    <li><a class="sonata-action-element" href="{{ path('folder_create', {id: folder_id}) }}"><i class="fa fa-plus-circle"></i>
+                                            Add new</a></li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+            <div class="row">
+                {% if folder_actions|length > 0 %}
+                    <form action="{{ path('folder_batch')  }}" method="post">
+                        {#<input type="hidden" name="_sonata_csrf_token" value="{{ csrf_token }}">#}
+                        <input type="hidden" name="currentFolder" value={{ folder_id }}>
+                {% endif %}
+                {% block list_folder_table %}
+                    <div class="box">
+                        {% if children|length > 0 %}
+                            {#<div class="box-header">#}
+                            {#</div>#}
+                            <div class="box-body">
+                                <table id="folders_table" class="table table-bordered table-hover" role="grid" aria-describedby="folders">
+                                    <thead>
+                                    <tr role="row">
+                                        {% if folder_actions|length > 0 %}
+                                            <th>
+                                                <input type="checkbox" class="minimal" id="folder_checkbox_all">
+                                            </th>
+                                        {% endif %}
+                                        {% for field_description in folder_headers %}
+                                            <th>
+                                            {% spaceless %}
+                                                {{ field_description.label }}
+                                            {% endspaceless %}
+                                            </th>
+                                        {% endfor %}
+                                    </tr>
+                                </thead>
+                                    <tbody>
+                                {% for child in children %}
+                                    <tr role="row">
+                                        {% if folder_actions|length > 0 %}
+                                            <td class="folder_checkbox_field">
+                                               <input type="checkbox" class="minimal" name="idx[]" value={{ child.id }}>
+                                            </td>
+                                        {% endif %}
+                                        {% spaceless %}
+                                            {% for  field in folder_fields %}
+                                                <td>
+                                                    {% if child[field].timestamp is defined  %}
+                                                        {{ child[field]|date }}
+                                                    {% elseif field == 'name'  %}
+                                                        <a href={{ path('folder_show', {'id':child.id}) }}>
+                                                            {{ child[field] }}
+                                                        </a>
+                                                    {% elseif field == 'createdBy' or field == 'updatedBy' %}
+                                                        <a href={{ path('admin_ged_user_show', {'id':child[field]['id']}) }}>
+                                                            {{ (child[field])['usernameCanonical'] }}
+                                                        </a>
+                                                    {% elseif child[field] is null %}
+                                                        <span class="text-muted">no content</span>
+                                                    {% else %}
+                                                        {{ child[field] }}
+                                                    {% endif %}
+                                                </td>
+                                            {%  endfor %}
+                                        {% endspaceless %}
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                                </table>
+                            </div>
+                            <div class="box-footer">
+                                {% if folder_actions|length > 0  %}
+                                <div class="form-inline clearfix pull-left" id="folder_batch_block">
+
+                                    <label class="checkbox" for="folder_all_elements" class="form-control">
+                                        <input type="checkbox"  class="minimal" name="all_elements" id="folder_all_elements">
+                                        {{ 'all_elements'|trans({}, 'SonataAdminBundle') }}
+                                        ({{ children|length }})
+                                    </label>
+
+                                    <select name="action" style="width: auto; height: auto" class="form-control">
+                                        {% for action in folder_actions %}
+                                            <option value="{{ action.name }}">{{ action.name|capitalize }}</option>
+                                        {% endfor %}
+                                    </select>
+
+                                    <input type="submit" class="form-control btn btn-small btn-primary" value="{{ 'btn_batch'|trans({}, 'SonataAdminBundle') }}">
+
+                                </div>
+                                {% endif %}
+                            </div>
+                        {% else %}
+                            <div class="info-box">
+                                <span class="info-box-icon bg-aqua"><i class="fa fa-arrow-circle-right"></i></span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">{{ 'NO FOLDERS' }}</span>
+                                    <div class="progress">
+                                        <div class="progress-bar" style="width: 0%"></div>
+                                    </div>
+                            <span class="progress-description">
+                                {#I need to add security control#}
+                                <a href="{{ path('folder_create', {id: folder_id}) }}">
+                                    <i class="fa fa-plus-circle"></i>
+                                    {{ 'link_action_create'|trans({}, 'SonataAdminBundle') }}
+                                </a>
+                            </span>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+            {% endblock %}
+                {% if folder_actions|length > 0 %}
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+
+        {# Displaying Files #}
+        <div class="col-xs-12">
+        <div class="row">
+            <nav class="navbar navbar-default" role="navigation">
+                <div class="container-fluid">
+                    <div class="navbar-header">
+                        <a class="navbar-brand" href="#">Files</a>
+                    </div>
+                    <div class="navbar-collapse">
+                        <div class="navbar-left">
+                        </div>
+                        <ul class="nav navbar-nav navbar-right">
+                            {% if files|length %}
+                                <li><a class="sonata-action-element" href="{{ path('file_create', {'id': folder_id}) }}"><i class="fa fa-plus-circle"></i>
+                                        Add new</a></li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </div>
+        <div class="row">
+            {% block list_file_table %}
+            {% if folder_actions|length > 0 %}
+            <form action="{{ path('file_batch')  }}" method="post">
+                {#<input type="hidden" name="_sonata_csrf_token" value="{{ csrf_token }}">#}
+                <input type="hidden" name="currentFolder" value={{ folder_id }}>
+                {% endif %}
+                    <div class="box">
+                        {% if files|length > 0 %}
+                            {#<div class="box-header">#}
+                            {#</div>#}
+                            <div class="box-body">
+                                <table id="files_table" class="table table-bordered table-hover" role="grid" aria-describedby="files">
+                                    <thead>
+                                    <tr role="row">
+                                        {% if file_actions|length > 0 %}
+                                            <th>
+                                                <input type="checkbox" class="minimal" id="file_checkbox_all">
+                                            </th>
+                                        {% endif %}
+                                        {% for field_description in file_headers %}
+                                            <th>
+                                                {% spaceless %}
+                                                    {{ field_description.label }}
+                                                {% endspaceless %}
+                                            </th>
+                                        {% endfor %}
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for file in files %}
+                                        <tr role="row">
+                                            {% if file_actions|length > 0 %}
+                                                <td class="file_checkbox_field">
+                                                    <input type="checkbox" class="minimal" name="idx[]" value={{ file.id }}>
+                                                </td>
+                                            {% endif %}
+                                            {% spaceless %}
+                                                {% for  field in file_fields %}
+                                                    <td>
+                                                        {% if file[field].timestamp is defined  %}
+                                                            {{ file[field]|date }}
+                                                        {% elseif field == 'name'  %}
+                                                            <a href={{ path('admin_ged_file_list', {'id':file.id}) }}>
+                                                                {{ file[field] }}
+                                                            </a>
+                                                        {% elseif field == 'createdBy' or field == 'updatedBy' %}
+                                                            <a href={{ path('admin_ged_user_show', {'id':file[field]['id']}) }}>
+                                                                {{ (file[field])['usernameCanonical'] }}
+                                                            </a>
+                                                        {% elseif file[field] is null %}
+                                                            <span class="text-muted">no content</span>
+                                                        {% else %}
+                                                            {{ file[field] }}
+                                                        {% endif %}
+                                                    </td>
+                                                {%  endfor %}
+                                            {% endspaceless %}
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="box-footer">
+                                {% if file_actions|length > 0  %}
+                                    <div class="form-inline clearfix pull-left" id="file_batch_block" >
+
+                                        <label class="checkbox" for="file_all_elements" class="form-control">
+                                            <input type="checkbox"  class="minimal" name="all_elements" id="file_all_elements">
+                                            {{ 'all_elements'|trans({}, 'SonataAdminBundle') }}
+                                            ({{ files|length }})
+                                        </label>
+
+                                        <select name="action" style="width: auto; height: auto" class="form-control">
+                                            {% for action in file_actions %}
+                                                <option value="{{ action.name }}">{{ action.name|capitalize }}</option>
+                                            {% endfor %}
+                                        </select>
+
+                                        <input type="submit" class="form-control btn btn-small btn-primary" value="{{ 'btn_batch'|trans({}, 'SonataAdminBundle') }}">
+
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% else %}
+                            <div class="info-box">
+                                <span class="info-box-icon bg-aqua"><i class="fa fa-arrow-circle-right"></i></span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">{{ 'NO FILES' }}</span>
+                                    <div class="progress">
+                                        <div class="progress-bar" style="width: 0%"></div>
+                                    </div>
+                        <span class="progress-description">
+                            {#I need to add security control#}
+                            <a href="{{ path('file_create', {id: folder_id}) }}">
+                                <i class="fa fa-plus-circle"></i>
+                                {{ 'link_action_create'|trans({}, 'SonataAdminBundle') }}
+                            </a>
+                        </span>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endblock %}
+                {% if file_actions|length > 0 %}
+                    </form>
+                {% endif %}
+        </div>
+        </div>
+
+        </section>
+    {% endblock %}
+
+{% block footer %}
+    {{ parent() }}
+{% endblock %}
+
+
+{% block javascripts %}
+
+    {{ parent() }}
+
+    <!-- Data Tables-->
+    <script src="{{ asset('bundles/ged/AdminLTE2/plugins/datatables/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('bundles/ged/AdminLTE2/plugins/datatables/dataTables.bootstrap.min.js') }}"></script>
+
+    <!-- iCheck 1.0.1 -->
+    <script src="{{ asset('bundles/ged/AdminLTE2/plugins/iCheck/icheck.min.js') }}"></script>
+    <script>
+
+        // dataTables for folders_table & files_table
+        $(function(){
+            $("#folders_table").DataTable({
+                "paging": true,
+                "ordering": true,
+                "bInfo" : false,
+            })
+        });
+
+        $(function(){
+            $("#files_table").DataTable({
+                "paging": true,
+                "ordering": true,
+                "bInfo" : false,
+            })
+
+        });
+
+        //iCheck for checkbox and radio inputs
+        $('input[type="checkbox"].minimal').iCheck({
+            checkboxClass: 'icheckbox_minimal-aero'
+        });
+
+        //Move the pagination block to box footer for folders & files
+        $(function(){
+            $('#folders_table_paginate').insertAfter('#folder_batch_block');
+        });
+
+        $(function(){
+           $('#files_table_paginate').insertAfter('#file_batch_block');
+        });
+
+        {% block batch_javascript %}
+        jQuery(document).ready(function ($) {
+            $('#folder_checkbox_all').on('ifChanged', function () {
+                $(this)
+                    .closest('table')
+                    .find('td.folder_checkbox_field input[type="checkbox"]')
+                    .iCheck($(this).is(':checked') ? 'check' : 'uncheck')
+                ;
+            });
+
+        });
+
+        jQuery(document).ready(function ($) {
+            $('#file_checkbox_all').on('ifChanged', function () {
+                $(this)
+                        .closest('table')
+                        .find('td.file_checkbox_field input[type="checkbox"]')
+                        .iCheck($(this).is(':checked') ? 'check' : 'uncheck')
+                ;
+            });
+
+        });
+        {% endblock %}
+
+
+    </script>
+
+{% endblock %}
+

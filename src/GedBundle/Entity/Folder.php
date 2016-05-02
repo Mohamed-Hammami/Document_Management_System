@@ -5,6 +5,7 @@ namespace GedBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Knp\Menu\NodeInterface;
 
 /**
  * Folder
@@ -13,7 +14,6 @@ use Gedmo\Mapping\Annotation as Gedmo;
  *
  * @ORM\Table(name="folder")
  * @ORM\Entity(repositoryClass="GedBundle\Repository\FolderRepository")
- * @ORM\Entity(repositoryClass="Gedmo\Tree\Entity\Repository\NestedTreeRepository")
  *
  * @ORM\AssociationOverrides({
  *      @ORM\AssociationOverride(name="createdBy"),
@@ -21,7 +21,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
  *      })
  *
  */
-class Folder extends Node
+class Folder extends Node implements NodeInterface
 {
     /**
      * @var int
@@ -74,15 +74,54 @@ class Folder extends Node
     /**
      *
      * @ORM\OneToMany(targetEntity="Folder", mappedBy="parent")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      * @ORM\OrderBy({"lft" = "ASC"})
      */
     private $children;
 
     /**
      *
-     * @ORM\OneToMany(targetEntity="File", mappedBy="folder")
+     * @ORM\OneToMany(targetEntity="File", mappedBy="folder", cascade={"remove"})
+     * @ORM\JoinColumn(referencedColumnName="id")
      */
     private $files;
+
+    /**
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
+     * @param string $description
+     */
+    public function setDescription($description)
+    {
+        $this->description = $description;
+    }
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(type="string", nullable=true)
+     */
+    private $description;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(type="string", nullable=true)
+     */
+    private $nature;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(type="string", nullable=true)
+     */
+    private $subject;
 
     /**
      * Get id
@@ -159,7 +198,7 @@ class Folder extends Node
     }
 
     /**
-     * @return mixed
+     * @return ArrayCollection
      */
     public function getFiles()
     {
@@ -167,7 +206,7 @@ class Folder extends Node
     }
 
     /**
-     * @param mixed $files
+     * @param ArrayCollection $files
      */
     public function setFiles($files)
     {
@@ -191,5 +230,17 @@ class Folder extends Node
         $file->setFolder(null);
         $this->files->removeElement($file);
 
+    }
+
+    public function __toString()
+    {
+        return $this->getName();
+    }
+
+    public function getOptions()
+    {
+       $options['label'] = $this->getName();
+
+        return $options;
     }
 }

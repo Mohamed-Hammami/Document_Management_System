@@ -1,0 +1,11 @@
+ged_bundle_file:
+    resource: '@GedBundle/Resources/config/Routing/File.yml'
+    prefix: /file
+
+ged_bundle_folder:
+    resource: '@GedBundle/Resources/config/Routing/Folder.yml'
+    prefix: /folder
+
+ged_bundle_batch:
+    resource: '@GedBundle/Resources/config/Routing/Batch.yml'
+    prefix: /batch

@@ -2,6 +2,7 @@
 
 namespace GedBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 
@@ -11,7 +12,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
  * @ORM\MappedSuperclass
  *
  */
-class Node
+abstract class Node
 {
 
     /**
@@ -52,6 +53,13 @@ class Node
      * @ORM\Column(type="datetime")
      */
     protected $updated;
+
+    /**
+     * @var ArrayCollection
+     *
+     * @ORM\ManyToMany(targetEntity="Tag", inversedBy="nodes")
+     */
+    protected $tags;
 
     /**
      * Get id
@@ -143,4 +151,38 @@ class Node
         $this->name = $name;
     }
 
+    /**
+     * @return ArrayCollection
+     */
+    public function getTags()
+    {
+        return $this->tags;
+    }
+
+    /**
+     * @param ArrayCollection $tags
+     */
+    public function setTags($tags)
+    {
+        $this->tags = $tags;
+    }
+
+    public function addTag(Tag $tag)
+    {
+        $tag->addNode($this);
+        $this->tags->add($tag);
+
+        return $this;
+    }
+
+    public function removeTag(Tag $tag)
+    {
+        $tag->removeNode($this);
+        $this->tags->removeElement($tag);
+    }
+
+    public function __construct()
+    {
+        $this->tags = new ArrayCollection();
+    }
 }

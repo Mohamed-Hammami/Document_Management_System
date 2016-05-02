@@ -1,0 +1,7 @@
+folder_batch:
+    path: /folderBatch
+    defaults: { _controller: 'GedBundle:Folder:folderBatch' }
+
+file_batch:
+    path: /fileBatch
+    defaults: { _controller: 'GedBundle:Folder:fileBatch'}

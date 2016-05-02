@@ -1,0 +1,465 @@
+{% extends base_template %}
+
+
+{# Actions blocks are disabled for now#}
+
+{#{% block actions %}#}
+    {#{% include 'SonataAdminBundle:CRUD:action_buttons.html.twig' %}#}
+{#{% endblock %}#}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('bundles/ged/AdminLTE2/plugins/datatables/dataTables.bootstrap.css') }}">
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <!-- Data Tables-->
+    <script src="{{ asset('bundles/ged/AdminLTE2/plugins/datatables/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('bundles/ged/AdminLTE2/plugins/datatables/dataTables.bootstrap.min.js') }}"></script>
+    <script>
+        $(function(){
+            $("#folderTable").DataTable({
+                "paging": false,
+                "ordering": true,
+                "bInfo" : false,
+            })
+        });
+
+        $(function(){
+            $("#fileTable").DataTable({
+                "paging": false,
+                "ordering": true,
+                "bInfo" : false,
+            })
+        });
+
+        $(function(){
+            $('.dataTables_filter').css('visibility', 'hidden')
+
+        })
+    </script>
+{% endblock %}
+
+{% block sonata_breadcrumb %}
+
+    <div class="hidden-xs">
+        {% if path is defined and path|length > 1 %}
+            <ol class="nav navbar-top-links breadcrumb">
+                {% for folder in path %}
+                    {% if not loop.last  %}
+                        <li>
+                            <a href="{{ path('admin_ged_folder_folderList', {'id': folder.id}) }}">
+                            {{ folder.name }}
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="active"><span>{{ folder.name }}</span></li>
+                    {% endif %}
+                {% endfor %}
+            </ol>
+        {% endif %}
+    </div>
+
+{% endblock %}
+
+{% block list_table %}
+    <div class="col-xs-12 col-md-12">
+        {# Displaying the folders #}
+        <nav class="navbar navbar-default" role="navigation">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="#">Folders</a>
+                </div>
+                <div class="navbar-collapse">
+                    <ul class="nav navbar-nav navbar-right">
+                        {% if children|length %}
+                        <li><a class="sonata-action-element" href="{{ path("admin_ged_folder_create") }}"><i class="fa fa-plus-circle"></i>
+                                Add new</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        {# I have to handle the security later I still have no internet connexion :((((#}
+        {% if folder_actions|length > 0 %}
+            <form action="{{ path('admin_ged_folder_folderBatch')  }}" method="post">
+                {#<input type="hidden" name="_sonata_csrf_token" value="{{ csrf_token }}">#}
+                <input type="hidden" name="currentFolder" value={{ folder_id }}>
+        {% endif %}
+        <div class="box box-primary" style="margin-bottom: 10px;">
+            <div class="box-body {% if children|length > 0 %}table-responsive no-padding{% endif %} ">
+                {% block list_header %}{% endblock %}
+                {% if  children|length > 0 %}
+                    <table class="table table-bordered table-striped sonata-ba-list" id="folderTable" style=".dataTables_filter { visibility: hidden;}">
+                        {% block table_header %}
+                            <thead>
+                            <tr class="sonata-ba-list-field-header">
+                                {% if folder_actions|length > 0 %}
+                                <th class="sonata-ba-list-field-header sonata-ba-list-field-header-batch">
+                                    <input type="checkbox" id="folder_batch_checkbox">
+                                </th>
+                                {% endif %}
+                                {% for field_description in folder_headers %}
+                                    {% spaceless %}
+                                        <th class="sonata-ba-list-field-header-{{ field_description.type}}">
+                                            {{ field_description.label }}
+                                        </th>
+                                    {% endspaceless %}
+                                {% endfor %}
+                            </tr>
+                            </thead>
+                        {% endblock %}
+
+                        {% block table_body %}
+                            <tbody>
+                            {% for child in children %}
+                            <tr>
+                                {% if folder_actions|length > 0 %}
+                                    <td class="sonata-ba-list-field sonata-ba-list-field-batch">
+                                        <input type="checkbox" name="idx[]" value={{ child.id }}>
+                                    </td>
+                                {% endif %}
+                                {% spaceless %}
+                                    {% for  field in folder_fields %}
+                                        <td class="sonata-ba-list-field sonata-ba-list-field-batch">
+                                            {% if child[field].timestamp is defined  %}
+                                                {{ child[field]|date }}
+                                            {% elseif field == 'name'  %}
+                                                <a class="sonata-link-identifier" href={{ path('admin_ged_folder_folderList', {'id':child.id}) }}>
+                                                    {{ child[field] }}
+                                                </a>
+                                            {% elseif field == 'createdBy' or field == 'updatedBy' %}
+                                                <a class="sonata-link-identifier" href={{ path('admin_ged_user_show', {'id':child[field]['id']}) }}>
+                                                    {{ (child[field])['usernameCanonical'] }}
+                                                </a>
+                                            {% elseif child[field] is null %}
+                                                <span class="text-muted">no content</span>
+                                            {% else %}
+                                                {{ child[field] }}
+                                            {% endif %}
+                                        </td>
+                                    {%  endfor %}
+                                {% endspaceless %}
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                        {% endblock %}
+
+                        {% block table_footer %}
+                        {% endblock %}
+                    </table>
+                {% else %}
+                    <div class="info-box">
+                        <span class="info-box-icon bg-aqua"><i class="fa fa-arrow-circle-right"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">{{ 'NO FOLDERS' }}</span>
+                            <div class="progress">
+                                <div class="progress-bar" style="width: 0%"></div>
+                            </div>
+                        <span class="progress-description">
+                            {#I need to add security control#}
+                            <a class="sonata-action-element" href="{{ path('admin_ged_folder_create') }}">
+                                <i class="fa fa-plus-circle"></i>
+                                {{ 'link_action_create'|trans({}, 'SonataAdminBundle') }}
+                            </a>
+                        </span>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+            {% block folder_list_footer %}
+                {% if children|length > 0 %}
+                    <div class="box-footer">
+                        <div class="form-inline clearfix">
+                            {% if not app.request.isXmlHttpRequest %}
+                                <div class="pull-left">
+                                    {% if folder_actions|length > 0  %}
+                                        {% block folder_batch %}
+                                            <script>
+                                                {% block folder_batch_javascript %}
+                                                jQuery(document).ready(function ($) {
+                                                    $('#folder_batch_checkbox').on('ifChanged', function () {
+                                                        $(this)
+                                                                .closest('table')
+                                                                .find('td.sonata-ba-list-field-batch input[type="checkbox"], div.sonata-ba-list-field-batch input[type="checkbox"]')
+                                                                .iCheck($(this).is(':checked') ? 'check' : 'uncheck')
+                                                        ;
+                                                    });
+
+                                                    $('td.sonata-ba-list-field-batch input[type="checkbox"], div.sonata-ba-list-field-batch input[type="checkbox"]')
+                                                            .on('ifChanged', function () {
+                                                                $(this)
+                                                                        .closest('tr, div.sonata-ba-list-field-batch')
+                                                                        .toggleClass('sonata-ba-list-row-selected', $(this).is(':checked'))
+                                                                ;
+                                                            })
+                                                            .trigger('ifChanged')
+                                                    ;
+                                                });
+                                                {% endblock %}
+                                            </script>
+
+                                        {% block folder_batch_actions %}
+                                            <label class="checkbox" for="folder_all_elements">
+                                                <input type="checkbox" name="all_elements" id="folder_all_elements">
+                                                {{ 'all_elements'|trans({}, 'SonataAdminBundle') }}
+                                                ({{ children|length }})
+                                            </label>
+
+                                            <select name="action" style="width: auto; height: auto" class="form-control">
+                                                {% for action in folder_actions %}
+                                                    <option value="{{ action.name }}">{{ action.name|capitalize }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        {% endblock %}
+
+                                            <input type="submit" class="btn btn-small btn-primary" value="{{ 'btn_batch'|trans({}, 'SonataAdminBundle') }}">
+                                        {% endblock %}
+                                    {% endif %}
+                                </div>
+
+                                <div class="pull-right">
+                                    {% if admin.hasRoute('export') and admin.isGranted('EXPORT') and admin.getExportFormats()|length %}
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                                <i class="fa fa-share-square-o"></i>
+                                                {{ "label_export_download"|trans({}, "SonataAdminBundle") }}
+                                                <span class="caret"></span>
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                {% for format in admin.getExportFormats() %}
+                                                <li>
+                                                    <a href="{{ admin.generateUrl('export', admin.modelmanager.paginationparameters(admin.datagrid, 0) + {'format' : format}) }}">
+                                                        <i class="fa fa-arrow-circle-o-down"></i>
+                                                        {{ ("export_format_" ~ format)|trans({}, 'SonataAdminBundle') }}
+                                                    </a>
+                                                <li>
+                                                    {% endfor %}
+                                            </ul>
+                                        </div>
+
+                                        &nbsp;-&nbsp;
+                                    {% endif %}
+
+                                    {#{% block pager_results %}#}
+                                        {#{% include admin.getTemplate('pager_results') %}#}
+                                    {#{% endblock %}#}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        {#{% block pager_links %}#}
+                            {#{% if admin.datagrid.pager.haveToPaginate() %}#}
+                                {#<hr/>#}
+                                {#{% include admin.getTemplate('pager_links') %}#}
+                            {#{% endif %}#}
+                        {#{% endblock %}#}
+                    </div>
+                {% endif %}
+            {% endblock %}
+        </div>
+        {% if folder_actions|length > 0%}
+            </form>
+        {% endif %}
+
+        {# Displaying files#}
+
+        <nav class="navbar navbar-default" role="navigation">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="#">Files</a>
+                </div>
+                <div class="navbar-collapse">
+                    <div class="navbar-left">
+                    </div>
+                    <ul class="nav navbar-nav navbar-right">
+                        {% if files|length %}
+                        <li><a class="sonata-action-element" href="{{ path("admin_ged_file_create") }}"><i class="fa fa-plus-circle"></i>
+                                Add new</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        {% if file_actions|length > 0 %}
+            <form action="{{ path('admin_ged_folder_fileBatch')  }}" method="post">
+                {#<input type="hidden" name="_sonata_csrf_token" value="{{ csrf_token }}">#}
+                <input type="hidden" name="currentFolder" value={{ folder_id }}>
+            {% endif %}
+        <div class="box box-primary" style="margin-bottom: 100px;">
+            <div class="box-body {% if files|length > 0 %}table-responsive no-padding{% endif %}">
+                {% if  files|length > 0 %}
+                    <table class="table table-bordered table-striped sonata-ba-list" id="fileTable">
+                        <thead>
+                        <tr class="sonata-ba-list-field-header">
+                            {% if folder_actions|length > 0 %}
+                                <th class="sonata-ba-list-field-header sonata-ba-list-field-header-batch">
+                                    <input type="checkbox" id="file_batch_checkbox">
+                                </th>
+                            {% endif %}
+                            {% for field_description in file_headers %}
+                                {% spaceless %}
+                                    <th class="sonata-ba-list-field-header-{{ field_description.type}}">
+                                        {{ field_description.label }}
+                                    </th>
+                                {% endspaceless %}
+                            {% endfor %}
+                        </tr>
+                        </thead>
+
+                        <tbody>
+                        {% for file in files %}
+                            <tr>
+                                {% if folder_actions|length > 0 %}
+                                    <td class="sonata-ba-list-field sonata-ba-list-field-batch">
+                                        <input type="checkbox" name="idx[]" value={{ file.id }}>
+                                    </td>
+                                {% endif %}
+                                {% spaceless %}
+                                    {% for  field in file_fields %}
+                                        <td class="sonata-ba-list-field sonata-ba-list-field-batch">
+                                            {% if file[field].timestamp is defined  %}
+                                                {{ file[field]|date }}
+                                            {% elseif field == 'name'  %}
+                                                <a class="sonata-link-identifier" href={{ path('admin_ged_file_show', {'id':file.id}) }}>
+                                                    {{ file[field] }}
+                                                </a>
+                                            {% elseif field == 'createdBy' or field == 'updatedBy' %}
+                                                <a class="sonata-link-identifier" href={{ path('admin_ged_user_show', {'id':file[field]['id']}) }}>
+                                                    {{ (file[field])['usernameCanonical'] }}
+                                                </a>
+                                            {% elseif file[field] is null %}
+                                                <span class="text-muted">no content</span>
+                                            {% else %}
+                                                {{ file[field] }}
+                                            {% endif %}
+                                        </td>
+                                    {%  endfor %}
+                                {% endspaceless %}
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+
+                    </table>
+                {% else %}
+                    <div class="info-box">
+                        <span class="info-box-icon bg-aqua"><i class="fa fa-arrow-circle-right"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">{{ 'No FILES' }}</span>
+                            <div class="progress">
+                                <div class="progress-bar" style="width: 0%"></div>
+                            </div>
+                        <span class="progress-description">
+                                {#I need to add security control#}
+                                <a class="sonata-action-element" href="{{ path('admin_ged_file_create') }}">
+                                    <i class="fa fa-plus-circle"></i>
+                                    {{ 'link_action_create'|trans({}, 'SonataAdminBundle') }}
+                                </a>
+                        </span>
+                        </div>
+                    </div>
+                {% endif %}
+
+                {{ sonata_block_render_event('sonata.admin.list.table.bottom', { 'admin': admin }) }}
+            </div>
+            {% block file_list_footer %}
+                {% if files|length > 0 %}
+                    <div class="box-footer">
+                        <div class="form-inline clearfix">
+                            {% if not app.request.isXmlHttpRequest %}
+                                <div class="pull-left">
+                                    {% if file_actions|length > 0  %}
+                                        {% block file_batch %}
+                                            <script>
+                                                {% block file_batch_javascript %}
+                                                jQuery(document).ready(function ($) {
+                                                    $('#file_batch_checkbox').on('ifChanged', function () {
+                                                        $(this)
+                                                                .closest('table')
+                                                                .find('td.sonata-ba-list-field-batch input[type="checkbox"], div.sonata-ba-list-field-batch input[type="checkbox"]')
+                                                                .iCheck($(this).is(':checked') ? 'check' : 'uncheck')
+                                                        ;
+                                                    });
+
+                                                    $('td.sonata-ba-list-field-batch input[type="checkbox"], div.sonata-ba-list-field-batch input[type="checkbox"]')
+                                                            .on('ifChanged', function () {
+                                                                $(this)
+                                                                        .closest('tr, div.sonata-ba-list-field-batch')
+                                                                        .toggleClass('sonata-ba-list-row-selected', $(this).is(':checked'))
+                                                                ;
+                                                            })
+                                                            .trigger('ifChanged')
+                                                    ;
+                                                });
+                                                {% endblock %}
+                                            </script>
+
+                                        {% block file_batch_actions %}
+                                            <label class="checkbox" for="file_all_elements">
+                                                <input type="checkbox" name="all_elements" id="file_all_elements">
+                                                {{ 'all_elements'|trans({}, 'SonataAdminBundle') }}
+                                                ({{ files|length }})
+                                            </label>
+
+                                            <select name="action" style="width: auto; height: auto" class="form-control">
+                                                {% for action in file_actions %}
+                                                    <option value="{{ action.name }}">{{ action.name|capitalize }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        {% endblock %}
+
+                                            <input type="submit" class="btn btn-small btn-primary" value="{{ 'btn_batch'|trans({}, 'SonataAdminBundle') }}">
+                                        {% endblock %}
+                                    {% endif %}
+                                </div>
+
+                                <div class="pull-right">
+                                    {% if admin.hasRoute('export') and admin.isGranted('EXPORT') and admin.getExportFormats()|length %}
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                                <i class="fa fa-share-square-o"></i>
+                                                {{ "label_export_download"|trans({}, "SonataAdminBundle") }}
+                                                <span class="caret"></span>
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                {% for format in admin.getExportFormats() %}
+                                                <li>
+                                                    <a href="{{ admin.generateUrl('export', admin.modelmanager.paginationparameters(admin.datagrid, 0) + {'format' : format}) }}">
+                                                        <i class="fa fa-arrow-circle-o-down"></i>
+                                                        {{ ("export_format_" ~ format)|trans({}, 'SonataAdminBundle') }}
+                                                    </a>
+                                                <li>
+                                                    {% endfor %}
+                                            </ul>
+                                        </div>
+
+                                        &nbsp;-&nbsp;
+                                    {% endif %}
+
+                                    {#{% block pager_results %}#}
+                                        {#{% include admin.getTemplate('pager_results') %}#}
+                                    {#{% endblock %}#}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        {#{% block pager_links %}#}
+                            {#{% if admin.datagrid.pager.haveToPaginate() %}#}
+                                {#<hr/>#}
+                                {#{% include admin.getTemplate('pager_links') %}#}
+                            {#{% endif %}#}
+                        {#{% endblock %}#}
+                    </div>
+                {% endif %}
+            {% endblock %}
+        </div>
+        {% if folder_actions|length > 0%}
+            </form>
+        {% endif %}
+    </div>
+{% endblock %}
+
+

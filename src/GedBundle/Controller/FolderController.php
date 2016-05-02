@@ -3,17 +3,23 @@
 namespace GedBundle\Controller;
 
 
-use Sonata\AdminBundle\Controller\CRUDController;
+use GedBundle\Entity\Folder;
 use GedBundle\Utils\FieldDescription;
 use GedBundle\Entity\File;
 use Sonata\AdminBundle\Exception\ModelManagerException;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use GedBundle\Utils\BatchActionDescription;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException;
+use GedBundle\Form\Type\FolderType;
 
-class FolderController extends CRUDController
+class FolderController extends Controller
 {
+
+    private $flashBagTypes = array('success', 'warning', 'info', 'danger');
 
     private $folderActionsValues = array("Delete", "Modify");
     private $fileActionsValues = array("Delete", "Modify");
@@ -35,7 +41,7 @@ class FolderController extends CRUDController
         return $this->folderHeader;
     }
 
-    public function folderListAction($id=1)
+    public function showAction(Request $request, $id)
     {
 
     // I have to test on the existence of folder id $id
@@ -50,12 +56,21 @@ class FolderController extends CRUDController
             ->getManager()
             ->getRepository('GedBundle:Folder');
 
+
+        $currentFolder = $folderRepository->find($id);
+
+        if( !$currentFolder )
+        {
+            throw new ResourceNotFoundException;
+        }
+
+        dump($folderRepository->getChildren());
+
         $files = $fileRepository->findFileUser($id);
-
         $children = $folderRepository->findFolderChildrenUser($id);
+        $path = $folderRepository->getPath($currentFolder);
 
-        dump($children);
-        dump($files);
+        dump($folderRepository->getPath($folderRepository->find($id)));
 
         $this->addFolderHeader('Name', 'text');
         $this->addFolderHeader('Description', 'text');
@@ -88,9 +103,10 @@ class FolderController extends CRUDController
         $this->addFolderAction( new BatchActionDescription('delete', false));
         $this->addFileAction(new BatchActionDescription('delete', false));
 
-        return $this->render($this->admin->getTemplate('folderList'), array(
+        return $this->render('@Ged/CRUD/folder.html.twig', array(
 
             'folder_id'      => $id,
+            'path'           => $path,
 
             'children'       => $children,
             'files'          => $files,
@@ -104,6 +120,48 @@ class FolderController extends CRUDController
             'folder_actions'   => $this->folderActions,
             'file_actions'      => $this->fileActions,
         ));
+    }
+
+    public function createAction(Request $request, $id)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $folderRepository =  $em->getRepository('GedBundle:Folder');
+
+        $folder = new Folder();
+        if ( !$rootFolder = $folderRepository->find($id) )
+            throw new NotFoundHttpException( sprintf('There is no folder with %d id', $id));
+
+        $folder->setParent($rootFolder);
+
+        $form = $this->createForm(FolderType::class, $folder);
+        $form->add('create', 'submit', array(
+            'label' => 'create',
+            'attr' => array(
+                'class' => 'btn btn-primary'
+            )));
+        $form->handleRequest($request);
+        if( $form->isValid() )
+        {
+
+            if ( !$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY') )
+            {
+                throw $this->createAccessDeniedException('You have to be authenticated to create a file');
+            }
+            $user = $this->get('security.token_storage')->getToken()->getUser();
+
+            $folder->setCreatedBy($user);
+
+            $em->persist($folder);
+
+            $em->flush();
+
+            return $this->redirect($this->generateUrl('folder_show'), array('id' => ($folder->getId())));
+        }
+
+        return $this->render(
+            '@Ged/CRUD/folderCreate.html.twig',
+            array('form' => $form->createView())
+        );
     }
 
     public function addFolderHeader($label, $type)
@@ -264,8 +322,7 @@ class FolderController extends CRUDController
 
         if( $nonRelevent )
         {
-            $nonRelevantMessage = 'flash_batch_empty';
-            $this->addFlash('sonata_flash_info', $nonRelevantMessage);
+            $this->addFlash('warning', 'Action aborted. No items were selected.');
 
             return new RedirectResponse(
                   $this->generateUrl('admin_ged_folder_folderList', array('id' => $id))
@@ -292,7 +349,6 @@ class FolderController extends CRUDController
 
         $folderRepository = $this->getDoctrine()->getRepository('GedBundle:Folder');
         $em = $this->getDoctrine()->getManager();
-
 
         try{
 
@@ -323,11 +379,11 @@ class FolderController extends CRUDController
                 $em->flush();
             }
 
-            $this->addFlash('sonata_flash_success', 'flash_batch_delete_success');
+            $this->addFlash('success', 'Selected folders have been successfully deleted.');
 
         } catch( ModelManagerException $ex )
         {
-            $this->addFlash('sonata_flash_error', 'flash_batch_delete_error');
+            $this->addFlash('error', 'Internal error while deleting the folders');
         }
 
         return new RedirectResponse(
@@ -381,8 +437,7 @@ class FolderController extends CRUDController
 
         if( $nonRelevent )
         {
-            $nonRelevantMessage = 'flash_batch_empty';
-            $this->addFlash('sonata_flash_info', $nonRelevantMessage);
+            $this->addFlash('warning', 'Action aborted. No items were selected.');
 
             return new RedirectResponse(
                 $this->generateUrl('admin_ged_folder_folderList', array('id' => $id))
@@ -438,11 +493,11 @@ class FolderController extends CRUDController
                 $em->flush();
             }
 
-            $this->addFlash('sonata_flash_success', 'flash_batch_delete_success');
+            $this->addFlash('success', 'Selected files have been successfully deleted.');
 
         } catch( ModelManagerException $ex )
         {
-            $this->addFlash('sonata_flash_error', 'flash_batch_delete_error');
+            $this->addFlash('error', 'Internal error while deleting the files');
         }
 
         return new RedirectResponse(
@@ -459,5 +514,18 @@ class FolderController extends CRUDController
     public function camelize($property)
     {
         return Container::camelize($property);
+    }
+
+    public function addFlash($type, $message)
+    {
+//        if( ! in_array($type, $this->flashBagTypes) )
+//        {
+//            throw $this->createNotFoundException('This flashBag type does not exist');
+//        }
+
+        $this->get('session')
+            ->getFlashBag()
+            ->add($type, $message)
+        ;
     }
 }

@@ -3,8 +3,33 @@ services:
     ged.admin.departement:
         class: GedBundle\Admin\DepartementAdmin
         tags:
-            - {name: sonata.admin, manager_type: orm, group: 'GED INTERFACE ADMINISTRATEUR', label: 'Departement'}
+            - {name: sonata.admin, manager_type: orm, group: 'Documents', label: 'Departement'}
         arguments:
             - ~
             - GedBundle\Entity\Departement
             - ~
+
+    ged.admin.version:
+        class: GedBundle\Admin\VersionAdmin
+        tags:
+            - {name: sonata.admin, manager_type: orm, group: 'Documents', label: 'Version'}
+        arguments:
+            - ~
+            - GedBundle\Entity\Version
+            - ~
+    gid.admin.file:
+        class: GedBundle\Admin\FileAdmin
+        tags:
+           - {name: sonata.admin, manager_type: orm, group: 'Documents', label: 'File'}
+        arguments:
+           - ~
+           - GedBundle\Entity\File
+           - ~
+    gid.admin.folder:
+        class: GedBundle\Admin\FolderAdmin
+        tags:
+           - {name: sonata.admin, manager_type: orm, group: 'Documents', label: 'Folder'}
+        arguments:
+           - ~
+           - GedBundle\Entity\Folder
+           - GedBundle:Folder

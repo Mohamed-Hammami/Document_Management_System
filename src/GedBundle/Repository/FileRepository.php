@@ -12,4 +12,33 @@ use Doctrine\ORM\EntityRepository;
  */
 class FileRepository extends EntityRepository
 {
+
+    public function findByFolderId($id)
+    {
+
+        $qb = $this->createQueryBuilder('fi')
+                ->leftJoin('fi.folder', 'fo')
+                ->where('fo.id = :id')
+                ->setParameter('id', $id);
+
+        return $qb->getQuery()
+                    ->getResult();
+
+    }
+
+    public function findFileUser($id)
+    {
+        $qb = $this->createQueryBuilder('fi')
+                ->leftJoin('fi.folder', 'fo')
+                ->where('fo.id = :id')
+                ->leftJoin('fi.createdBy', 'crt')
+                ->leftJoin('fi.updatedBy', 'upd')
+                ->addSelect('crt')
+                ->addSelect('upd')
+                ->setParameter('id', $id);
+
+        return $qb->getQuery()
+                    ->getArrayResult();
+    }
+
 }

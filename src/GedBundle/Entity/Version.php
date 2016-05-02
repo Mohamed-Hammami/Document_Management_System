@@ -3,7 +3,8 @@
 namespace GedBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Gedmo\Mapping\Annotation as Gedmo;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
+use Symfony\Component\HttpFoundation\File\File as BaseFile;
 
 /**
  * Version
@@ -16,6 +17,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
  *      @ORM\AssociationOverride(name="updatedBy")
  * })
  *
+ * @Vich\Uploadable
  */
 class Version extends Node
 {
@@ -31,14 +33,14 @@ class Version extends Node
     /**
      * @var string
      *
-     * @ORM\Column(name="type", type="string", length=255)
+     * @ORM\Column(name="type", type="string", length=255, nullable=true)
      */
     private $type;
 
     /**
      * @var bool
      *
-     * @ORM\Column(name="isLast", type="boolean")
+     * @ORM\Column(name="isLast", type="boolean", nullable=true)
      */
     private $isLast;
 
@@ -48,6 +50,26 @@ class Version extends Node
      * @ORM\ManyToOne(targetEntity="File", inversedBy="versions")
      */
     private $file;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="fileName", type="string")
+     */
+    private $fileName;
+
+    /**
+     * @ORM\Column(type="decimal", nullable=true)
+     */
+    private $size;
+
+
+    /**
+     *
+     * @Vich\UploadableField(mapping="file_version", fileNameProperty="fileName")
+     *
+     */
+    private $fileContent;
 
     /**
      * Get id
@@ -121,4 +143,66 @@ class Version extends Node
         $this->file = $file;
     }
 
+    /**
+     * @return string
+     */
+    public function getFileName()
+    {
+        return $this->fileName;
+    }
+
+    /**
+     * @param string $fileName
+     */
+    public function setFileName($fileName)
+    {
+        $this->fileName = $fileName;
+    }
+
+    /**
+     * @return BaseFile
+     */
+    public function getFileContent()
+    {
+        return $this->fileContent;
+    }
+
+    /**
+     * @param BaseFile $fileContent
+     *
+     * @return Version
+     */
+    public function setFileContent(BaseFile $fileContent = null)
+    {
+        $this->fileContent = $fileContent;
+
+        if($fileContent){
+            $this->setUpdated(new \DateTime('now'));
+        }
+
+        return $this;
+    }
+
+    public function getSize()
+    {
+        return $this->size;
+    }
+
+    public function setSize($size)
+    {
+        $this->size = $size;
+    }
+
+    public function __toString()
+    {
+        return $this->getName();
+    }
+
+    public function getFormattedSize()
+    {
+
+        $units = array( 'B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB');
+        $power = $this->size > 0 ? floor(log($this->size, 1024)) : 0;
+        return number_format($this->size / pow(1024, $power), 2, '.', ',') . ' ' . $units[$power];
+    }
 }
