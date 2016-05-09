@@ -146,3 +146,6 @@ vich_uploader:
 
 assetic:
     use_controller: false
+
+avanzu_admin_theme:
+    bower_bin: "bower"

@@ -6,7 +6,6 @@ namespace GedBundle\Controller;
 use GedBundle\Entity\Folder;
 use GedBundle\Utils\FieldDescription;
 use GedBundle\Entity\File;
-use Sonata\AdminBundle\Exception\ModelManagerException;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\RedirectResponse;
