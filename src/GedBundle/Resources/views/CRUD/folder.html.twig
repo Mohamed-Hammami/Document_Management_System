@@ -3,40 +3,71 @@
 {% block stylesheets %}
     {{ parent() }}
     <link rel="stylesheet" href='{{ asset('bundles/ged/AdminLTE2/plugins/iCheck/all.css') }}'>
+    <style>
+    </style>
+{% endblock %}
+
+{% block page_title %}
+{% endblock %}
+
+{% block page_subtitle%}
+{% endblock %}
+
+{% block avanzu_breadcrumb %}
+    <ol class="breadcrumb">
+        <i class="fa fa-home"></i>
+        {% for folder in path %}
+            {% if loop.last %}
+                <li class="active">
+                    {{ folder.name }}
+                </li>
+            {% else %}
+                 <li>
+                    <a href="{{ path('folder_show', {'id': folder.id}) }}">{{ folder.name }}</a>
+                </li>
+            {% endif %}
+        {% endfor %}
+    </ol>
 {% endblock %}
 
 {% block page_content %}
+    <div class="row" style="margin: auto">
+        {# Displaying tabs#}
+        <ul class="nav nav-tabs">
+            <li class="active"><a data-toggle="tab"  href="#folder">Folders</a></li>
+            <li><a data-toggle="tab" href="#file">Files</a></li>
+            <li><a data-toggle="tab" href="#permission">Permissions</a></li>
+        </ul>
 
-    {# Displaying FlashBag #}
-    <div class="col-xs-12">
-        <div class="row">
-            {{ include('@Ged/Utils/flashBag.html.twig', {'flashbag' : app.session.flashbag}) }}
+        <div class="tab-content">
+            {# Displaying Folders #}
+            <div id="folder"  class="tab-pane fade in active" style="margin-top: 15px">
+                {{ include('GedBundle:CRUD:folderList.html.twig',
+                    {'folder_id':     folder_id,
+                    'path':           path,
+                    'children':       children,
+                    'folder_headers': folder_headers,
+                    'folder_fields' : folder_fields,
+                    'folder_actions': folder_actions})
+                }}
+            </div>
+            {# Displaying Files #}
+            <div id="file" class="tab-pane fade"  style="margin-top: 15px">
+                {{ include('GedBundle:CRUD:fileList.html.twig',
+                    {'folder_id':   folder_id,
+                    'path':         path,
+                    'files':        files,
+                    'file_headers': file_headers,
+                    'file_fields' : file_fields,
+                    'file_actions': file_actions})
+                }}
+            </div>
+
+            <div id="permission" class="tab-pane fade"  style="margin-top: 15px">
+            </div>
+
         </div>
     </div>
-
-    {# Displaying Folders #}
-    {{ include('GedBundle:CRUD:folderList.html.twig',
-            {'folder_id':     folder_id,
-            'path':           path,
-            'children':       children,
-            'folder_headers': folder_headers,
-            'folder_fields' : folder_fields,
-            'folder_actions': folder_actions})
-    }}
-
-
-
-    {# Displaying Files #}
-
-
-
-    {#{{ include('@GedBundle:CRUD:fileList.html.twig') }}#}
-
-
-{% endblock %}
-
-{% block avanzu_admin_footer %}
-
 {% endblock %}
 
 {% block javascripts %}

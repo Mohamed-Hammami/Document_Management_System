@@ -55,8 +55,10 @@ class FolderController extends Controller
             ->getManager()
             ->getRepository('GedBundle:Folder');
 
-
         $currentFolder = $folderRepository->find($id);
+
+        $path = $folderRepository->getPath($currentFolder);
+        dump($path);
 
         if( !$currentFolder )
         {
@@ -118,11 +120,19 @@ class FolderController extends Controller
 
             'folder_actions'   => $this->folderActions,
             'file_actions'      => $this->fileActions,
+
+            'path' => $path,
         ));
+
+
     }
 
-    public function createAction(Request $request, $id)
+    public function createAction($id, Request $request)
     {
+        $logger = $this->get('logger');
+
+        $logger->info('log from create Action');
+
         $em = $this->getDoctrine()->getManager();
         $folderRepository =  $em->getRepository('GedBundle:Folder');
 
@@ -138,7 +148,12 @@ class FolderController extends Controller
             'attr' => array(
                 'class' => 'btn btn-primary'
             )));
+
+
         $form->handleRequest($request);
+
+        dump($form);
+
         if( $form->isValid() )
         {
 
@@ -154,12 +169,16 @@ class FolderController extends Controller
 
             $em->flush();
 
-            return $this->redirect($this->generateUrl('folder_show'), array('id' => ($folder->getId())));
+            return $this->redirect($this->generateUrl('folder_show', array('id' => ($folder->getId()))));
+
         }
 
         return $this->render(
             '@Ged/CRUD/folderCreate.html.twig',
-            array('form' => $form->createView())
+            array(
+                'form' => $form->createView(),
+                'id' => $id,
+            )
         );
     }
 
@@ -324,7 +343,7 @@ class FolderController extends Controller
             $this->addFlash('warning', 'Action aborted. No items were selected.');
 
             return new RedirectResponse(
-                  $this->generateUrl('admin_ged_folder_folderList', array('id' => $id))
+                  $this->generateUrl('folder_show', array('id' => $id))
             );
         }
 
@@ -386,7 +405,7 @@ class FolderController extends Controller
         }
 
         return new RedirectResponse(
-            $this->generateUrl('admin_ged_folder_folderList', array('id' => $id))
+            $this->generateUrl('folder_show', array('id' => $id))
         );
 
     }
@@ -439,7 +458,7 @@ class FolderController extends Controller
             $this->addFlash('warning', 'Action aborted. No items were selected.');
 
             return new RedirectResponse(
-                $this->generateUrl('admin_ged_folder_folderList', array('id' => $id))
+                $this->generateUrl('folder_show', array('id' => $id))
             );
         }
 
@@ -500,7 +519,7 @@ class FolderController extends Controller
         }
 
         return new RedirectResponse(
-            $this->generateUrl('admin_ged_folder_folderList', array('id' => $id))
+            $this->generateUrl('folder_show', array('id' => $id))
         );
 
     }

@@ -57,12 +57,15 @@ class FileController extends Controller
 
             $em->flush();
 
-            return $this->redirect($this->generateUrl('file_show'), array('id' => ($file->getId())));
+            return $this->redirect($this->generateUrl('file_show', array('id' => ($file->getId()))));
         }
 
         return $this->render(
             '@Ged/CRUD/fileCreate.html.twig',
-            array('form' => $form->createView())
+            array(
+                'form' => $form->createView(),
+                'id' => $id,
+            )
         );
 
     }

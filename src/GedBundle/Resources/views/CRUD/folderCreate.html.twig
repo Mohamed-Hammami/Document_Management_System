@@ -1,40 +1,30 @@
-{% extends 'GedBundle::starter.html.twig' %}
 
-{% block main_content %}
-    <section class="content">
-        <div class="col-md-12">
-            <div class="box box-primary">
-                <div class="box-header with-border">
-                    <h3 class="box-title">Folder</h3>
-                </div>
-                <!-- /.box-header -->
-                <!-- form start -->
-
-                {{ form_start(form) }}
-                <div class="box-body">
-                    <div class="form-group">
-                        {{ form_label(form.name) }}
-                        {{ form_errors(form.name) }}
-                        {{ form_widget(form.name) }}
-                    </div>
-                    <div class="form-group">
-                        {{ form_label(form.description) }}
-                        {{ form_errors(form.description) }}
-                        {{ form_widget(form.description) }}
-                    </div>
-                </div>
-                <!-- /.box-body -->
-
-                <div class="box-footer">
-                    <div class="form-group">
-                        {{ form_widget(form.create) }}
-                    </div>
-                </div>
-                {{ form_end(form) }}
+{% block folder_create %}
+    <form action="{{ path('folder_create', {'id': id}) }}" method="post"{{form_enctype(form) }}>
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;<span class="sr-only">Close</span></button>
+            <h4 class="modal-title" id="myModalLabel">Create Folder</h4>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                {{ form_label(form.name) }}
+                {{ form_errors(form.name) }}
+                {{ form_widget(form.name) }}
+            </div>
+            <div class="form-group">
+                {{ form_label(form.description) }}
+                {{ form_errors(form.description) }}
+                {{ form_widget(form.description) }}
             </div>
         </div>
-    </section>
-{% endblock %}
-
-{% block footer %}
+        <div class="modal-footer">
+            <div class="pull-left">
+                {{ form_widget(form.create) }}
+            </div>
+            <div class="pull-right">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+        {{ form_rest(form) }}
+    </form>
 {% endblock %}
