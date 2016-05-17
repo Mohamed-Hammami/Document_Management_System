@@ -18,6 +18,12 @@ class VersionType extends  AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
+            ->add('type', null, array(
+                'label' => 'Version type',
+                'attr' => array(
+                    'placeholder' => 'Enter a type for the version',
+                    'class' => 'form-control'
+                )))
             ->add('fileContent', 'file', array(
             ));
     }

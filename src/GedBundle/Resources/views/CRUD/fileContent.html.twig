@@ -1,0 +1,173 @@
+
+{# style to be placed on a separate stylesheet later#}
+<style>
+
+    dd, dt{
+
+        margin-bottom: 5px;
+    }
+
+</style>
+
+
+{# Displaying File's content #}
+<div class="col-xs-12">
+    <div class="row">
+        <div class="col-xs-8">
+            <div class="box">
+                {% if versions|length > 0 %}
+                    <div class="box-header">
+                        <h3 class="box-title">Versions</h3>
+
+                    </div>
+                    <div class="box-body no-padding">
+                        <table class="table table-condensed">
+                            <tbody>
+                                <tr>
+                                    <th >Number</th>
+                                    <th>Creation date</th>
+                                    <th>Created by</th>
+                                    <th>Size</th>
+                                </tr>
+                                {% for version in versions %}
+                                    <tr>
+                                        <th>#{{ loop.index }}</th>
+                                        <th>
+                                            {{ version.created|date }}
+                                        </th>
+                                        <th>
+                                            <span class="badge">
+                                                <i class="fa fa-fw fa-user"></i>{{ version.createdBy }}
+                                            </span>
+                                        </th>
+                                        <th>
+                                            {{ version.size|humanSize }}
+                                        </th>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="box-footer">
+                        <div  class = "pull-right">
+                            <span class="progress-description">
+                                {#I need to add security control#}
+                                <a data-toggle="modal" data-target="#versionCreate" class="sonata-action-element"
+                                   href="{{ path('version_create', {id: file.id}) }}">
+                                    <i class="fa fa-plus-circle"></i>
+                                    {{ 'link_action_create'|trans({}, 'SonataAdminBundle') }}
+                                </a>
+                            </span>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="info-box">
+                        <span class="info-box-icon bg-aqua"><i class="fa fa-arrow-circle-right"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">{{ 'NO VERSIONS' }}</span>
+                            <div class="progress">
+                                <div class="progress-bar" style="width: 0%"></div>
+                            </div>
+                            <span class="progress-description">
+                                {#I need to add security control#}
+                                <a data-toggle="modal" data-target="#versionCreate" class="sonata-action-element"
+                                   href="{{ path('version_create', {id: file.id}) }}">
+                                    <i class="fa fa-plus-circle"></i>
+                                    {{ 'link_action_create'|trans({}, 'SonataAdminBundle') }}
+                                </a>
+                            </span>
+                        </div>
+                    </div>
+                {% endif %}
+
+            </div>
+            <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title">General properties</h3>
+                </div>
+                <div class="box-body ">
+                    <dl class="dl-horizontal" style="">
+                        <dt>File name</dt>
+                        <dd>{{ file.name }}</dd>
+                        <dt>Created by</dt>
+                        <dd>
+                            <span class="badge">
+                                <i class="fa fa-fw fa-user"></i>{{ file.createdBy.username }}
+                            </span>
+                        </dd>
+                        <dt>Last updated by</dt>
+                        <dd>
+                            <span class="badge">
+                                <i class="fa fa-fw fa-user"></i> {{ file.updatedBy.username }}
+                            </span>
+                        </dd>
+                        <dt>Creation date</dt>
+                        <dd>{{ file.created|date }}</dd>
+                        <dt>Modification date</dt>
+                        <dd>{{ file.updated|date }}</dd>
+                        <dt>Nature</dt>
+                        <dd>
+                            {% if file.nature %}
+                                {{ file.nature }}
+                            {%  else %}
+                                <span class="text-muted">No content</span>
+                            {% endif %}
+                        </dd>
+                        <dt>Description</dt>
+                        <dd>
+                            {% if file.description %}
+                                {{ file.description }}
+                            {%  else %}
+                                <span class="text-muted">No content</span>
+                            {% endif %}
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-4">
+            <div class="box">
+                <div class="box-body ">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Contributors</h3>
+                        </div>
+                        <div class="panel-body">
+                            {% for crt in creators %}
+                                <span class="badge">
+                            <i class="fa fa-fw fa-user"></i>{{ crt.username }}
+                        </span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Tags</h3>
+                        </div>
+                        <div class="panel-body">
+                            Panel content
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Version creation modal#}
+<div id="versionCreate" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Create New Version</h4>
+            </div>
+            <div class="modal-body">
+                Loading...
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,13 +1,15 @@
-{% extends 'AvanzuAdminThemeBundle:layout:base-layout.html.twig' %}
+{% extends '@Ged/default_layout.html.twig' %}
 
 {% block stylesheets %}
     {{ parent() }}
     <link rel="stylesheet" href='{{ asset('bundles/ged/AdminLTE2/plugins/iCheck/all.css') }}'>
     <style>
+
     </style>
 {% endblock %}
 
 {% block page_title %}
+    <i class="fa fa-fw fa-folder-open"></i>{{ path|last.name }}
 {% endblock %}
 
 {% block page_subtitle%}
@@ -33,11 +35,55 @@
 {% block page_content %}
     <div class="row" style="margin: auto">
         {# Displaying tabs#}
-        <ul class="nav nav-tabs">
-            <li class="active"><a data-toggle="tab"  href="#folder">Folders</a></li>
-            <li><a data-toggle="tab" href="#file">Files</a></li>
-            <li><a data-toggle="tab" href="#permission">Permissions</a></li>
-        </ul>
+        <div class="row" style="margin: auto;">
+            <nav class="navbar navbar-default" role="navigation" style="margin-bottom: auto">
+                <div class="container-fluid">
+                    <div class="navbar-header">
+                        <a class="navbar-brand" href="#"><i class="fa fa-th"></i></a>
+                    </div>
+                    <div>
+                        <ul class="nav navbar-nav" id="tabs">
+                            <li class="active" id="folder_tab"><a data-toggle="tab" href="#folder" id="folder_link">
+                                    <i class="fa fa-fw fa-folder"></i>Folders</a>
+                            </li>
+                            <li id="file_tab"><a data-toggle="tab" href="#file" id="file_link">
+                                    <i class="fa fa-fw fa-file"></i>Files</a>
+                            </li>
+                            <li id="permission_tab"><a data-toggle="tab" href="#permission" id="permission_link">
+                                    <i class="fa fa-fw fa-users"></i>Permissions</a></li>
+                        </ul>
+                    </div>
+                    <div class="navbar-collapse" id="add_buttons">
+                        <ul class="nav navbar-nav navbar-right" id="new_folder">
+                            {% if children|length %}
+                                <li>
+                                    <a data-toggle="modal"
+                                       data-target="#folderCreate"
+                                       class="add-new"
+                                       href="{{ path('folder_create', {id: folder_id}) }}">
+                                        <i class="fa fa-plus-circle"></i>
+                                        Add new</a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                        <ul class="nav navbar-nav navbar-right" id="new_file" style="display: none">
+                            {% if files|length %}
+                                <li>
+                                    <a data-toggle="modal"
+                                       data-target="#fileCreate"
+                                       class="add-new"
+                                       href="{{ path('file_create', {id: folder_id}) }}">
+                                        <i class="fa fa-plus-circle"></i>
+                                        Add new</a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                        <ul class="nav navbar-nav navbar-right" id="new_permission" style="display: none">
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </div>
 
         <div class="tab-content">
             {# Displaying Folders #}
@@ -110,6 +156,31 @@
 
         $(function(){
             $('#files_table_paginate').insertAfter('#file_batch_block');
+        });
+
+
+        // Adding new folder or new new file depending on the active tab
+
+        jQuery(document).ready(function($){
+
+            $('#folder_link').click(function(){
+                $('#add_buttons').children().css('display', 'none');
+                console.log('folder active');
+                $('#new_folder').css('display', '');
+                $('#add_buttons').prepend($('#new_folder'));
+            });
+            $('#file_link').click(function(){
+                $('#add_buttons').children().css('display', 'none');
+                console.log('file active');
+                $('#new_file').css('display', '');
+                $('#add_buttons').prepend($('#new_file'));
+            });
+            $('#permission_link').click(function(){
+                $('#add_buttons').children().css('display', 'none');
+                console.log('permission active');
+                $('#new_permission').css('display', '');
+                $('#add_buttons').prepend($('#new_permission'));
+            });
         });
 
         {% block batch_javascript %}

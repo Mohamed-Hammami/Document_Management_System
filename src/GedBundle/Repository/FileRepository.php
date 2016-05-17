@@ -41,4 +41,31 @@ class FileRepository extends EntityRepository
                     ->getArrayResult();
     }
 
+    public function findFileComment($id)
+    {
+        $qb = $this->createQueryBuilder('fi')
+            ->where('fi.id = :id')
+            ->leftJoin('fi.comments', 'co')
+            ->addSelect('co')
+            ->setParameter('id', $id);
+
+        return $qb->getQuery()
+                   ->getOneOrNullResult();
+    }
+
+    public function findCreators($id)
+    {
+        $qb = $this->_em->createQueryBuilder()
+            ->from('GedBundle:File', 'fe')
+            ->from('GedBundle:User', 'usr')
+            ->select('usr')
+            ->distinct()
+            ->where('fe.createdBy = usr.id')
+            ->andWhere('fe.id = :id')
+            ->setParameter('id', $id);
+
+        return $qb->getQuery()
+            ->getResult();
+    }
+
 }

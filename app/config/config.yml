@@ -41,6 +41,8 @@ framework:
 twig:
     debug:            "%kernel.debug%"
     strict_variables: "%kernel.debug%"
+    globals:
+            admin_skin: skin-blue
 
 # Doctrine Configuration
 doctrine:
@@ -132,6 +134,12 @@ services:
     sonata.user.orm.group_manager:
         abstract: true
         public:   false
+
+    app.twig_extension:
+        class: GedBundle\Twig\Extension\sizeExtension
+        public: false
+        tags:
+            - { name: twig.extension }
 
 # Vich uploader config
 vich_uploader:

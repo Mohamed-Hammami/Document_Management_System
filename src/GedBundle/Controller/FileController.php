@@ -8,7 +8,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use GedBundle\Form\Type\FileType;
-use Vich\UploaderBundle\Form\Type\VichFileType;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException;
+
 
 class FileController extends Controller
 {
@@ -26,7 +27,8 @@ class FileController extends Controller
         if ( $folderRepository->find($id) )
             $folder = $folderRepository->find($id);
         else
-            throw new NotFoundHttpException( sprintf('There is no folder with %d id', $id));
+            throw new ResourceNotFoundException( sprintf('There is no folder with %d id', $id));
+
 
         $file->setFolder($folder);
 
@@ -39,7 +41,6 @@ class FileController extends Controller
         $form->handleRequest($request);
         if( $form->isValid() )
         {
-
             if ( !$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY') )
             {
                 throw $this->createAccessDeniedException('You have to be authenticated to create a file');
@@ -51,6 +52,7 @@ class FileController extends Controller
             if ( $version = $form->get('version')->getData() )
             {
                 $version = $this->addNewVersion($version, $file, $user);
+                $version->setFile($file);
                 $em->persist($version);
             }
             $em->persist($file);
@@ -72,8 +74,43 @@ class FileController extends Controller
 
     public function showAction(Request $request, $id)
     {
+        $em = $this->getDoctrine()->getManager();
 
+        $fileRepository = $em->getRepository('GedBundle:File');
+        $versionRepository = $em->getRepository('GedBundle:Version');
+        $folderRepository = $em->getRepository('GedBundle:Folder');
+
+        if( !$file = $fileRepository->find($id) )
+        {
+            throw new ResourceNotFoundException( sprintf('There is no file with %d id', $id));
+        }
+
+        $fileComment = $fileRepository->findFileComment($id);
+        $versions = $versionRepository->findVersionsByFile($id);
+        $folder = $folderRepository->findFolderByFile($id);
+        $versionCreators = $versionRepository->findCreators($id);
+        $fileCreators = $fileRepository->findCreators($id);
+
+        $path = $this->buildPath($folder, $file);
+        $creators = $versionCreators + $fileCreators;
+
+        dump($fileComment);
+        dump($path);
+        dump($versions);
+        dump($creators);
+
+
+        return $this->render('@Ged/CRUD/fileShow.html.twig', array(
+
+            'path'     => $path,
+            'file'     => $fileComment,
+            'versions' => $versions,
+            'creators' => $creators,
+
+
+        ));
     }
+
 
     public function addNewVersion(Version $version, File $file, $user)
     {
@@ -88,4 +125,35 @@ class FileController extends Controller
 
         return $version;
     }
+
+    public function getFormattedSize($size)
+    {
+
+        $units = array( 'B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB');
+        $power = $size > 0 ? floor(log($size, 1024)) : 0;
+        return number_format($size / pow(1024, $power), 2, '.', ',') . ' ' . $units[$power];
+    }
+
+    public function buildPath($folder, $file)
+    {
+
+        $folderRepository = $this
+            ->getDoctrine()
+            ->getManager()
+            ->getRepository('GedBundle:Folder');
+
+
+        $path = $folderRepository->getPath($folder);
+
+        $path[] = $file;
+
+        return $path;
+    }
+
+//    public function downloadVersionAction(Version $version)
+//    {
+//        $downloadHandler = $this->get('vich_uploader.download_handler');
+//
+//        return $downloadHandler->downloadObject($version, $fileField = 'imageFile');
+//    }
 }

@@ -1,37 +1,12 @@
-{# Displaying Folders #}
 
 <div class="col-xs-12">
     <div class="row">
-        <nav class="navbar navbar-default" role="navigation">
-            <div class="container-fluid">
-                <div class="navbar-header">
-                    <a class="navbar-brand" href="#">Folders</a>
-                </div>
-                <div class="navbar-collapse">
-                    <ul class="nav navbar-nav navbar-right">
-                        {% if children|length %}
-                            <li>
-                                <a data-toggle="modal"
-                                   data-target="#folderCreate"
-                                   class="sonata-action-element" href="{{ path('folder_create', {id: folder_id}) }}">
-                                    <i class="fa fa-plus-circle"></i>
-                                    Add new</a>
-                            </li>
-                        {% endif %}
-                    </ul>
-                </div>
-            </div>
-        </nav>
+        {{ include('@Ged/Utils/flashBag.html.twig', {'flashbag' : app.session.flashbag}) }}
     </div>
+</div>
 
-    {# Displaying FlashBag #}
-
-    <div class="col-xs-12">
-        <div class="row">
-            {{ include('@Ged/Utils/flashBag.html.twig', {'flashbag' : app.session.flashbag}) }}
-        </div>
-    </div>
-
+{# Displaying Folders #}
+<div class="col-xs-12">
     <div class="row">
         {% if folder_actions|length > 0 %}
         <form action="{{ path('folder_batch')  }}" method="post">

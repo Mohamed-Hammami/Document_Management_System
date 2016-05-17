@@ -6,6 +6,10 @@ ged_bundle_folder:
     resource: '@GedBundle/Resources/config/Routing/Folder.yml'
     prefix: /folder
 
+ged_bundle_version:
+    resource: '@GedBundle/Resources/config/Routing/Version.yml'
+    prefix: /version
+
 ged_bundle_batch:
     resource: '@GedBundle/Resources/config/Routing/Batch.yml'
     prefix: /batch

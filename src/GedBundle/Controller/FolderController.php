@@ -121,7 +121,6 @@ class FolderController extends Controller
             'folder_actions'   => $this->folderActions,
             'file_actions'      => $this->fileActions,
 
-            'path' => $path,
         ));
 
 

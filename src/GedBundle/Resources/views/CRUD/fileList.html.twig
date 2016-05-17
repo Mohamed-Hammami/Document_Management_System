@@ -1,38 +1,12 @@
-{# Displaying Files #}
 
 <div class="col-xs-12">
     <div class="row">
-        <nav class="navbar navbar-default" role="navigation">
-            <div class="container-fluid">
-                <div class="navbar-header">
-                    <a class="navbar-brand" href="#">Files</a>
-                </div>
-                <div class="navbar-collapse">
-                    <div class="navbar-left">
-                    </div>
-                    <ul class="nav navbar-nav navbar-right">
-                        {% if files|length %}
-                            <li>
-                                <a data-toggle="modal" data-target="#fileCreate" class="sonata-action-element"
-                                   href="{{ path('file_create', {id: folder_id}) }}">
-                                    <i class="fa fa-plus-circle"></i>
-                                    Add new</a>
-                            </li>
-                        {% endif %}
-                    </ul>
-                </div>
-            </div>
-        </nav>
+        {{ include('@Ged/Utils/flashBag.html.twig', {'flashbag' : app.session.flashbag}) }}
     </div>
+</div>
 
-    {# Displaying FlashBag #}
-
-    <div class="col-xs-12">
-        <div class="row">
-            {{ include('@Ged/Utils/flashBag.html.twig', {'flashbag' : app.session.flashbag}) }}
-        </div>
-    </div>
-
+{# Displaying Files #}
+<div class="col-xs-12">
     <div class="row">
         {% block list_file_table %}
             {% if folder_actions|length > 0 %}
@@ -76,7 +50,7 @@
                                                     {% if file[field].timestamp is defined  %}
                                                         {{ file[field]|date }}
                                                     {% elseif field == 'name'  %}
-                                                        <a href={{ path('admin_ged_file_list', {'id':file.id}) }}>
+                                                        <a href={{ path('file_show', {'id':file.id}) }}>
                                                             {{ file[field] }}
                                                         </a>
                                                     {% elseif field == 'createdBy' or field == 'updatedBy' %}
@@ -84,7 +58,7 @@
                                                             {{ (file[field])['usernameCanonical'] }}
                                                         </a>
                                                     {% elseif file[field] is null %}
-                                                        <span class="text-muted">no content</span>
+                                                        <span class="text-muted">No content</span>
                                                     {% else %}
                                                         {{ file[field] }}
                                                     {% endif %}

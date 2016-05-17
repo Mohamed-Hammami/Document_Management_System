@@ -56,4 +56,15 @@ class FolderRepository extends NestedTreeRepository
                 ->getArrayResult();
 
     }
+
+    public function findFolderByFile($id)
+    {
+        $qb = $this->createQueryBuilder('fo')
+            ->leftJoin('fo.files', 'fi')
+            ->where('fi.id = :id')
+            ->setParameter('id', $id);
+
+        return $qb->getQuery()
+            ->getOneOrNullResult();
+    }
 }
