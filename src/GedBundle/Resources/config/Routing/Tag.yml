@@ -1,0 +1,14 @@
+
+tag_add:
+    path: /{id}/add
+    defaults: { _controller: 'GedBundle:Tags:add' }
+    options:
+        expose:
+            true
+
+tag_drop:
+    path: /{id}/drop
+    defaults: { _controller: 'GedBundle:Tags:drop' }
+    options:
+        expose:
+            true

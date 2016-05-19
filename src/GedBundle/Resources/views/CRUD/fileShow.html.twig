@@ -71,3 +71,70 @@
         </div>
     </div>
 {% endblock %}
+
+{% block javascripts %}
+
+    {{ parent() }}
+    <script src="{{ asset('bundles/fosjsrouting/js/router.js') }}"></script>
+    <script src="{{ path('fos_js_routing_js', { callback: 'fos.Router.setData' }) }}"></script>
+
+
+{% endblock %}
+
+{% block  javascripts_inline%}
+
+    <script>
+
+        var file_id = "{{ file.id }}";
+        $("document").ready( function(){
+            $('#new_tag').click( function(){
+                var input_tag = $('#input_tag').val();
+                var file_tags = $(".tag_name").text();
+                if( input_tag.length >= 2 )
+                {
+                    $.ajax({
+                        type: 'post',
+                        url: Routing.generate('tag_add', { id:file_id }),
+                        data: { tag:  input_tag, file_tags: file_tags},
+                        beforeSend: function(){
+                            console.log('before ajax add request is sent');
+                            console.log(input_tag);
+                        },
+                        success: function(data){
+                            console.log('after ajax add success');
+                            console.log(data);
+                            var $element = $("<span/>").addClass("tag label label-info")
+                                    .append($("<span/>").addClass("tag_name").append(data.tag))
+                                    .append($("<a/>").append($("<i:>")
+                                            .addClass("remove glyphicon glyphicon-remove-sign glyphicon-white")));
+                            $(".tags_content").append($element);
+                        },
+                    });
+                }
+            });
+
+            $("i.remove-tag").click(function(event){
+                var $target = $(this).parent().prev();
+                $.ajax({
+                    type: 'post',
+                    url: Routing.generate('tag_drop', { id:file_id}),
+                    data: { tag: $target.text()},
+                    beforeSend: function(){
+                        console.log('before ajax drop request is sent');
+                        console.log($target.text());
+                    },
+                    success: function(data){
+                        console.log('after ajax add success');
+                        console.log(data);
+                        if( data.result = true )
+                        {
+                            $target.remove();
+                        }
+                    }
+                });
+            })
+        });
+
+    </script>
+
+{% endblock %}

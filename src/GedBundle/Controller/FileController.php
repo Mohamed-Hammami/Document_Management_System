@@ -79,6 +79,7 @@ class FileController extends Controller
         $fileRepository = $em->getRepository('GedBundle:File');
         $versionRepository = $em->getRepository('GedBundle:Version');
         $folderRepository = $em->getRepository('GedBundle:Folder');
+        $tagsRepository = $em->getRepository('GedBundle:Tag');
 
         if( !$file = $fileRepository->find($id) )
         {
@@ -91,6 +92,8 @@ class FileController extends Controller
         $versionCreators = $versionRepository->findCreators($id);
         $fileCreators = $fileRepository->findCreators($id);
 
+        $tagsName = $this->extractTags($fileRepository->findTagsName($id));
+
         $path = $this->buildPath($folder, $file);
         $creators = $versionCreators + $fileCreators;
 
@@ -98,6 +101,7 @@ class FileController extends Controller
         dump($path);
         dump($versions);
         dump($creators);
+        dump($tagsName);
 
 
         return $this->render('@Ged/CRUD/fileShow.html.twig', array(
@@ -106,8 +110,7 @@ class FileController extends Controller
             'file'     => $fileComment,
             'versions' => $versions,
             'creators' => $creators,
-
-
+            'tags'     => $tagsName,
         ));
     }
 
@@ -148,6 +151,26 @@ class FileController extends Controller
         $path[] = $file;
 
         return $path;
+    }
+
+    public function extractTags($input)
+    {
+        if( count($input) == 0 || $input[0]['tg_name'] == null )
+        {
+            return null;
+        } else
+        {
+            $tags = array();
+            foreach( $input as $element )
+            {
+                $tags[] = $element['tg_name'];
+            }
+
+            return $tags;
+        }
+
+
+
     }
 
 //    public function downloadVersionAction(Version $version)

@@ -1,0 +1,72 @@
+<style>
+
+    .tags_content {
+        margin-top: 10px;
+        margin-left: 1px;
+        margin-right: 1px;
+    }
+    .tag {
+        font-size: 12px;
+        padding: 0.3em 0.4em 0.3em;
+        margin: 2px 1px !important;
+        display: inline-block;
+        max-width: 100%;
+    }
+
+    .tag > span {
+        display: inline-block;
+        max-width: 94%;
+        white-space: nowrap;
+        overflow: hidden;
+        -ms-text-overflow: ellipsis;
+        -o-text-overflow: ellipsis;
+        text-overflow: ellipsis;
+    }
+
+    .tag a {
+        display: inline-block;
+        color: #bbb;
+        cursor: pointer;
+        opacity: 0.6;
+        margin: 0 0 0 0.3em;
+    }
+
+    .tag a:hover {
+        opacity: 1.0;
+    }
+
+    .tag a .glyphicon-white {
+        color: #fff;
+        margin-bottom: 2px;
+    }
+
+    .tag .remove-tag {
+        vertical-align: bottom;
+        top: 0;
+    }
+</style>
+
+
+<div class="panel-heading">
+    <h3 class="panel-title">Tags</h3>
+</div>
+<div class="panel-body">
+    <div class="input-group input-group-sm">
+        <input type="text" class="form-control" placeholder="Add a new tag" id="input_tag">
+            <span class="input-group-btn">
+                <button type="button" class="btn btn-info btn-flat" id="new_tag">
+                    <i class="fa fa-fw fa-plus-circle"></i>
+                </button>
+            </span>
+    </div>
+    <div class="row tags_content">
+        {% for tag in tags %}
+            <span class="tag label label-info">
+                <span class="tag_name" >{{ tag }}</span>
+                <a><i class="remove-tag glyphicon glyphicon-remove-sign glyphicon-white"></i></a>
+            </span>
+        {% endfor %}
+    </div>
+</div>
+
+

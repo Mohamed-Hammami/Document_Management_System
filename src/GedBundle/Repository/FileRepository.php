@@ -56,16 +56,28 @@ class FileRepository extends EntityRepository
     public function findCreators($id)
     {
         $qb = $this->_em->createQueryBuilder()
-            ->from('GedBundle:File', 'fe')
+            ->from('GedBundle:File', 'fi')
             ->from('GedBundle:User', 'usr')
             ->select('usr')
             ->distinct()
-            ->where('fe.createdBy = usr.id')
-            ->andWhere('fe.id = :id')
+            ->where('fi.createdBy = usr.id')
+            ->andWhere('fi.id = :id')
             ->setParameter('id', $id);
 
         return $qb->getQuery()
             ->getResult();
+    }
+
+    public function findTagsName($id)
+    {
+        $qb = $this->createQueryBuilder('fi')
+            ->leftJoin('fi.tags', 'tg')
+            ->addSelect('tg')
+            ->where('fi.id = :id')
+            ->setParameter('id', $id);
+
+        return $qb->getQuery()
+            ->getScalarResult();
     }
 
 }

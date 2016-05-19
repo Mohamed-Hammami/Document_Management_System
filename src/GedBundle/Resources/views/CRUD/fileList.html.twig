@@ -87,12 +87,12 @@
                                     </select>
 
                                     <input type="submit" class="form-control btn btn-small btn-primary" value="{{ 'btn_batch'|trans({}, 'SonataAdminBundle') }}">
-
                                 </div>
                             {% endif %}
                         </div>
                     {% else %}
-                        <div class="info-box">
+                        <div class="box-body">
+                            <div class="info-box">
                             <span class="info-box-icon bg-aqua"><i class="fa fa-arrow-circle-right"></i></span>
                             <div class="info-box-content">
                                 <span class="info-box-text">{{ 'NO FILES' }}</span>
@@ -108,6 +108,7 @@
                                 </a>
                             </span>
                             </div>
+                        </div>
                         </div>
                     {% endif %}
                 </div>

@@ -10,6 +10,10 @@ ged_bundle_version:
     resource: '@GedBundle/Resources/config/Routing/Version.yml'
     prefix: /version
 
+ged_bundle_tag:
+    resource: '@GedBundle/Resources/config/Routing/Tag.yml'
+    prefix: /tag
+
 ged_bundle_batch:
     resource: '@GedBundle/Resources/config/Routing/Batch.yml'
     prefix: /batch

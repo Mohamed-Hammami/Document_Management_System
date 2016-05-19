@@ -48,3 +48,7 @@ _sonata_admin:
 ged_bundle_routes:
     resource: '@GedBundle/Resources/config/routing.yml'
     prefix: /ged
+
+# FOS JsRouting
+fos_js_routing:
+    resource: "@FOSJsRoutingBundle/Resources/config/routing/routing.xml"

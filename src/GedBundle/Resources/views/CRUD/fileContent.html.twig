@@ -7,6 +7,31 @@
         margin-bottom: 5px;
     }
 
+    .tag {
+        font-size: 14px;
+        padding: .3em .4em .4em;
+        margin: 0 .1em;
+    }
+    .tag a {
+        color: #bbb;
+        cursor: pointer;
+        opacity: 0.6;
+    }
+    .tag a:hover {
+        opacity: 1.0
+    }
+    .tag .remove {
+        vertical-align: bottom;
+        top: 0;
+    }
+    .tag a {
+        margin: 0 0 0 .3em;
+    }
+    .tag a .glyphicon-white {
+        color: #fff;
+        margin-bottom: 2px;
+    }
+
 </style>
 
 
@@ -61,6 +86,7 @@
                         </div>
                     </div>
                 {% else %}
+                    <div class="box-body">
                     <div class="info-box">
                         <span class="info-box-icon bg-aqua"><i class="fa fa-arrow-circle-right"></i></span>
                         <div class="info-box-content">
@@ -77,6 +103,7 @@
                                 </a>
                             </span>
                         </div>
+                    </div>
                     </div>
                 {% endif %}
 
@@ -141,12 +168,11 @@
                         </div>
                     </div>
                     <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h3 class="panel-title">Tags</h3>
-                        </div>
-                        <div class="panel-body">
-                            Panel content
-                        </div>
+                        {{ include('GedBundle:CRUD:tags.html.twig',
+                        {'file':    file,
+                        'path':     path,
+                        'tags':     tags,}
+                        )}}
                     </div>
                 </div>
             </div>

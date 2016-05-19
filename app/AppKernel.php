@@ -33,8 +33,7 @@ class AppKernel extends Kernel
 
             new Avanzu\AdminThemeBundle\AvanzuAdminThemeBundle(),
             new Symfony\Bundle\AsseticBundle\AsseticBundle(),
-
-            # new Application\Sonata\UserBundle\ApplicationSonataUserBundle(),
+            new FOS\JsRoutingBundle\FOSJsRoutingBundle(),
 
             new GedBundle\GedBundle(),
         );

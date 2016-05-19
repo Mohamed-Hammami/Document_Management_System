@@ -12,4 +12,15 @@ use Doctrine\ORM\EntityRepository;
  */
 class TagRepository extends EntityRepository
 {
+    public function countNodes($id)
+    {
+        $qb = $this->createQueryBuilder('t')
+            ->select('t')
+            ->leftJoin('t.nodes', 'n')
+            ->where('t.id = :id')
+            ->setParameter('id', $id);
+
+        return $qb->getQuery()
+            ->getSingleResult();
+    }
 }
