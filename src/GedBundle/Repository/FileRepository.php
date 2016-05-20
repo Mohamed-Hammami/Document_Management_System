@@ -13,10 +13,11 @@ use Doctrine\ORM\EntityRepository;
 class FileRepository extends EntityRepository
 {
 
-    public function findByFolderId($id)
+    public function findFileIdByFolderId($id)
     {
 
         $qb = $this->createQueryBuilder('fi')
+                ->select('fi.id')
                 ->leftJoin('fi.folder', 'fo')
                 ->where('fo.id = :id')
                 ->setParameter('id', $id);
@@ -39,18 +40,6 @@ class FileRepository extends EntityRepository
 
         return $qb->getQuery()
                     ->getArrayResult();
-    }
-
-    public function findFileComment($id)
-    {
-        $qb = $this->createQueryBuilder('fi')
-            ->where('fi.id = :id')
-            ->leftJoin('fi.comments', 'co')
-            ->addSelect('co')
-            ->setParameter('id', $id);
-
-        return $qb->getQuery()
-                   ->getOneOrNullResult();
     }
 
     public function findCreators($id)

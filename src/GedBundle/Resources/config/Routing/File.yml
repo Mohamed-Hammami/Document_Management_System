@@ -6,3 +6,7 @@ file_create:
 file_show:
     path: /{id}/show
     defaults: { _controller: 'GedBundle:File:show'}
+
+#file_remove:
+#    path: /{id}/remove
+#    defaults: { _controller: 'GedBundle:File:remove' }

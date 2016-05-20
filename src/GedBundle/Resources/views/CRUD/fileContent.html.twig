@@ -32,6 +32,7 @@
         margin-bottom: 2px;
     }
 
+
 </style>
 
 
@@ -43,6 +44,16 @@
                 {% if versions|length > 0 %}
                     <div class="box-header">
                         <h3 class="box-title">Versions</h3>
+                        <div  class = "pull-right">
+                            <span class="progress-description">
+                                {#I need to add security control#}
+                                <a data-toggle="modal" data-target="#versionCreate" class="sonata-action-element"
+                                   href="{{ path('version_create', {id: file.id}) }}">
+                                    <i class="fa fa-plus-circle"></i>
+                                    {{ 'link_action_create'|trans({}, 'SonataAdminBundle') }}
+                                </a>
+                            </span>
+                        </div>
 
                     </div>
                     <div class="box-body no-padding">
@@ -53,10 +64,11 @@
                                     <th>Creation date</th>
                                     <th>Created by</th>
                                     <th>Size</th>
+                                    <th></th>
                                 </tr>
                                 {% for version in versions %}
                                     <tr>
-                                        <th>#{{ loop.index }}</th>
+                                        <th>{{ loop.index }}</th>
                                         <th>
                                             {{ version.created|date }}
                                         </th>
@@ -68,22 +80,17 @@
                                         <th>
                                             {{ version.size|humanSize }}
                                         </th>
+                                        <th>
+                                            <a href="{{ vich_uploader_asset(version, 'fileContent') }}" download="">
+                                                <i class="fa fa-fw fa-download"></i>
+                                            </a>
+                                        </th>
                                     </tr>
                                 {% endfor %}
                             </tbody>
                         </table>
                     </div>
                     <div class="box-footer">
-                        <div  class = "pull-right">
-                            <span class="progress-description">
-                                {#I need to add security control#}
-                                <a data-toggle="modal" data-target="#versionCreate" class="sonata-action-element"
-                                   href="{{ path('version_create', {id: file.id}) }}">
-                                    <i class="fa fa-plus-circle"></i>
-                                    {{ 'link_action_create'|trans({}, 'SonataAdminBundle') }}
-                                </a>
-                            </span>
-                        </div>
                     </div>
                 {% else %}
                     <div class="box-body">
@@ -174,6 +181,41 @@
                         'tags':     tags,}
                         )}}
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title">
+                        Comments
+                    </h3>
+                </div>
+                <div class="box-body box-comment-post">
+                    <form action="#" method="post">
+                        <img class="img-responsive img-circle img-sm" src="{{ asset('bundles/ged/AdminLTE2/dist/img/no-avatar.png') }}" alt="Alt Text">
+                        <div class="img-push">
+                            <input type="text" class="form-control input-sm" id="comment-input" placeholder="Press enter to post comment">
+                        </div>
+                    </form>
+                </div>
+                <div class="box-footer box-comments" id="comments-output">
+                    {% if comments|length > 0 %}
+                        {% for comment in comments %}
+                            <div class="box-comment">
+                                <img class="img-circle img-sm" src="{{ asset('bundles/ged/AdminLTE2/dist/img/no-avatar.png') }}" alt="User Image">
+                                <div class="comment-text">
+                                    <span class="username">
+                                        {{ comment.createdBy.username }}
+                                        <span class="text-muted pull-right">{{ comment.created |date("H:i  F m") }}</span>
+                                    </span>
+                                    {{ comment.content }}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
                 </div>
             </div>
         </div>

@@ -1,0 +1,12 @@
+
+comment_add:
+    path: /{id}/add
+    defaults: { _controller: 'GedBundle:Comment:add' }
+    options:
+        expose: true
+
+comment_remove:
+    path: /{id}/remove
+    defaults: { _controller: 'GedBundle:Comment:remove' }
+    options:
+        expose: true

@@ -15,12 +15,24 @@ class TagRepository extends EntityRepository
     public function countNodes($id)
     {
         $qb = $this->createQueryBuilder('t')
-            ->select('t')
-            ->leftJoin('t.nodes', 'n')
+            ->select('COUNT(t.id)')
+            ->innerJoin('t.files', 'fi')
             ->where('t.id = :id')
             ->setParameter('id', $id);
 
         return $qb->getQuery()
-            ->getSingleResult();
+            ->getSingleScalarResult();
+    }
+
+    public function findTagsByFile($id)
+    {
+        $qb = $this->createQueryBuilder('t')
+                ->select('t')
+                ->innerJoin('t.files', 'fi')
+                ->where('fi.id = :id')
+                ->setParameter('id', $id);
+
+        return $qb->getQuery()
+                    ->getResult();
     }
 }

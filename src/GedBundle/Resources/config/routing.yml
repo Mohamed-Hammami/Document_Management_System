@@ -14,6 +14,11 @@ ged_bundle_tag:
     resource: '@GedBundle/Resources/config/Routing/Tag.yml'
     prefix: /tag
 
+ged_bundle_comment:
+    resource: '@GedBundle/Resources/config/Routing/Comment.yml'
+    prefix: /comment
+
 ged_bundle_batch:
     resource: '@GedBundle/Resources/config/Routing/Batch.yml'
     prefix: /batch
+

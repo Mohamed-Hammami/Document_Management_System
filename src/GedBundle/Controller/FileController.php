@@ -6,6 +6,7 @@ use GedBundle\Entity\File;
 use GedBundle\Entity\Version;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use GedBundle\Form\Type\FileType;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
@@ -79,14 +80,21 @@ class FileController extends Controller
         $fileRepository = $em->getRepository('GedBundle:File');
         $versionRepository = $em->getRepository('GedBundle:Version');
         $folderRepository = $em->getRepository('GedBundle:Folder');
-        $tagsRepository = $em->getRepository('GedBundle:Tag');
+        $commentRepository = $em->getRepository('GedBundle:Comment');
 
         if( !$file = $fileRepository->find($id) )
         {
             throw new ResourceNotFoundException( sprintf('There is no file with %d id', $id));
         }
 
-        $fileComment = $fileRepository->findFileComment($id);
+        if ( !$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY') )
+        {
+            throw $this->createAccessDeniedException('You have to be authenticated to view a file');
+        }
+        $user = $this->get('security.token_storage')->getToken()->getUser();
+
+        $file = $fileRepository->find($id);
+        $comments = $commentRepository->findCommentsByFile($id, 5);
         $versions = $versionRepository->findVersionsByFile($id);
         $folder = $folderRepository->findFolderByFile($id);
         $versionCreators = $versionRepository->findCreators($id);
@@ -97,20 +105,24 @@ class FileController extends Controller
         $path = $this->buildPath($folder, $file);
         $creators = $versionCreators + $fileCreators;
 
-        dump($fileComment);
+        dump($file);
+        dump($comments);
         dump($path);
         dump($versions);
         dump($creators);
         dump($tagsName);
+        dump($user);
 
 
         return $this->render('@Ged/CRUD/fileShow.html.twig', array(
 
             'path'     => $path,
-            'file'     => $fileComment,
+            'file'     => $file,
+            'comments' => $comments,
             'versions' => $versions,
             'creators' => $creators,
             'tags'     => $tagsName,
+            'user'     => $user,
         ));
     }
 
@@ -173,10 +185,11 @@ class FileController extends Controller
 
     }
 
-//    public function downloadVersionAction(Version $version)
-//    {
-//        $downloadHandler = $this->get('vich_uploader.download_handler');
-//
-//        return $downloadHandler->downloadObject($version, $fileField = 'imageFile');
-//    }
+
+
+    public function downloadVersionAction(Version $version)
+    {
+        $helper = $this->container->get('vich_uploader.templating.helper.uploader_helper');
+        $path = $helper->asset($version, '$fileContent');
+    }
 }

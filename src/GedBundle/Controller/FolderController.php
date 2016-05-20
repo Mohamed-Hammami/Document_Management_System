@@ -126,7 +126,7 @@ class FolderController extends Controller
 
     }
 
-    public function createAction($id, Request $request)
+    public function createAction(Request $request, $id = 0)
     {
         $logger = $this->get('logger');
 
@@ -150,8 +150,6 @@ class FolderController extends Controller
 
 
         $form->handleRequest($request);
-
-        dump($form);
 
         if( $form->isValid() )
         {
@@ -325,7 +323,6 @@ class FolderController extends Controller
             $data        = $request->request->all();
         }
 
-        dump($data);
 
         if( !in_array($this->camelize($action), $this->folderActionsValues) )
         {
@@ -334,8 +331,6 @@ class FolderController extends Controller
 
         // at least one item must be checked
         $nonRelevent = (count($idx) < 1 && !$allElements);
-
-        dump($nonRelevent);
 
         if( $nonRelevent )
         {
@@ -365,43 +360,27 @@ class FolderController extends Controller
         // I have also to add a model manager exception
 
         $folderRepository = $this->getDoctrine()->getRepository('GedBundle:Folder');
-        $em = $this->getDoctrine()->getManager();
-
-        try{
 
             if( !$data['all_elements'] )
             {
                 foreach( $data['idx'] as $value )
                 {
-                    if( !($folder = $folderRepository->find($value)) )
-                    {
-                        $this->createNotFoundException(sprintf("There's no folder with %d id"), $value);
-                    } else
-                    {
-                        $em->remove($folder);
-                    }
+                    dump($value);
+                    $this->removeFolder($value);
                 }
 
-                $em->flush();
             } else
             {
-
                 $folder = $folderRepository->find($id);
                 $children = $folderRepository->getChildren($folder, true);
                 foreach( $children as $child)
                 {
-                    $em->remove($child);
+                    $this->removeFolder($child->getId());
                 }
-
-                $em->flush();
             }
 
             $this->addFlash('success', 'Selected folders have been successfully deleted.');
 
-        } catch( ModelManagerException $ex )
-        {
-            $this->addFlash('error', 'Internal error while deleting the folders');
-        }
 
         return new RedirectResponse(
             $this->generateUrl('folder_show', array('id' => $id))
@@ -477,45 +456,26 @@ class FolderController extends Controller
     {
         // Control security with $this->admin->checkAccess do it below !!!
 
-        // I have also to add a model manager exception
-
-        $fileRepository = $this->getDoctrine()->getRepository('GedBundle:File');
         $em = $this->getDoctrine()->getManager();
+        $fileRepository = $em->getRepository('GedBundle:File');
 
-
-        try{
-
-            if( !$data['all_elements'] )
+        if( !$data['all_elements'] )
+        {
+            foreach( $data['idx'] as $fileId )
             {
-                foreach( $data['idx'] as $value )
-                {
-                    if( !($file = $fileRepository->find($value)) )
-                    {
-                        $this->createNotFoundException(sprintf("There's no file with %d id"), $value);
-                    } else
-                    {
-                        $em->remove($file);
-                    }
-                }
-
-                $em->flush();
-            } else
-            {
-                $files = $fileRepository->findByFolderId($id);
-                foreach( $files as $file)
-                {
-                    $em->remove($file);
-                }
-
-                $em->flush();
+                $this->removeFile($fileId, $id);
             }
 
-            $this->addFlash('success', 'Selected files have been successfully deleted.');
-
-        } catch( ModelManagerException $ex )
+        } else
         {
-            $this->addFlash('error', 'Internal error while deleting the files');
+            $filesId = $fileRepository->findFileIdByFolderId($id);
+            foreach( $filesId as $fileId)
+            {
+                $this->removeFile($fileId, $id);
+            }
         }
+
+        $this->addFlash('success', 'Selected files have been successfully deleted.');
 
         return new RedirectResponse(
             $this->generateUrl('folder_show', array('id' => $id))
@@ -544,5 +504,76 @@ class FolderController extends Controller
             ->getFlashBag()
             ->add($type, $message)
         ;
+    }
+
+    public function removeFile($fileId, $folderId)
+    {
+
+        $em = $this->getDoctrine()->getManager();
+
+        $fileRepository = $em->getRepository('GedBundle:File');
+        $versionRepository = $em->getRepository('GedBundle:Version');
+        $commentRepository = $em->getRepository('GedBundle:Comment');
+        $tagsRepository = $em->getRepository('GedBundle:Tag');
+        $folderRepository = $em->getRepository('GedBundle:Folder');
+
+
+        if( !$file = $fileRepository->find($fileId) )
+        {
+            throw new ResourceNotFoundException( sprintf('There is no file with %d id', $fileId));
+        }
+
+        if( !$folder = $folderRepository->find($folderId) )
+        {
+            throw new ResourceNotFoundException( sprintf('There is no folder with %d id', $folderId));
+        }
+
+        $folder->removeFile($file);
+
+        $versions = $versionRepository->findVersionsByFile($fileId);
+        $comments = $commentRepository->findAllCommentsByFile($fileId);
+        $tags = $tagsRepository->findTagsByFile($fileId);
+
+        foreach( $tags as $tag)
+        {
+            if( $tagsRepository->countNodes($tag->getId()) <= 1 )
+                $em->remove($tag);
+        }
+
+        foreach( $versions as $version)
+        {
+            $em->remove($version);
+        }
+
+        foreach( $comments as $comment)
+        {
+            $em->remove($comment);
+        }
+
+        $em->remove($file);
+        $em->flush();
+
+    }
+
+    public function removeFolder($folderId)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $fileRepository = $em->getRepository('GedBundle:File');
+        $folderRepository = $em->getRepository('GedBundle:Folder');
+
+        if( !($folder = $folderRepository->find($folderId)) )
+        {
+            $this->createNotFoundException(sprintf("There's no folder with %d id"), $folderId);
+        }
+
+
+        $filesId = $fileRepository->findFileIdByFolderId($folderId);
+
+        dump($filesId);
+        foreach( $filesId as $fileId )
+            $this->removeFile($fileId['id'], $folderId);
+
+        $em->remove($folder);
+        $em->flush();
     }
 }

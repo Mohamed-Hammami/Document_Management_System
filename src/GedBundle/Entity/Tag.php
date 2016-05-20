@@ -32,9 +32,9 @@ class Tag
     /**
      * @var ArrayCollection
      *
-     * @ORM\ManyToMany(targetEntity="Node", mappedBy="tags")
+     * @ORM\ManyToMany(targetEntity="File", mappedBy="tags")
      */
-    private $nodes;
+    private $files;
 
     /**
      * Get id
@@ -72,33 +72,32 @@ class Tag
     /**
      * @return ArrayCollection
      */
-    public function getNodes()
+    public function getFiles()
     {
-        return $this->nodes;
+        return $this->files;
     }
 
-    /**
-     * @param ArrayCollection $nodes
-     */
-    public function setNodes($nodes)
+
+    public function setFiles($files)
     {
-        $this->nodes = $nodes;
+        $this->files = $files;
     }
 
-    public function addNode(Node $node)
+    public function addFile(File $file)
     {
-        $this->nodes->add($node);
+        $this->files->add($file);
 
         return $this;
     }
 
-    public function removeNode(Node $node)
+    public function removeFile(File $file)
     {
-        $this->nodes->removeElement($node);
+        $this->files->removeElement($file);
+
     }
 
     public function __construct()
     {
-        $this->nodes = new ArrayCollection();
+        $this->files = new ArrayCollection();
     }
 }

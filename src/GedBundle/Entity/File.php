@@ -73,6 +73,14 @@ class File extends Node
      * @ORM\Column(type="datetime", nullable=true)
      */
     private $expiration;
+
+    /**
+     * @var ArrayCollection
+     *
+     * @ORM\ManyToMany(targetEntity="Tag", inversedBy="files")
+     */
+    protected $tags;
+
     /**
      * Get id
      *
@@ -83,21 +91,19 @@ class File extends Node
         return $this->id;
     }
 
-    /**
-     * @return Folder
-     */
+
     public function getFolder()
     {
         return $this->folder;
     }
 
-    /**
-     * @param Folder $folder
-     */
-    public function setFolder(Folder $folder)
+
+    public function setFolder($folder)
     {
         $this->folder = $folder;
     }
+
+
 
     /**
      * @return string
@@ -220,6 +226,35 @@ class File extends Node
     }
 
 
+    /**
+     * @return ArrayCollection
+     */
+    public function getTags()
+    {
+        return $this->tags;
+    }
+
+    /**
+     * @param ArrayCollection $tags
+     */
+    public function setTags($tags)
+    {
+        $this->tags = $tags;
+    }
+
+    public function addTag(Tag $tag)
+    {
+        $tag->addFile($this);
+        $this->tags->add($tag);
+
+        return $this;
+    }
+
+    public function removeTag(Tag $tag)
+    {
+        $tag->removeFile($this);
+        $this->tags->removeElement($tag);
+    }
 
     public function __toString()
     {
@@ -229,6 +264,7 @@ class File extends Node
 
     public function __construct()
     {
+        $this->tags = new ArrayCollection();
         $this->versions = new ArrayCollection();
         $this->comments = new ArrayCollection();
     }

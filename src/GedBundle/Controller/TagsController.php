@@ -7,6 +7,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class TagsController extends Controller
 {
@@ -17,6 +18,9 @@ class TagsController extends Controller
 
     public function addAction(Request $request, $id)
     {
+        if( !$request->isXmlHttpRequest() )
+            throw new AccessDeniedException('unauthorized access');
+        
         $em = $this->getDoctrine()->getManager();
         $fileRepository = $em->getRepository('GedBundle:File');
         $tagRepository = $em->getRepository('GedBundle:Tag');
@@ -66,16 +70,35 @@ class TagsController extends Controller
 
     public function dropAction(Request $request, $id)
     {
+        if( !$request->isXmlHttpRequest() )
+            throw new AccessDeniedException('unauthorized access');
+
         $em = $this->getDoctrine()->getManager();
         $fileRepository = $em->getRepository('GedBundle:File');
         $tagRepository = $em->getRepository('GedBundle:Tag');
 
-        $result = $tagRepository->countNodes(15);
+        $result = $tagRepository->countNodes($id);
 
-        dump($result);
+        if( !$file = $fileRepository->find($id) )
+        {
+            throw new ResourceNotFoundException( sprintf('There is no file with %d id', $id));
+        }
 
-        return 0;
+        $inputTag = $this->inputControl($request->get('tag'));
+        $inputTag = trim($inputTag);
+        dump($inputTag);
 
+        $tag = $tagRepository->findOneBy(array( 'name' =>  $inputTag));
+        $file->removeTag($tag);
+
+        if( $tagRepository->countNodes($tag->getId()) <= 1)
+            $em->remove($tag);
+
+        $em->flush();
+
+        $response =  new JsonResponse();
+
+        return $response->setData(array('result' => true));
     }
 
     public function inputControl($input)

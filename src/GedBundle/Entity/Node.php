@@ -55,13 +55,6 @@ abstract class Node
     protected $updated;
 
     /**
-     * @var ArrayCollection
-     *
-     * @ORM\ManyToMany(targetEntity="Tag", inversedBy="nodes")
-     */
-    protected $tags;
-
-    /**
      * Get id
      *
      * @return integer
@@ -151,38 +144,4 @@ abstract class Node
         $this->name = $name;
     }
 
-    /**
-     * @return ArrayCollection
-     */
-    public function getTags()
-    {
-        return $this->tags;
-    }
-
-    /**
-     * @param ArrayCollection $tags
-     */
-    public function setTags($tags)
-    {
-        $this->tags = $tags;
-    }
-
-    public function addTag(Tag $tag)
-    {
-        $tag->addNode($this);
-        $this->tags->add($tag);
-
-        return $this;
-    }
-
-    public function removeTag(Tag $tag)
-    {
-        $tag->removeNode($this);
-        $this->tags->removeElement($tag);
-    }
-
-    public function __construct()
-    {
-        $this->tags = new ArrayCollection();
-    }
 }

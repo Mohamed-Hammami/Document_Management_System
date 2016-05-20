@@ -86,7 +86,12 @@
     <script>
 
         var file_id = "{{ file.id }}";
+        var user_id = "{{ user.id }}";
+        var img = "{{ asset('bundles/ged/AdminLTE2/dist/img/no-avatar.png') }}";
         $("document").ready( function(){
+
+//          Tags events
+
             $('#new_tag').click( function(){
                 var input_tag = $('#input_tag').val();
                 var file_tags = $(".tag_name").text();
@@ -97,43 +102,85 @@
                         url: Routing.generate('tag_add', { id:file_id }),
                         data: { tag:  input_tag, file_tags: file_tags},
                         beforeSend: function(){
-                            console.log('before ajax add request is sent');
-                            console.log(input_tag);
                         },
                         success: function(data){
-                            console.log('after ajax add success');
-                            console.log(data);
+
                             var $element = $("<span/>").addClass("tag label label-info")
                                     .append($("<span/>").addClass("tag_name").append(data.tag))
                                     .append($("<a/>").append($("<i:>")
-                                            .addClass("remove glyphicon glyphicon-remove-sign glyphicon-white")));
+                                            .addClass("remove-tag glyphicon glyphicon-remove-sign glyphicon-white")));
                             $(".tags_content").append($element);
                         },
                     });
                 }
             });
 
-            $("i.remove-tag").click(function(event){
-                var $target = $(this).parent().prev();
+            $(".tags_content").on("click", "a", (function(event){
+
+                console.log('event drop');
+                var $target = $(event.target).parent().prev();
                 $.ajax({
                     type: 'post',
                     url: Routing.generate('tag_drop', { id:file_id}),
                     data: { tag: $target.text()},
                     beforeSend: function(){
-                        console.log('before ajax drop request is sent');
-                        console.log($target.text());
+
                     },
                     success: function(data){
-                        console.log('after ajax add success');
-                        console.log(data);
                         if( data.result = true )
                         {
-                            $target.remove();
+                            $target.parent().remove();
                         }
-                    }
+                    },
                 });
-            })
+            }))
+
+//          Comments events
+
+            $('#comment-input').keypress( function(event){
+                var keycode = (event.keyCode ? event.keyCode : event.which);
+                if(keycode == '13'){
+                    event.preventDefault();
+                    var $comment = $('#comment-input');
+                    if( $comment.val().length > 0 )
+                    {
+                        $.ajax({
+                            type: 'post',
+                            url: Routing.generate('comment_add', { id:file_id }),
+                            data: { comment:  $comment.val(), user: user_id},
+                            beforeSend: function(){
+                                console.log($comment.val());
+                                $comment.val('');
+                            },
+                            success: function(data){
+                                console.log(data);
+                                if( data.status )
+                                {
+                                    var t= "";
+                                    t+= "<div class='box-comment'>";
+                                    t+= "<img class='img-circle img-sm' src='" + img + "' alt='User Image'>";
+                                    t+= "<div class='comment-text'>";
+                                    t+= "<span class='username'>";
+                                    t+= "{{ user.username }}";
+                                    t+= "<span class='text-muted pull-right'>" + data.date + "</span>";
+                                    t+= "</span>";
+                                    t+= data.comment;
+                                    t+= "</div>";
+                                    t+= "</div>";
+
+                                    $("#comments-output").prepend(t);
+                                }
+
+                            }
+                        });
+
+                    }
+                }
+            });
+
         });
+
+
 
     </script>
 

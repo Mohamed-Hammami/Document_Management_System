@@ -12,4 +12,34 @@ use Doctrine\ORM\EntityRepository;
  */
 class CommentRepository extends EntityRepository
 {
+    public function findCommentsByFile($id, $limit)
+    {
+        $qb = $this->createQueryBuilder('c')
+                ->leftJoin('c.file', 'f')
+                ->leftJoin('c.createdBy', 'u')
+                ->addSelect('u')
+                ->where('f.id = :id')
+                ->setParameter('id', $id)
+                ->orderBy('c.created', 'DESC')
+                ->setMaxResults($limit);
+
+        return $qb->getQuery()
+                    ->getResult();
+
+    }
+
+
+    public function findAllCommentsByFile($id)
+    {
+        $qb = $this->createQueryBuilder('c')
+            ->leftJoin('c.file', 'f')
+            ->leftJoin('c.createdBy', 'u')
+            ->addSelect('u')
+            ->where('f.id = :id')
+            ->setParameter('id', $id);
+
+        return $qb->getQuery()
+            ->getResult();
+
+    }
 }
