@@ -4,6 +4,11 @@
     <i class="fa fa-fw fa-file"></i>{{ path|last.name }}
 {% endblock %}
 
+{% block stylesheets%}
+    {{ parent() }}
+    {#<link rel="stylesheet" href="{{ asset('bundles/ged/AdminLTE2/plugins/select2/select2.min.css') }}">#}
+{% endblock %}
+
 {% block page_subtitle%}
 {% endblock %}
 
@@ -66,7 +71,12 @@
             </div>
             {# Displaying Permission #}
             <div id="permission" class="tab-pane fade"  style="margin-top: 15px">
-
+                {{ include('GedBundle:CRUD:filePermission.html.twig',
+                {
+                    'file': file,
+                    'permissions' : permissions,
+                    })
+                }}
             </div>
         </div>
     </div>
@@ -77,7 +87,8 @@
     {{ parent() }}
     <script src="{{ asset('bundles/fosjsrouting/js/router.js') }}"></script>
     <script src="{{ path('fos_js_routing_js', { callback: 'fos.Router.setData' }) }}"></script>
-
+    {#<script src="{{ asset('bundles/ged/AdminLTE2/plugins/select2/select2.full.min.js') }}"></script>#}
+    {#<script src="{{ asset('bundles/tetranzselect2entity/js/select2entity.js') }}"></script>#}
 
 {% endblock %}
 
@@ -178,6 +189,113 @@
                 }
             });
 
+//          Permissions events
+
+            $('.minus-button').click(function(){
+                var permission_id = $(this).closest("tr").attr("id");
+                var level = $(this).closest("tr").attr("level");
+                var name = "";
+
+                if ( level < 2 )
+                {
+                    level++;
+                    if ( level == 0 )
+                        name="Control";
+                    else if( level == 1)
+                        name = "Edit";
+                    else if( level == 2)
+                        name = "View";
+                    $(this).next().text(name);
+                    $(this).closest("tr").attr("level", level);
+                    console.log("minus id = "+permission_id+" level = "+level);
+
+                    $.ajax({
+                        type: 'post',
+                        url: Routing.generate('file_permission_change', { id:permission_id }),
+                        data: { level: level},
+                        beforeSend: function(){
+                        },
+                        success: function(data){
+                            console.log(data.status);
+                        }
+                    });
+
+
+                }
+            });
+
+            $('.plus-button').click(function(){
+                var permission_id = $(this).closest("tr").attr("id");
+                var level = $(this).closest("tr").attr("level");
+                var name = "";
+
+                if ( level > 0 )
+                {
+                    level--;
+                    if( level == 2)
+                        name = "View";
+                    else if( level == 1)
+                        name = "Edit";
+                    else if( level == 0)
+                        name = "Control";
+                    $(this).prev().text(name);
+                    $(this).closest("tr").attr("level", level);
+                    console.log("plus id = "+permission_id+" level = "+level);
+
+                    $.ajax({
+                        type: 'post',
+                        url: Routing.generate('file_permission_change', { id: permission_id }),
+                        data: { level: level},
+                        beforeSend: function(){
+                        },
+                        success: function(data){
+                            console.log(data.status);
+                        }
+                    });
+
+                }
+            });
+
+
+            $('.remove-permission').click(function(){
+                var permission_id = $(this).closest("tr").attr("id");
+                $.ajax({
+                    type: 'post',
+                    url: Routing.generate('file_permission_remove', { id: permission_id }),
+                    beforeSend: function(){
+                    },
+                    success: function(data){
+                        console.log(data.status);
+                    }
+                });
+
+                $(this).closest("tr").remove();
+
+                {#{#}
+                    {#$("#permissions-content").remove();#}
+
+                    {#var t = "";#}
+                    {#t += "<div class='box-body'>";#}
+                    {#t += "<div class='info-box'>";#}
+                    {#t += "<span class='info-box-icon bg-aqua'><i class='fa fa-arrow-circle-right'></i></span>";#}
+                    {#t += "<div class='info-box-content'>";#}
+                    {#t += "<span class='info-box-text'>{{ 'NO PERMISSIONS'}}</span>";#}
+                    {#t += "<div class='progress'>";#}
+                    {#t += "<div class='progress-bar' style='width: 0%'></div>";#}
+                    {#t += "</div>";#}
+                    {#t += "<span class='progress-description'>";#}
+                    {#t += "<a>";#}
+                    {#t += "<i class='fa fa-plus-circle'></i>";#}
+                    {#t += "Add new";#}
+                    {#t += "</a>";#}
+                    {#t += "</span>";#}
+                    {#t += "</div>";#}
+                    {#t += "</div>";#}
+                    {#t += "</div>";#}
+
+                    {#$("#permissions-box").prepend(t);#}
+                {#}#}
+            });
         });
 
 
