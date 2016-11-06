@@ -1,0 +1,33 @@
+
+user_add:
+    path: /add
+    defaults: { _controller: 'GedBundle:User:add' }
+
+user_modify:
+    path: /profile/{userid}/modify
+    defaults: { _controller: 'GedBundle:User:modify' }
+
+user_list:
+    path: /list
+    defaults: { _controller: 'GedBundle:User:list' }
+
+user_show:
+    path: /{userid}/show
+    defaults: { _controller: 'GedBundle:User:show'}
+
+
+user_fetch:
+    path: /fetch
+    defaults: { _controller: 'GedBundle:User:fetchUsers'}
+    options:
+        expose:
+            true
+
+# Admin Lte routes
+
+avanzu_admin_profile:
+    path: /{userid}/profile
+    defaults: { _controller: 'GedBundle:User:profile' }
+
+avanzu_admin_logout:
+    path: /logout

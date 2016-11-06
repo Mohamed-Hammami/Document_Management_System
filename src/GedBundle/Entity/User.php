@@ -4,17 +4,19 @@ namespace GedBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-use Sonata\UserBundle\Entity\BaseUser as BaseUser;
-
-
+use FOS\UserBundle\Entity\User as BaseUser;
+use Symfony\Component\Validator\Constraints as Assert;
+use Avanzu\AdminThemeBundle\Model\UserInterface as ThemeUser;
+use Symfony\Component\HttpFoundation\File\File as BaseFile;
 
 /**
  * User
  *
  * @ORM\Table(name="user")
  * @ORM\Entity(repositoryClass="GedBundle\Repository\UserRepository")
+
  */
-class User extends BaseUser
+class User extends BaseUser implements ThemeUser
 {
     /**
      * @var int
@@ -26,12 +28,25 @@ class User extends BaseUser
     protected $id;
 
     /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     *
+     */
+    protected $name;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     *
+     */
+    protected $surName;
+
+
+    /**
      *  @var \Doctrine\Common\Collections\ArrayCollection
      *
      * @ORM\ManyToMany(targetEntity="Groupe", inversedBy="users")
      * @ORM\JoinTable(name="groupe_user",
-     *     joinColumns={ @ORM\JoinColumn(name="groupe_id", referencedColumnName="id") },
-     *     inverseJoinColumns={ @ORM\JoinColumn(name="user_id", referencedColumnName="id") }
+     *     joinColumns={ @ORM\JoinColumn(name="user_id", referencedColumnName="id") },
+     *     inverseJoinColumns={ @ORM\JoinColumn(name="groupe_id", referencedColumnName="id") }
      *              )
      */
     protected $groupes;
@@ -44,6 +59,32 @@ class User extends BaseUser
     private $departement;
 
     /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     *
+     * @var string
+     */
+    private $avatar;
+
+    /**
+     * @ORM\Column(type="datetime")
+     *
+     * @var \DateTime
+     */
+    private $updatedAt;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     *
+     */
+    protected $title;
+
+    /**
+     * @ORM\Column(type="datetime")
+     *
+     */
+    protected $registrationDate;
+
+    /**
      * Get id
      *
      * @return integer 
@@ -51,6 +92,38 @@ class User extends BaseUser
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * @param mixed $name
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getSurName()
+    {
+        return $this->surName;
+    }
+
+    /**
+     * @param mixed $surName
+     */
+    public function setSurName($surName)
+    {
+        $this->surName = $surName;
     }
 
     /**
@@ -88,9 +161,97 @@ class User extends BaseUser
         return $this->groupes;
     }
 
+
+    /**
+     * @return string
+     */
+    public function getAvatar()
+    {
+        return $this->avatar;
+    }
+
+    /**
+     * @param string $avatar
+     */
+    public function setAvatar($avatar)
+    {
+        $this->avatar = $avatar;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getUpdatedAt()
+    {
+        return $this->updatedAt;
+    }
+
+    /**
+     * @param \DateTime $updatedAt
+     */
+    public function setUpdatedAt($updatedAt)
+    {
+        $this->updatedAt = $updatedAt;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getTitle()
+    {
+        return $this->title;
+    }
+
+    /**
+     * @param mixed $title
+     */
+    public function setTitle($title)
+    {
+        $this->title = $title;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getRegistrationDate()
+    {
+        return $this->registrationDate;
+    }
+
+    /**
+     * @param mixed $registrationDate
+     */
+    public function setRegistrationDate($registrationDate)
+    {
+        $this->registrationDate = $registrationDate;
+    }
+
+
     public function __construct()
     {
         parent::__construct();
         $this->groupes = new ArrayCollection();
+        $this->updatedAt =  new \DateTime('now');
     }
+
+//   userInterface functions
+
+    public function getUsername()
+    {
+        return parent::getUsername();
+    }
+
+    public function getMemberSince()
+    {
+        $this->getRegistrationDate();
+    }
+
+    public function isOnline(){}
+
+    public function getIdentifier()
+    {
+        return $this->getId();
+    }
+
 }
+

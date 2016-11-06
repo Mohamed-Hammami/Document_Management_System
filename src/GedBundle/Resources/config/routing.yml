@@ -18,6 +18,18 @@ ged_bundle_comment:
     resource: '@GedBundle/Resources/config/Routing/Comment.yml'
     prefix: /comment
 
+ged_bundel_user:
+    resource: '@GedBundle/Resources/config/Routing/User.yml'
+    prefix: /user
+
+ged_bundle_group:
+    resource: '@GedBundle/Resources/config/Routing/Group.yml'
+    prefix: /group
+
+ged_bundle_permission:
+    resource: '@GedBundle/Resources/config/Routing/Permission.yml'
+    prefix: /permission
+
 ged_bundle_batch:
     resource: '@GedBundle/Resources/config/Routing/Batch.yml'
     prefix: /batch

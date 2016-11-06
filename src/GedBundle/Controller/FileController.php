@@ -78,9 +78,11 @@ class FileController extends Controller
         $em = $this->getDoctrine()->getManager();
 
         $fileRepository = $em->getRepository('GedBundle:File');
+        $groupeRepository = $em->getRepository('GedBundle:Groupe');
         $versionRepository = $em->getRepository('GedBundle:Version');
         $folderRepository = $em->getRepository('GedBundle:Folder');
         $commentRepository = $em->getRepository('GedBundle:Comment');
+        $groupFileRepository = $em->getRepository('GedBundle:GroupeFile');
 
         if( !$file = $fileRepository->find($id) )
         {
@@ -91,28 +93,29 @@ class FileController extends Controller
         {
             throw $this->createAccessDeniedException('You have to be authenticated to view a file');
         }
-        $user = $this->get('security.token_storage')->getToken()->getUser();
 
-        $file = $fileRepository->find($id);
+        $this->denyAccessUnlessGranted('view', $file);
+
+        $user = $this->get('security.token_storage')->getToken()->getUser();
+        //$file = $fileRepository->find($id);
         $comments = $commentRepository->findCommentsByFile($id, 5);
         $versions = $versionRepository->findVersionsByFile($id);
         $folder = $folderRepository->findFolderByFile($id);
         $versionCreators = $versionRepository->findCreators($id);
         $fileCreators = $fileRepository->findCreators($id);
+        $groupFile = $groupFileRepository->findGroupFileByFile($id);
 
         $tagsName = $this->extractTags($fileRepository->findTagsName($id));
 
+        $ids = $groupFileRepository->findGroupIds($id);
+        $groups = $groupeRepository->findFreeGroups($id);
+        dump($groupeRepository->findAll());
+        dump($ids);
+        dump($groups);
+
+
         $path = $this->buildPath($folder, $file);
         $creators = $versionCreators + $fileCreators;
-
-        dump($file);
-        dump($comments);
-        dump($path);
-        dump($versions);
-        dump($creators);
-        dump($tagsName);
-        dump($user);
-
 
         return $this->render('@Ged/CRUD/fileShow.html.twig', array(
 
@@ -123,12 +126,14 @@ class FileController extends Controller
             'creators' => $creators,
             'tags'     => $tagsName,
             'user'     => $user,
+            'permissions' => $groupFile,
         ));
     }
 
 
     public function addNewVersion(Version $version, File $file, $user)
     {
+        $this->denyAccessUnlessGranted('edit', $file);
 
         $version->setFileName($file->getName().'_0');
         $version->setName($file->getName().md5(uniqid()));
@@ -180,15 +185,13 @@ class FileController extends Controller
 
             return $tags;
         }
-
-
-
     }
 
 
 
     public function downloadVersionAction(Version $version)
     {
+
         $helper = $this->container->get('vich_uploader.templating.helper.uploader_helper');
         $path = $helper->asset($version, '$fileContent');
     }

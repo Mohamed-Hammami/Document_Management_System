@@ -30,6 +30,8 @@ class TagsController extends Controller
             throw new ResourceNotFoundException( sprintf('There is no file with %d id', $id));
         }
 
+        $this->denyAccessUnlessGranted('edit', $file);
+
         $tags = $tagRepository->findAll();
         $inputTag = $this->inputControl($request->get('tag'));
         $fileTags = explode(' ', $request->get('file_tags'));
@@ -77,12 +79,13 @@ class TagsController extends Controller
         $fileRepository = $em->getRepository('GedBundle:File');
         $tagRepository = $em->getRepository('GedBundle:Tag');
 
-        $result = $tagRepository->countNodes($id);
 
         if( !$file = $fileRepository->find($id) )
         {
             throw new ResourceNotFoundException( sprintf('There is no file with %d id', $id));
         }
+
+        $this->denyAccessUnlessGranted('edit', $file);
 
         $inputTag = $this->inputControl($request->get('tag'));
         $inputTag = trim($inputTag);

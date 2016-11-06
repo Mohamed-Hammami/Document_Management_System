@@ -3,9 +3,6 @@
 {% block stylesheets %}
     {{ parent() }}
     <link rel="stylesheet" href='{{ asset('bundles/ged/AdminLTE2/plugins/iCheck/all.css') }}'>
-    <style>
-
-    </style>
 {% endblock %}
 
 {% block page_title %}
@@ -122,6 +119,9 @@
     <script src="{{ asset('bundles/ged/AdminLTE2/plugins/iCheck/icheck.js') }}"></script>
     <script src="{{ asset('bundles/fosjsrouting/js/router.js') }}"></script>
     <script src="{{ path('fos_js_routing_js', { callback: 'fos.Router.setData' }) }}"></script>
+    <script src="{{ asset('bundles/ged/AdminLTE2/plugins/select2/select2.full.min.js') }}"></script>
+    <script src="{{ asset('bundles/tetranzselect2entity/js/select2entity.js') }}"></script>
+
 
 
 {% endblock %}
@@ -132,14 +132,23 @@
         // dataTables for folders_table & files_table
         $(function(){
             $("#folders_table").DataTable({
+                'aoColumnDefs': [{
+                    'bSortable': false,
+                    'aTargets': ['nosort']
+                }],
                 "paging": true,
                 "ordering": true,
                 "bInfo" : false,
+
             })
         });
 
         $(function(){
             $("#files_table").DataTable({
+                'aoColumnDefs': [{
+                    'bSortable': false,
+                    'aTargets': ['nosort']
+                }],
                 "paging": true,
                 "ordering": true,
                 "bInfo" : false,

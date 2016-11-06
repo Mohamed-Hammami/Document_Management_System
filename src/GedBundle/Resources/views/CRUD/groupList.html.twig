@@ -1,0 +1,91 @@
+{% extends 'GedBundle:CRUD:user.html.twig' %}
+
+{% block user_content %}
+    <div class="col-xs-12" style="margin-top: 15px">
+        <div class="box">
+            {% if groups|length > 0 %}
+                <div class="box-body">
+                    <table id="group_table" class="table table-condensed table-hover">
+                        <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Label</th>
+                            <th>User's number</th>
+                            <th class="nosort"></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for group in groups %}
+                            <tr id="{{ group.g_id }}">
+                                <td><a href="{{ path('group_show', {'groupid': group.g_id}) }}">
+                                        {{ group.g_name }}
+                                    </a></td>
+                                <td>{{ group.g_label }}</td>
+                                <td>{{ group.number }}
+                                <th>
+                                    <button class="btn btn-default remove-group"><span class="glyphicon glyphicon-trash"></span></button>
+                                </th>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="box-body">
+                    <div class="info-box">
+                        <span class="info-box-icon bg-aqua"><i class="fa fa-arrow-circle-right"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">{{ 'NO GROUPS' }}</span>
+                            <div class="progress">
+                                <div class="progress-bar" style="width: 0%"></div>
+                            </div>
+                        <span class="progress-description">
+                            {#I need to add security control#}
+                            <a
+                                    href="{{ path('group_add') }}">
+                                <i class="fa fa-plus-circle"></i>
+                                Add new
+                            </a>
+                        </span>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+
+    {{ parent() }}
+    <script src="{{ asset('bundles/fosjsrouting/js/router.js') }}"></script>
+    <script src="{{ path('fos_js_routing_js', { callback: 'fos.Router.setData' }) }}"></script>
+
+{% endblock %}
+
+{% block javascripts_inline %}
+
+    {{ parent() }}
+
+    <script>
+    $(function(){
+    $('.remove-group').click(function(){
+    var group_id = $(this).closest("tr").attr("id");
+
+    $.ajax({
+    type: 'post',
+    url: Routing.generate('group_remove', { groupid: group_id }),
+    beforeSend: function(){
+    },
+    success: function(data){
+    console.log(data.status);
+    }
+    });
+
+    $(this).closest("tr").remove();
+
+    });
+    });
+    </script>
+
+{% endblock %}

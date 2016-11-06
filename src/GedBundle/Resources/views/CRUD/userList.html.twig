@@ -1,0 +1,74 @@
+{% extends 'GedBundle:CRUD:user.html.twig' %}
+
+{% block user_content %}
+    <style>
+        img{
+            max-width:  50px;
+            max-height: 50px;
+        }
+    </style>
+
+    <div class="col-xs-12" style="margin-top: 15px">
+        <div class="box">
+            {% if users|length > 0 %}
+                <div class="box-body">
+                    <table id="user_table" class="table table-condensed table-hover">
+                    <thead>
+                        <tr>
+                            <th class="nosort">Avatar</th>
+                            <th>Username</th>
+                            <th>Title</th>
+                            <th>Name</th>
+                            <th>Surname</th>
+                            <th >Email</th>
+                            <th>Registration Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                            <tr>
+                                <td>{{ macro.avatar(user.avatar, user.username) }}</td>
+                                <td><a href="{{ path('user_show', {'userid': user.id}) }}">
+                                    {{ user.username }}
+                                </a></td>
+                                <td>
+                                    {% if user.title is null %}
+                                        <span class="text-muted">No content</span>
+                                    {% else %}
+                                        {{ user.title }}
+                                    {% endif %}
+                                </td>
+                                <td>{{ user.name }}</td>
+                                <td>{{ user.surname }}</td>
+                                <td>{{ user.email }}</td>
+                                <td>{{ user.registrationDate|date }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                </div>
+            {% else %}
+                <div class="box-body">
+                    <div class="info-box">
+                        <span class="info-box-icon bg-aqua"><i class="fa fa-arrow-circle-right"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">{{ 'NO USERS' }}</span>
+                            <div class="progress">
+                                <div class="progress-bar" style="width: 0%"></div>
+                            </div>
+                        <span class="progress-description">
+                            {#I need to add security control#}
+                            <a
+                               href="{{ path('user_add') }}">
+                                <i class="fa fa-plus-circle"></i>
+                                Add new
+                            </a>
+                        </span>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+

@@ -27,6 +27,8 @@ class VersionController extends Controller
             throw new ResourceNotFoundException( sprintf('There is no file with %d id', $id));
         }
 
+        $this->denyAccessUnlessGranted('edit', $file);
+
         $form = $this->createForm(VersionType::class, $version);
         $form->add('create', 'submit', array(
             'label' => 'create',

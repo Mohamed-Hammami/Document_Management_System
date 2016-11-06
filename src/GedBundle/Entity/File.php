@@ -14,7 +14,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
  *
  *@ORM\AssociationOverrides({
  *      @ORM\AssociationOverride(name="createdBy"),
- *      @ORM\AssociationOverride(name="updatedBy")
+ *      @ORM\AssociationOverride(name="updatedBy"),
  * })
  *
  */
@@ -80,6 +80,16 @@ class File extends Node
      * @ORM\ManyToMany(targetEntity="Tag", inversedBy="files")
      */
     protected $tags;
+    /**
+     *
+     * @var \Doctrine\Common\Collections\ArrayCollection
+     *
+     * @ORM\OneToMany(targetEntity="GroupeFile", mappedBy="file")
+     *
+     */
+    protected $groupes;
+
+
 
     /**
      * Get id
@@ -256,6 +266,22 @@ class File extends Node
         $this->tags->removeElement($tag);
     }
 
+    public function addGroupe(GroupeFile  $groupe)
+    {
+        $this->groupes[] =$groupe;
+    }
+
+    public function removeGroupe(GroupeFile $groupe)
+    {
+        $this->groupes->removeElement($groupe);
+    }
+
+    public function getGroupes()
+    {
+        return $this->groupes;
+    }
+
+
     public function __toString()
     {
         return $this->getName();
@@ -265,6 +291,7 @@ class File extends Node
     public function __construct()
     {
         $this->tags = new ArrayCollection();
+        $this->groupes = new ArrayCollection();
         $this->versions = new ArrayCollection();
         $this->comments = new ArrayCollection();
     }

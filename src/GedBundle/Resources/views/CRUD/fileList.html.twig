@@ -19,11 +19,11 @@
                         {#<div class="box-header">#}
                         {#</div>#}
                         <div class="box-body">
-                            <table id="files_table" class="table table-bordered table-hover" role="grid" aria-describedby="files">
+                            <table id="files_table" class="table table-condensed table-hover" role="grid" aria-describedby="files">
                                 <thead>
                                 <tr role="row">
                                     {% if file_actions|length > 0 %}
-                                        <th>
+                                        <th class="nosort">
                                             <input type="checkbox" class="minimal" id="file_checkbox_all">
                                         </th>
                                     {% endif %}
@@ -54,8 +54,11 @@
                                                             {{ file[field] }}
                                                         </a>
                                                     {% elseif field == 'createdBy' or field == 'updatedBy' %}
-                                                        <a href={{ path('admin_ged_user_show', {'id':file[field]['id']}) }}>
-                                                            {{ (file[field])['usernameCanonical'] }}
+                                                        <a href={{ path('user_show', {'userid':file[field]['id']}) }}>
+                                                            <span class="badge">
+                                                                <i class="fa fa-fw fa-user"></i>
+                                                                {{ (file[field])['usernameCanonical'] }}
+                                                            </span>
                                                         </a>
                                                     {% elseif file[field] is null %}
                                                         <span class="text-muted">No content</span>
@@ -76,7 +79,7 @@
 
                                     <label class="checkbox" for="file_all_elements" class="form-control">
                                         <input type="checkbox"  class="minimal" name="all_elements" id="file_all_elements">
-                                        {{ 'all_elements'|trans({}, 'SonataAdminBundle') }}
+                                        All elements
                                         ({{ files|length }})
                                     </label>
 
@@ -86,7 +89,7 @@
                                         {% endfor %}
                                     </select>
 
-                                    <input type="submit" class="form-control btn btn-small btn-primary" value="{{ 'btn_batch'|trans({}, 'SonataAdminBundle') }}">
+                                    <input type="submit" class="form-control btn btn-small btn-primary" value="Submit">
                                 </div>
                             {% endif %}
                         </div>
@@ -104,7 +107,7 @@
                                 <a data-toggle="modal" data-target="#fileCreate" class="sonata-action-element"
                                    href="{{ path('file_create', {id: folder_id}) }}">
                                     <i class="fa fa-plus-circle"></i>
-                                    {{ 'link_action_create'|trans({}, 'SonataAdminBundle') }}
+                                    Add new
                                 </a>
                             </span>
                             </div>
@@ -120,7 +123,7 @@
 </div>
 
 
-{# Folder create modal#}
+{# File create modal#}
 
 <div id="fileCreate" class="modal fade" role="dialog">
     <div class="modal-dialog">

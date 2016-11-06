@@ -1,0 +1,56 @@
+{% extends 'GedBundle:CRUD:user.html.twig' %}
+
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('bundles/ged/AdminLTE2/plugins/select2/select2.min.css') }}">
+    <style>
+
+
+    </style>
+{% endblock %}
+
+{% block user_content %}
+
+    <div class="col-xs-12" style="margin-top: 15px">
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">New group</h3>
+            </div>
+            {% block group_create %}
+                <form action="{{ path('group_add') }}" method="post"{{ form_enctype(form) }}>
+                    <div class="box-body">
+                        <div class="form-group col-xs-10">
+                            {{ form_label(form.name) }}
+                            {{ form_errors(form.name) }}
+                            {{ form_widget(form.name) }}
+                        </div>
+                        <div class="form-group col-xs-10">
+                            {{ form_label(form.label) }}
+                            {{ form_errors(form.label) }}
+                            {{ form_widget(form.label) }}
+                        </div>
+                        <div class="form-group col-xs-10">
+                            {{ form_label(form.users) }}
+                            {{ form_errors(form.users) }}
+                            {{ form_widget(form.users) }}
+                        </div>
+                    </div>
+                    <div class="box-footer">
+                        {{ form_widget(form.create) }}
+                        {{ form_widget(form.cancel) }}
+                    </div>
+                    {{ form_rest(form) }}
+                </form>
+            {% endblock %}
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('bundles/ged/AdminLTE2/plugins/select2/select2.full.min.js') }}"></script>
+    <script src="{{ asset('bundles/tetranzselect2entity/js/select2entity.js') }}"></script>
+{% endblock %}
+

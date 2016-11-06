@@ -1,0 +1,30 @@
+
+group_list:
+    path: /list
+    defaults: { _controller: 'GedBundle:Group:list' }
+
+group_show:
+    path: /{groupid}/show
+    defaults: { _controller: 'GedBundle:Group:show' }
+
+group_add:
+    path: /add
+    defaults: { _controller: 'GedBundle:Group:add' }
+
+group_fetch:
+    path: /fetch
+    defaults: { _controller: 'GedBundle:Group:fetch'}
+    options:
+        expose: true
+
+group_user_remove:
+    path: /{groupid}/userRemove
+    defaults: { _controller: 'GedBundle:Group:userRemove'}
+    options:
+        expose: true
+
+group_remove:
+    path: /{groupid}/remove
+    defaults: { _controller: 'GedBundle:Group:remove'}
+    options:
+        expose: true

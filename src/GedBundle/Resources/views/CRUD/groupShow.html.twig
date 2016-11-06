@@ -1,0 +1,106 @@
+{% extends 'GedBundle:CRUD:user.html.twig' %}
+
+{% block user_content %}
+
+    <style>
+        dd, dt{
+
+            margin-bottom: 5px;
+        }
+
+        img{
+            max-width:  150px;
+            max-height: 150px;
+        }
+    </style>
+
+
+    <div class="col-xs-12" style="margin-top: 15px">
+        <div class="box">
+            <div class="box-header">
+                <h3 class="box-title">
+                    Group information
+                </h3>
+            </div>
+            <div class="box-body ">
+                <div class="row">
+                    <div class="col-xs-8">
+                        <dl class="dl-horizontal" style="">
+                            <dt>Group name</dt>
+                            <dd>{{ group.name }}</dd>
+                            <dt>Group label</dt>
+                            <dd>{{ group.label}}</dd>
+                        </dl>
+                    </div>
+                    <div class="col-xs-4">
+                        <i class="fa fa-4x fa-users"></i>
+                    </div>
+                </div>
+
+                <hr></hr>
+
+                <div class="row">
+                    {% for user in group.users %}
+                    <div class="col-xs-6" id="{{ user.id }}">
+                        <div class="user-block">
+                            <a href="#" class="pull-right btn-box-tool userRemove"><i class="fa fa-times"></i></a>
+                            <a href="{{ path('user_show', {'userid': user.id}) }}">
+                                {{ macro.avatar(user.avatar, user.username) }}
+                            </a>
+                            <span class="username">
+                              <a href="#">
+                                  {{ user.name }} {{ user.surName }}
+                              </a>
+                            </span>
+                            <span class="description">Email: {{ user.email }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+
+    {{ parent() }}
+    <script src="{{ asset('bundles/fosjsrouting/js/router.js') }}"></script>
+    <script src="{{ path('fos_js_routing_js', { callback: 'fos.Router.setData' }) }}"></script>
+
+{% endblock %}
+
+{% block javascripts_inline %}
+
+    {{ parent() }}
+
+    <script>
+        $(function(){
+
+
+            $(".userRemove").click(function(){
+
+                var group_id = {{ group.id }};
+                var user_id = $(this).closest("div").parent().attr("id");
+
+                console.log(group_id);
+                console.log(user_id);
+
+                $.ajax({
+                    type: 'post',
+                    url: Routing.generate('group_user_remove', { groupid:group_id }),
+                    data: { userId: user_id},
+                    beforeSend: function(){
+                    },
+                    success: function(data){
+                        console.log(data.status);
+
+                    }
+                });
+
+                $(this).closest("div").parent().remove();
+            });
+        });
+
+    </script>
+{% endblock %}

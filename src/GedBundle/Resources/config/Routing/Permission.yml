@@ -1,0 +1,16 @@
+
+file_permission_add:
+    path: /{id}/add
+    defaults: { _controller: 'GedBundle:GroupFile:add'}
+
+file_permission_change:
+    path: /{id}/change
+    defaults: { _controller: 'GedBundle:GroupFile:change'}
+    options:
+        expose: true
+
+file_permission_remove:
+    path: /{id}/remove
+    defaults: { _controller: 'GedBundle:GroupFile:remove'}
+    options:
+        expose: true

@@ -1,0 +1,173 @@
+{% extends '@Ged/default_layout.html.twig' %}
+
+{% block page_title %}
+{% endblock %}
+
+{% block page_subtitle%}
+{% endblock %}
+
+{% block page_content %}
+
+    <div class="row" style="margin: auto">
+        <div class="row" style="margin: auto;">
+            <nav class="navbar navbar-default" role="navigation" style="margin-bottom: auto">
+                <div class="container-fluid">
+                    <div class="navbar-header">
+                        <a class="navbar-brand" href="#"><i class="fa fa-th"></i></a>
+                    </div>
+                    <div>
+                        <ul class="nav navbar-nav" id="tabs">
+                            <li id="listUser_link"><a href="{{ path('user_list') }}">
+                                    <i class="fa fa-fw fa-user"></i>Users</a>
+                            </li>
+                            <li id="listGroup_link"><a href="{{ path('group_list') }}">
+                                    <i class="fa fa-fw fa-users"></i>Groups</a>
+                            </li>
+                            <li id="show_link"><a href={{ path('user_show', {'userid': user.id}) }}>
+                                    <i class="fa fa-fw fa-search"></i>Show</a>
+                            </li>
+                            {#<li id="edit_link"><a href={{ path('user_modify', {'userid': user.id}) }}>#}
+                                    {#<i class="fa fa-fw fa-gear"></i></i>Edit</a>#}
+                            {#</li>#}
+                            <li id="adduser_link"><a href={{ path('user_add') }}>
+                                    <i class="fa fa-fw fa-user-plus"></i></i>New user</a>
+                            </li>
+                            <li id="addgroup_link"><a href={{ path('group_add') }}>
+                                    <i class="fa fa-fw fa-user-plus"></i></i>New group</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </div>
+        <div class="row">
+            {% block user_content %}
+
+            {% endblock %}
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block javascripts %}
+
+    {{ parent() }}
+
+{% endblock %}
+
+{% block javascripts_inline %}
+    <script>
+
+        $(function(){
+            var path =  window.location.pathname.split('/');
+            var link = path.pop();
+
+            $("#tabs").removeClass("active");
+
+            switch ( link )
+            {
+
+                case 'list':
+                    link = path.pop();
+                    if( link == 'user' )
+                    {
+                        $("#listUser_link").addClass("active");
+                        break;
+                    } else if( link == 'group' )
+                    {
+                        $("#listGroup_link").addClass("active");
+                        break;
+                    }
+                    break;
+                case 'show':
+                    $("#show_link").addClass("active");
+                    break;
+                case  'modify':
+                    $("#edit_link").addClass("active");
+                    break;
+                case 'add':
+                    link =  path.pop();
+                    if( link == 'user' )
+                    {
+                        $("#adduser_link").addClass("active");
+                        break;
+                    } else if( link == 'group' )
+                    {
+                        $("#addgroup_link").addClass("active");
+                        break;
+                    }
+            }
+
+
+
+        });
+
+        $(function(){
+            $("#user_table").DataTable({
+
+                'aoColumnDefs': [{
+                    'bSortable': false,
+                    'aTargets': ['nosort']
+                }],
+                "paging": true,
+                "ordering": true,
+
+            });
+
+            $("#group_table").DataTable({
+
+                'aoColumnDefs': [{
+                    'bSortable': false,
+                    'aTargets': ['nosort']
+                }],
+                "paging": true,
+                "ordering": true,
+
+            })
+        });
+
+        $(function(){
+            $('.remove-permission').click(function(){
+                var permission_id = $(this).closest("tr").attr("id");
+
+                $.ajax({
+                    type: 'post',
+                    url: Routing.generate('file_permission_remove', { id: permission_id }),
+                    beforeSend: function(){
+                    },
+                    success: function(data){
+                        console.log(data.status);
+                    }
+                });
+
+                $(this).closest("tr").remove();
+
+                {#{#}
+                {#$("#permissions-content").remove();#}
+
+                {#var t = "";#}
+                {#t += "<div class='box-body'>";#}
+                {#t += "<div class='info-box'>";#}
+                {#t += "<span class='info-box-icon bg-aqua'><i class='fa fa-arrow-circle-right'></i></span>";#}
+                {#t += "<div class='info-box-content'>";#}
+                {#t += "<span class='info-box-text'>{{ 'NO PERMISSIONS'}}</span>";#}
+                {#t += "<div class='progress'>";#}
+                {#t += "<div class='progress-bar' style='width: 0%'></div>";#}
+                {#t += "</div>";#}
+                {#t += "<span class='progress-description'>";#}
+                {#t += "<a>";#}
+                {#t += "<i class='fa fa-plus-circle'></i>";#}
+                {#t += "Add new";#}
+                {#t += "</a>";#}
+                {#t += "</span>";#}
+                {#t += "</div>";#}
+                {#t += "</div>";#}
+                {#t += "</div>";#}
+
+                {#$("#permissions-box").prepend(t);#}
+                {#}#}
+            });
+        });
+
+    </script>
+{% endblock %}

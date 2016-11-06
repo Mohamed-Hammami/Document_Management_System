@@ -1,0 +1,72 @@
+{% macro user_form(form, edit, user) %}
+<div class="row">
+    <div class="col-xs-12">
+        <div class="box box-primary">
+            {% if edit %}
+                {% set action = path('user_modify',  { 'userid': user.id }) %}
+                {% set file_field = form.avatarEdit %}
+                {% set form_title = "Modify informations" %}
+            {% else %}
+                {% set action = path('user_add') %}
+                {% set file_field = form.avatar %}
+                {% set form_title = "New user" %}
+            {% endif %}
+            <div class="box-header with-border">
+                <h3 class="box-title">New user</h3>
+            </div>
+                {% block user_create %}
+                    <form action="{{ action }}" method="post"{{ form_enctype(form) }}>
+                        <div class="box-body">
+                            <div class="form-group col-xs-10">
+                                {{ form_label(form.username) }}
+                                {{ form_errors(form.username) }}
+                                {{ form_widget(form.username) }}
+                            </div>
+                            <div class="form-group col-xs-10">
+                                {{ form_label(file_field) }}
+                                {{ form_errors(file_field) }}
+                                {{ form_widget(file_field) }}
+                            </div>
+                            <div class="form-group col-xs-10">
+                                {{ form_label(form.name) }}
+                                {{ form_errors(form.name) }}
+                                {{ form_widget(form.name) }}
+                            </div>
+                            <div class="form-group col-xs-10">
+                                {{ form_label(form.surname) }}
+                                {{ form_errors(form.surname) }}
+                                {{ form_widget(form.surname) }}
+                            </div>
+                            <div class="form-group col-xs-10">
+                                {{ form_label(form.title) }}
+                                {{ form_errors(form.title) }}
+                                {{ form_widget(form.title) }}
+                            </div>
+                            <div class="form-group col-xs-10">
+                                {{ form_label(form.email) }}
+                                {{ form_errors(form.email) }}
+                                {{ form_widget(form.email) }}
+                            </div>
+                            <div class="form-group col-xs-10">
+                                <fieldset>
+                                    {{ form_label(form.plainPassword) }}
+                                    {{ form_errors(form.plainPassword) }}
+                                    {{ form_widget(form.plainPassword) }}
+                                </fieldset>
+                            </div>
+                        </div>
+                        <div class="box-footer">
+
+                            {{ form_widget(form.create) }}
+                            {{ form_widget(form.cancel) }}
+                        </div>
+                        {{ form_rest(form) }}
+                    </form>
+                {% endblock %}
+        </div>
+    </div>
+</div>
+{% endmacro %}
+
+
+

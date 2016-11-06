@@ -12,4 +12,93 @@ use Doctrine\ORM\EntityRepository;
  */
 class GroupeRepository extends EntityRepository
 {
+    public function findGroupsUsers($id)
+    {
+        $qb = $this->createQueryBuilder('g')
+            ->leftJoin('g.users', 'u')
+            ->select('g')
+            ->addSelect('u')
+            ->where('g.id = :id')
+            ->setParameter('id', $id);
+
+        return $qb->getQuery()->getSingleResult();
+    }
+
+
+    public function findGroups()
+    {
+        $qb = $this->createQueryBuilder('g')
+            ->select('g.id')
+            ->addSelect('g.label as text');
+
+        return $qb->getQuery()->getResult();
+    }
+
+    public function findGroupsByUser($id)
+    {
+        $qb = $this->createQueryBuilder('g')
+            ->leftJoin('g.users', 'u')
+            ->where('u.id = :id')
+            ->setParameter('id', $id);
+
+        return $qb->getQuery()->getResult();
+    }
+
+    public function findFreeGroups($id)
+    {
+        $em = $this->getEntityManager();
+        $groupFileRepository = $em->getRepository('GedBundle:GroupeFile');
+
+        $ids = $groupFileRepository->findGroupIds($id);
+        $groupIds = array();
+        foreach($ids as $id)
+        {
+            array_push($groupIds, $id['id']);
+        }
+
+        $groups = $this->findAll();
+
+        foreach( $groups as $key=>$group)
+        {
+            if( in_array($group->getId(), $groupIds) )
+                unset($groups[$key]);
+        }
+
+        return $groups;
+
+    }
+
+    public function findUserIds($id)
+    {
+        $qb = $this->createQueryBuilder('g')
+                ->leftJoin('g.users', 'u')
+                ->where('g.id = :id')
+                ->setParameter('id', $id)
+                ->select('u.id');
+
+        return $qb->getQuery()->getResult();
+    }
+
+    public function findGroupUsersNum()
+    {
+        $qb = $this->createQueryBuilder('g')
+            ->leftJoin('g.users', 'u')
+            ->addSelect('count(u.id) as number')
+            ->groupBy('g.id');
+
+        return $qb->getQuery()->getScalarResult();
+    }
+
+    public function findUsersByGroup($id)
+    {
+        $qb = $this->createQueryBuilder('g')
+                ->leftJoin('g.users', 'u')
+                ->select('g')
+                ->addselect('u')
+                ->where('g.id = :id')
+                ->setParameter('id', $id);
+
+        return $qb->getQuery()->getSingleResult();
+    }
+
 }

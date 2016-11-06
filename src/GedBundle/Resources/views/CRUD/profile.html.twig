@@ -1,0 +1,61 @@
+{% extends '@Ged/default_layout.html.twig' %}
+
+{% import 'AvanzuAdminThemeBundle:layout:macros.html.twig' as macro %}
+
+{% block page_title %}
+{% endblock %}
+
+{% block page_subtitle%}
+{% endblock %}
+
+{% block page_content %}
+
+    <div class="row" style="margin: auto">
+        <div class="row" style="margin: auto;">
+            <nav class="navbar navbar-default" role="navigation" style="margin-bottom: auto">
+                <div class="container-fluid">
+                    <div class="navbar-header">
+                        <a class="navbar-brand" href="#"><i class="fa fa-th"></i></a>
+                    </div>
+                    <div>
+                        <ul class="nav navbar-nav" id="tabs">
+                            <li id="show_link"><a href="{{ path('avanzu_admin_profile', { 'userid': user.id })  }}">
+                                    <i class="fa fa-fw fa-user"></i>My profile</a>
+                            </li>
+                            <li id="edit_link"><a href="{{  path('user_modify',  { 'userid': user.id }) }}">
+                                    <i class="fa fa-fw fa-gear"></i></i>Edit</a>
+                            </li>
+
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </div>
+        <div class="row">
+            {% block profile_content %}
+            {% endblock %}
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block javascripts_inline %}
+    <script>
+        $(function(){
+            var path =  window.location.pathname.split('/');
+            path = path.pop();
+
+            $("#tabs").removeClass("active");
+
+            switch ( path )
+            {
+                case 'profile':
+                    $("#show_link").addClass("active");
+                    break;
+                case  'modify':
+                    $("#edit_link").addClass("active");
+                    break;
+            }
+        });
+    </script>
+{% endblock %}

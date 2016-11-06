@@ -98,7 +98,7 @@
 
         var file_id = "{{ file.id }}";
         var user_id = "{{ user.id }}";
-        var img = "{{ asset('bundles/ged/AdminLTE2/dist/img/no-avatar.png') }}";
+        var img = "{{ asset(user.avatar) }}";
         $("document").ready( function(){
 
 //          Tags events
@@ -182,6 +182,8 @@
                                     $("#comments-output").prepend(t);
                                 }
 
+                                console.log(img)
+
                             }
                         });
 
@@ -259,6 +261,7 @@
 
             $('.remove-permission').click(function(){
                 var permission_id = $(this).closest("tr").attr("id");
+
                 $.ajax({
                     type: 'post',
                     url: Routing.generate('file_permission_remove', { id: permission_id }),

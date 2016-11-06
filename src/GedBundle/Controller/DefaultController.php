@@ -14,6 +14,13 @@ class DefaultController extends Controller
     public function indexAction(Request $request)
     {
 
+        $em = $this->getDoctrine()->getManager();
+        $rep = $em->getRepository('GedBundle:GroupeFile');
+
+        $query = $rep->findGroupFileByFile(1);
+
+        dump($query);
+
         return $this->render('GedBundle:Default:index.html.twig');
     }
 }

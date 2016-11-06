@@ -45,6 +45,8 @@ class FolderController extends Controller
 
     // I have to test on the existence of folder id $id
 
+        $em = $this->getDoctrine()->getManager();
+
         $fileRepository = $this
             ->getDoctrine()
             ->getManager()
@@ -54,6 +56,17 @@ class FolderController extends Controller
             ->getDoctrine()
             ->getManager()
             ->getRepository('GedBundle:Folder');
+
+        if( $id == 0)
+        {
+            $folder = new Folder();
+            $folder->setName('Root');
+            $folder->setDescription('The root folder');
+            $folder->setCreated(new \DateTime('now'));
+
+            $em->persist($folder);
+            $em->flush();
+        }
 
         $currentFolder = $folderRepository->find($id);
 
@@ -126,14 +139,12 @@ class FolderController extends Controller
 
     }
 
-    public function createAction(Request $request, $id = 0)
+    public function createAction(Request $request, $id)
     {
-        $logger = $this->get('logger');
-
-        $logger->info('log from create Action');
 
         $em = $this->getDoctrine()->getManager();
         $folderRepository =  $em->getRepository('GedBundle:Folder');
+
 
         $folder = new Folder();
         if ( !$rootFolder = $folderRepository->find($id) )

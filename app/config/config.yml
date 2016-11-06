@@ -3,17 +3,11 @@ imports:
     - { resource: security.yml }
     - { resource: services.yml }
     - { resource: "@GedBundle/Resources/config/services.yml" }
-    - { resource: "@GedBundle/Resources/config/admin.yml"}
 
 # Put parameters here that don't need to change on each machine where the app is deployed
 # http://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
     locale: en
-
-    # Sonata User & Group parameters
-    sonata.user.admin.user.entity:  GedBundle\Entity\User
-    sonata.user.admin.user.class:   GedBundle\Admin\UserAdmin
-    sonata.user.admin.group.entity: GedBundle\Entity\Group
 
 framework:
     #esi:             ~
@@ -43,6 +37,8 @@ twig:
     strict_variables: "%kernel.debug%"
     globals:
             admin_skin: skin-blue
+    form_themes:
+            - 'TetranzSelect2EntityBundle:Form:fields.html.twig'
 
 # Doctrine Configuration
 doctrine:
@@ -60,9 +56,8 @@ doctrine:
         #   2. Uncomment database_path in parameters.yml.dist
         #   3. Uncomment next line:
         #     path:     "%database_path%"
-
-        types:
-            json: Sonata\Doctrine\Types\JsonType
+        types: #this is about this line and line below
+            json:     \Doctrine\DBAL\Types\StringType
 
     orm:
         auto_generate_proxy_classes: "%kernel.debug%"
@@ -74,7 +69,6 @@ doctrine:
             default:
                 mappings:
                     GedBundle: ~
-                    SonataUserBundle: ~
                     FOSUserBundle: ~
                     gedmo_tree:
                         type: annotation
@@ -91,26 +85,17 @@ swiftmailer:
     password:  "%mailer_password%"
     spool:     { type: memory }
 
-# Sonata Admin config
-sonata_block:
-    default_contexts: [cms]
-    blocks:
-        # enable the SonataAdminBundle block
-        sonata.admin.block.admin_list:
-            contexts: [admin]
-        sonata.user.block.menu:    ~    # used to display the menu in profile pages
-        sonata.user.block.account: ~   # used to display menu option (login option)
-        sonata.block.service.text: ~ # used to if you plan to use Sonata user routes
-
 
 # FosUser Configuration to be transferred later to bundle path
 fos_user:
     db_driver: orm # other valid values are 'mongodb', 'couchdb' and 'propel'
     firewall_name: main
-    user_class: %sonata.user.admin.user.entity%
-
-    service:
-        user_manager: sonata.user.orm.user_manager
+    user_class: GedBundle\Entity\User
+    registration:
+            form:
+                type: GedBundle\Form\RegistrationType
+                # if you are using Symfony < 2.8 you should use the type name instead
+                # type: app_user_registration
 
 # Doctrine extensions config
 stof_doctrine_extensions:
@@ -120,26 +105,13 @@ stof_doctrine_extensions:
             blameable:     true
             timestampable: true
 
-sonata_user:
-    manager_type: orm
-
-sonata_admin:
-    title:  DMS
-
 services:
-    sonata.user.admin.group:
-        abstract: true
-        public:   false
-
-    sonata.user.orm.group_manager:
-        abstract: true
-        public:   false
-
     app.twig_extension:
         class: GedBundle\Twig\Extension\sizeExtension
         public: false
         tags:
             - { name: twig.extension }
+
 
 # Vich uploader config
 vich_uploader:

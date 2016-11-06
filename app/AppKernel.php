@@ -15,26 +15,16 @@ class AppKernel extends Kernel
             new Symfony\Bundle\SwiftmailerBundle\SwiftmailerBundle(),
             new Doctrine\Bundle\DoctrineBundle\DoctrineBundle(),
             new Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle(),
-            new AppBundle\AppBundle(),
 
             # Added by me
-            new FOS\UserBundle\FOSUserBundle(),
-            new Sonata\CoreBundle\SonataCoreBundle(),
-            new Sonata\BlockBundle\SonataBlockBundle(),
             new Knp\Bundle\MenuBundle\KnpMenuBundle(),
-            new Sonata\DoctrineORMAdminBundle\SonataDoctrineORMAdminBundle(),
-            new Sonata\AdminBundle\SonataAdminBundle(),
-            new Sonata\UserBundle\SonataUserBundle('FOSUserBundle'),
-            # Sonata user bundle extends fos user bundle
-            # new Sonata\UserBundle\SonataUserBundle(),
+            new FOS\UserBundle\FOSUserBundle(),
             new Stof\DoctrineExtensionsBundle\StofDoctrineExtensionsBundle(),
-            new Sonata\EasyExtendsBundle\SonataEasyExtendsBundle(),
             new Vich\UploaderBundle\VichUploaderBundle(),
-
             new Avanzu\AdminThemeBundle\AvanzuAdminThemeBundle(),
             new Symfony\Bundle\AsseticBundle\AsseticBundle(),
             new FOS\JsRoutingBundle\FOSJsRoutingBundle(),
-
+            new Tetranz\Select2EntityBundle\TetranzSelect2EntityBundle(),
             new GedBundle\GedBundle(),
         );
 

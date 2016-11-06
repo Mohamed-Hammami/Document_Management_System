@@ -50,7 +50,7 @@
                                 <a data-toggle="modal" data-target="#versionCreate" class="sonata-action-element"
                                    href="{{ path('version_create', {id: file.id}) }}">
                                     <i class="fa fa-plus-circle"></i>
-                                    {{ 'link_action_create'|trans({}, 'SonataAdminBundle') }}
+                                    Add new
                                 </a>
                             </span>
                         </div>
@@ -68,7 +68,7 @@
                                 </tr>
                                 {% for version in versions %}
                                     <tr>
-                                        <th>{{ loop.index }}</th>
+                                        <th>#{{ loop.index }}</th>
                                         <th>
                                             {{ version.created|date }}
                                         </th>
@@ -106,7 +106,7 @@
                                 <a data-toggle="modal" data-target="#versionCreate" class="sonata-action-element"
                                    href="{{ path('version_create', {id: file.id}) }}">
                                     <i class="fa fa-plus-circle"></i>
-                                    {{ 'link_action_create'|trans({}, 'SonataAdminBundle') }}
+                                    Add new
                                 </a>
                             </span>
                         </div>
@@ -195,7 +195,11 @@
                 </div>
                 <div class="box-body box-comment-post">
                     <form action="#" method="post">
-                        <img class="img-responsive img-circle img-sm" src="{{ asset('bundles/ged/AdminLTE2/dist/img/no-avatar.png') }}" alt="Alt Text">
+                        {% if user.avatar is defined %}
+                        <img class="img-circle img-sm" src="{{ asset(user.avatar) }}" alt="User Image">
+                        {% else %}
+                            <img class="img-circle img-sm" src="{{  asset('bundles/avanzuadmintheme/img/avatar.png') }}" alt="User Image">
+                        {% endif %}
                         <div class="img-push">
                             <input type="text" class="form-control input-sm" id="comment-input" placeholder="Press enter to post comment">
                         </div>
@@ -205,7 +209,11 @@
                     {% if comments|length > 0 %}
                         {% for comment in comments %}
                             <div class="box-comment">
-                                <img class="img-circle img-sm" src="{{ asset('bundles/ged/AdminLTE2/dist/img/no-avatar.png') }}" alt="User Image">
+                                {% if comment.createdBy.avatar is defined %}
+                                    <img class="img-circle img-sm" src="{{ asset(comment.createdBy.avatar) }}" alt="User Image">
+                                {% else %}
+                                    <img class="img-circle img-sm" src="{{  asset('bundles/avanzuadmintheme/img/avatar.png') }}" alt="User Image">
+                                {% endif %}
                                 <div class="comment-text">
                                     <span class="username">
                                         {{ comment.createdBy.username }}

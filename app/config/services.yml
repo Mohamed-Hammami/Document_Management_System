@@ -1,16 +1,19 @@
-# Learn more about services, parameters and containers at
-# http://symfony.com/doc/current/book/service_container.html
+
 parameters:
-#    parameter_name: value
+    ged_bundle.navbar_user_listener.class: GedBundle\EventListener\NavbarUserListener
 
 services:
-#    service_name:
-#        class: AppBundle\Directory\ClassName
-#        arguments: ["@another_service_name", "plain_value", "%parameter_name%"]
-
-    app.menu_listener:
-        class: GedBundle\Event\MenuBuilderListener
-        tags:
-            - { name: kernel.event_listener, event: sonata.admin.event.configure.menu.sidebar, method: addMenuItems }
+    my_admin_bundle.show_user_listener:
+        class: %ged_bundle.navbar_user_listener.class%
         arguments:
-            - @doctrine.orm.entity_manager
+            - @security.token_storage
+        tags:
+            - { name: kernel.event_listener, event: theme.navbar_user, method: onShowUser }
+
+    ged_bundle.file_voter:
+        class: GedBundle\Security\FileVoter
+        arguments: [ @doctrine.orm.entity_manager ]
+        tags:
+            - { name: security.voter }
+
+        public: false

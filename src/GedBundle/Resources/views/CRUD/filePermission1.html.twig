@@ -1,0 +1,98 @@
+{% extends '@Ged/default_layout.html.twig' %}
+
+{% block page_title %}
+    <i class="fa fa-fw fa-file"></i>{{ path|last.name }}
+{% endblock %}
+
+{% block stylesheets%}
+    {{ parent() }}
+    {#<link rel="stylesheet" href="{{ asset('bundles/ged/AdminLTE2/plugins/select2/select2.min.css') }}">#}
+{% endblock %}
+
+{% block page_subtitle%}
+{% endblock %}
+
+{% block avanzu_breadcrumb %}
+    <ol class="breadcrumb">
+        <i class="fa fa-home"></i>
+        {% for element in path %}
+            {% if loop.last %}
+                <li class="active">
+                    {{ element.name }}
+                </li>
+            {% else %}
+                <li>
+                    <a href="{{ path('folder_show', {'id': element.id}) }}">{{ element.name }}</a>
+                </li>
+            {% endif %}
+        {% endfor %}
+    </ol>
+{% endblock %}
+
+{% block page_content %}
+    <div class="row" style="margin: auto">
+
+        {# Displaying tabs#}
+        <div class="row" style="margin: auto;">
+            <nav class="navbar navbar-default" role="navigation" style="margin-bottom: auto">
+                <div class="container-fluid">
+                    <div class="navbar-header">
+                        <a class="navbar-brand" href="#"><i class="fa fa-th"></i></a>
+                    </div>
+                    <div>
+                        <ul class="nav navbar-nav" id="tabs">
+                            <li class="active" id="folder_tab"><a data-toggle="tab" href="#content" id="content_link">
+                                    <i class="fa fa-fw fa-file"></i></i>Content</a>
+                            </li>
+                            <li id="file_tab"><a data-toggle="tab" href="#edit" id="edit_link">
+                                    <i class="fa fa-fw fa-file"></i>Edit</a>
+                            </li>
+                            <li id="permission_tab"><a data-toggle="tab" href="#permission" id="permission_link">
+                                    <i class="fa fa-fw fa-users"></i>Permissions</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </div>
+        <div class="tab-content">
+            {# Displaying File's Content #}
+            <div id="content"  class="tab-pane fade in active" style="margin-top: 15px">
+                {{ include('GedBundle:CRUD:fileContent.html.twig',
+                {'file':        file,
+                    'path':        path,
+                    'versions':    versions,
+                    'creators':    creators,
+                })
+                }}
+            </div>
+            {# Displaying File's Edit #}
+            <div id="edit" class="tab-pane fade"  style="margin-top: 15px">
+                {{ include('GedBundle:CRUD:fileEdit.html.twig')}}
+            </div>
+            {# Displaying Permission #}
+            <div id="permission" class="tab-pane fade"  style="margin-top: 15px">
+                {{ include('GedBundle:CRUD:filePermission.html.twig',
+                {
+                    'file': file,
+                    'permissions' : permissions,
+                })
+                }}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+
+    {{ parent() }}
+    <script src="{{ asset('bundles/fosjsrouting/js/router.js') }}"></script>
+    <script src="{{ path('fos_js_routing_js', { callback: 'fos.Router.setData' }) }}"></script>
+    {#<script src="{{ asset('bundles/ged/AdminLTE2/plugins/select2/select2.full.min.js') }}"></script>#}
+    {#<script src="{{ asset('bundles/tetranzselect2entity/js/select2entity.js') }}"></script>#}
+
+{% endblock %}
+
+{% block  javascripts_inline%}
+
+
+{% endblock %}
