@@ -45,7 +45,7 @@ class Workspace
      * @var User
      *
      *
-     * @ORM\OneToOne(targetEntity="User")
+     * @ORM\OneToOne(targetEntity="User", inversedBy="workspace")
      */
     private $user;
 

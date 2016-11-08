@@ -12,18 +12,10 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class WorkspaceFile
 {
+
+
     /**
-     * @var int
-     *
-     * @ORM\Column(name="id", type="integer")
      * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $id;
-
-
-    /**
-     *
      * @ORM\ManyToOne(targetEntity="Workspace", inversedBy="files")
      * @ORM\JoinColumn(nullable=false)
      *
@@ -32,7 +24,7 @@ class WorkspaceFile
 
 
     /**
-     *
+     * @ORM\Id
      * @ORM\ManyToOne(targetEntity="File", inversedBy="workspaces")
      * @ORM\JoinColumn(nullable=false)
      *
@@ -53,17 +45,6 @@ class WorkspaceFile
      * @ORM\Column(name="notification", type="smallint", nullable=true)
      */
     private $notification;
-
-
-    /**
-     * Get id
-     *
-     * @return integer 
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
 
 
     /**
@@ -131,6 +112,14 @@ class WorkspaceFile
     {
         $this->file = $file;
         $file->addWorkspace($this);
+    }
+
+    public function __construct(Workspace $workspace, File $file )
+    {
+        $this->file = $file;
+        $this->workspace = $workspace;
+        $file->addWorkspace($this);
+        $workspace->addFile($this);
     }
 
 }

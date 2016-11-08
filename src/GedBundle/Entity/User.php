@@ -85,6 +85,13 @@ class User extends BaseUser implements ThemeUser
     protected $registrationDate;
 
     /**
+     * @var Workspace
+     *
+     * @ORM\OneToOne(targetEntity="Workspace", mappedBy="user")
+     */
+    protected $workspace;
+
+    /**
      * Get id
      *
      * @return integer 
@@ -252,6 +259,24 @@ class User extends BaseUser implements ThemeUser
     {
         return $this->getId();
     }
+
+    /**
+     * @return Workspace
+     */
+    public function getWorkspace()
+    {
+        return $this->workspace;
+    }
+
+    /**
+     * @param Workspace $workspace
+     */
+    public function setWorkspace($workspace)
+    {
+        $this->workspace = $workspace;
+    }
+
+
 
 }
 

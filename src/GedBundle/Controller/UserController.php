@@ -3,6 +3,7 @@
 namespace GedBundle\Controller;
 
 use GedBundle\Entity\User;
+use GedBundle\Entity\Workspace;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -125,8 +126,8 @@ class UserController extends Controller
                 $user->setAvatar('user/'.$fileName);
             }
 
+            $this->addUserWorkspace($user);
             $userManager->updateUser($user);
-
 
             return $this->redirect($this->generateUrl('user_list'));
 
@@ -236,5 +237,16 @@ class UserController extends Controller
 
 
         return $response;
+    }
+
+    private function addUserWorkspace(User $user)
+    {
+
+        $em = $this->getDoctrine()->getEntityManager();
+        $workspace = new Workspace();
+        $user->setWorkspace($workspace);
+        $em->persist($workspace);
+        $em->flush();
+
     }
 }
