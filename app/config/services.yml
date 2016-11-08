@@ -17,3 +17,7 @@ services:
             - { name: security.voter }
 
         public: false
+
+    ged_bundle.logout_handler:
+       class: GedBundle\Security\LogoutHandler
+       arguments: [ @doctrine.orm.entity_manager ]

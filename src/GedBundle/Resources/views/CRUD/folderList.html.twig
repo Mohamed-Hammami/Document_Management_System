@@ -38,10 +38,10 @@
                                 </thead>
                                 <tbody>
                                 {% for child in children %}
-                                    <tr role="row">
+                                    <tr role='row' {% if child.onHold == true %} class='warning' {% endif %}>
                                         {% if folder_actions|length > 0 %}
-                                            <td class="folder_checkbox_field">
-                                                <input type="checkbox" class="minimal" name="idx[]" value={{ child.id }}>
+                                            <td class='folder_checkbox_field'>
+                                                <input type='checkbox' class='minimal' name='idx[]' value={{ child.id }}>
                                             </td>
                                         {% endif %}
                                         {% spaceless %}
@@ -55,13 +55,13 @@
                                                         </a>
                                                     {% elseif field == 'createdBy' or field == 'updatedBy' %}
                                                         <a href={{ path('user_show', {'userid':child[field]['id']}) }}>
-                                                            <span class="badge">
-                                                                <i class="fa fa-fw fa-user"></i>
+                                                            <span class='badge'>
+                                                                <i class='fa fa-fw fa-user'></i>
                                                                 {{ (child[field])['usernameCanonical'] }}
                                                             </span>
                                                          </a>
                                                     {% elseif child[field] is null %}
-                                                        <span class="text-muted">no content</span>
+                                                        <span class='text-muted'>no content</span>
                                                     {% else %}
                                                         {{ child[field] }}
                                                     {% endif %}

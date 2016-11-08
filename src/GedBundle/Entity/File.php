@@ -80,6 +80,7 @@ class File extends Node
      * @ORM\ManyToMany(targetEntity="Tag", inversedBy="files")
      */
     protected $tags;
+
     /**
      *
      * @var \Doctrine\Common\Collections\ArrayCollection
@@ -89,12 +90,21 @@ class File extends Node
      */
     protected $groupes;
 
+    /**
+    *
+    * @var \Doctrine\Common\Collections\ArrayCollection
+    *
+    * @ORM\OneToMany(targetEntity="WorkspaceFile", mappedBy="file")
+    *
+    */
+    protected $workspaces;
+
 
 
     /**
      * Get id
      *
-     * @return integer 
+     * @return integer
      */
     public function getId()
     {
@@ -266,6 +276,24 @@ class File extends Node
         $this->tags->removeElement($tag);
     }
 
+    /**
+     * @return ArrayCollection
+     */
+    public function getWorkspaces()
+    {
+        return $this->workspaces;
+    }
+
+    /**
+     * @param ArrayCollection $workspaces
+     */
+    public function setWorkspaces($workspaces)
+    {
+        $this->workspaces = $workspaces;
+    }
+
+
+
     public function addGroupe(GroupeFile  $groupe)
     {
         $this->groupes[] =$groupe;
@@ -282,11 +310,20 @@ class File extends Node
     }
 
 
+    public function addWorkspace($workspace)
+    {
+        $this->workspaces[] = $workspace;
+    }
+
+    public function removeWorkspace($workspace)
+    {
+        $this->workspaces->removeElement($workspace);
+    }
+
     public function __toString()
     {
         return $this->getName();
     }
-
 
     public function __construct()
     {
@@ -294,6 +331,8 @@ class File extends Node
         $this->groupes = new ArrayCollection();
         $this->versions = new ArrayCollection();
         $this->comments = new ArrayCollection();
+        $this->workspaces = new ArrayCollection();
+        $this->setOnHold(false);
     }
 
 

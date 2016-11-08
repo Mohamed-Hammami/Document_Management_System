@@ -86,6 +86,16 @@ class Folder extends Node implements NodeInterface
      */
     private $files;
 
+
+    /**
+     *
+     * @var \Doctrine\Common\Collections\ArrayCollection
+     *
+     * @ORM\OneToMany(targetEntity="WorkspaceFolder", mappedBy="folder")
+     *
+     */
+    protected $workspaces;
+
     /**
      * @return string
      */
@@ -216,6 +226,34 @@ class Folder extends Node implements NodeInterface
     public function __construct()
     {
         $this->files = new ArrayCollection();
+        $this->workspaces = new ArrayCollection();
+        $this->setOnHold(false);
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getWorkspaces()
+    {
+        return $this->workspaces;
+    }
+
+    /**
+     * @param ArrayCollection $workspaces
+     */
+    public function setWorkspaces($workspaces)
+    {
+        $this->workspaces = $workspaces;
+    }
+
+    public function addWorkspace($workspace)
+    {
+        $this->workspaces[] = $workspace;
+    }
+
+    public function removeWorkspace($workspace)
+    {
+        $this->workspaces->removeElement($workspace);
     }
 
     public function addFile(File $file)

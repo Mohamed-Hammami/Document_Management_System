@@ -1,5 +1,10 @@
 {% extends '@Ged/default_layout.html.twig' %}
 
+{% block avanzu_sidebar %}
+    {{ parent() }}
+    {% include('@Ged/clipboard.html.twig') %}
+{% endblock %}
+
 {% block stylesheets %}
     {{ parent() }}
     <link rel="stylesheet" href='{{ asset('bundles/ged/AdminLTE2/plugins/iCheck/all.css') }}'>
@@ -46,8 +51,9 @@
                             <li id="file_tab"><a data-toggle="tab" href="#file" id="file_link">
                                     <i class="fa fa-fw fa-file"></i>Files</a>
                             </li>
-                            <li id="permission_tab"><a data-toggle="tab" href="#permission" id="permission_link">
-                                    <i class="fa fa-fw fa-users"></i>Permissions</a></li>
+                            <li id="edit_tab"><a data-toggle="tab" href="#edit" id="edit_link">
+                                    <i class="fa fa-fw fa-edit"></i>Edit</a>
+                            </li>
                         </ul>
                     </div>
                     <div class="navbar-collapse" id="add_buttons">
@@ -105,8 +111,9 @@
                     'file_actions': file_actions})
                 }}
             </div>
-
-            <div id="permission" class="tab-pane fade"  style="margin-top: 15px">
+            {# Edit Folder#}
+            <div id="edit" class="tab-pane fade"  style="margin-top: 15px">
+                {{ render(controller('GedBundle:Folder:edit', { 'id': folder_id })) }}
             </div>
 
         </div>
@@ -121,7 +128,6 @@
     <script src="{{ path('fos_js_routing_js', { callback: 'fos.Router.setData' }) }}"></script>
     <script src="{{ asset('bundles/ged/AdminLTE2/plugins/select2/select2.full.min.js') }}"></script>
     <script src="{{ asset('bundles/tetranzselect2entity/js/select2entity.js') }}"></script>
-
 
 
 {% endblock %}
@@ -187,7 +193,7 @@
                 $('#new_file').css('display', '');
                 $('#add_buttons').prepend($('#new_file'));
             });
-            $('#permission_link').click(function(){
+            $('#edit_link').click(function(){
                 $('#add_buttons').children().css('display', 'none');
                 console.log('permission active');
                 $('#new_permission').css('display', '');
@@ -218,6 +224,127 @@
 
         });
         {% endblock %}
+
+
+        // Controls for clipboard buttons
+
+        jQuery(document).ready(function ($) {
+
+            $("#remove_cutFolders").click(function(){
+
+                var cutFolders = [];
+                {% for folder in app.session.get("cutFolders") %}
+                    cutFolders.push({{ folder.id }});
+                {% endfor %}
+
+                {% if app.session.get('cutFolders')  is not null %}
+
+                    $.ajax({
+                        type: 'post',
+                        url: Routing.generate('folder_reset_paste'),
+                        data: { cutFolders:  cutFolders},
+                        beforeSend: function(){
+                        },
+                        success: function(data){
+                            console.log(data.status)
+                        }
+                    });
+
+                    $("#cutFolder_div").empty().prepend("<span class='text-muted'>No folders in the selection</span>");
+                    // ugly code !!!
+                    {% if app.session.get('cutFolders') is not null %}
+                    var id = {{ (app.session.get("cutFolders")|first).parent.id }};
+                    {% endif %}
+                    if ( id == {{ folder_id }} )
+                    {
+                        $(".warning").removeAttr("class");
+                    }
+
+                {% endif %}
+
+            });
+
+            $("#remove_cutFiles").click(function(){
+
+                var cutFiles = [];
+                {% for file in app.session.get("cutFiles") %}
+                    cutFiles.push({{ file.id }});
+                {% endfor %}
+
+                {% if app.session.get('cutFiles') is not null %}
+                    $.ajax({
+                        type: 'post',
+                        url: Routing.generate('file_reset_paste'),
+                        data: { cutFiles:  cutFiles},
+                        beforeSend: function(){
+                        },
+                        success: function(data){
+                            console.log(data.status)
+                        }
+                    });
+
+                    $("#cutFile_div").empty().prepend("<span class='text-muted'>No files in the selection</span>");
+                    {% if app.session.get('cutFiles') is not null %}
+                    var id = {{ (app.session.get("cutFiles")|first).folder.id }};
+                    {% endif %}
+                    console.log(id);
+                    if ( id == {{ folder_id }} )
+                    {
+                        $(".warning").removeAttr("class");
+                    }
+                {% endif %}
+            });
+
+            $("#paste_folders").click(function(){
+
+                var cutFolders = [];
+                {% for folder in app.session.get("cutFolders") %}
+                    cutFolders.push({{ folder.id }});
+                {% endfor %}
+
+                {% if app.session.get('cutFolders') is not null %}
+
+                    $.ajax({
+                        type: 'post',
+                        url: Routing.generate('folder_paste', {parentId: {{ folder_id }}}),
+                        data: { sourceId: {{ (app.session.get('cutFolders')|first).parent.id}}, childIds: cutFolders },
+                        beforeSend: function(){
+                        },
+                        success: function(data){
+                            console.log(data.status)
+                            location.reload();
+                        }
+
+                    })
+                {% endif %}
+            });
+
+            $("#paste_files").click(function(){
+
+                var cutFiles = [];
+                {% for file in app.session.get("cutFiles") %}
+                cutFiles.push({{ file.id }});
+                {% endfor %}
+
+                {% if app.session.get('cutFiles') is not null %}
+
+                $.ajax({
+                    type: 'post',
+                    url: Routing.generate('file_paste', {parentId: {{ folder_id }}}),
+                    data: { sourceId: {{ (app.session.get('cutFiles')|first).folder.id}}, fileIds: cutFiles },
+                    beforeSend: function(){
+                    },
+                    success: function(data){
+                        console.log(data.status)
+                        location.reload();
+                    }
+
+                })
+                {% endif %}
+            });
+
+        });
+
 
     </script>
 {% endblock %}

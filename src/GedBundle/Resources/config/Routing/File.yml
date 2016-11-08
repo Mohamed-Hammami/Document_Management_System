@@ -7,6 +7,10 @@ file_show:
     path: /{id}/show
     defaults: { _controller: 'GedBundle:File:show'}
 
+file_edit:
+    path: /{id}/edit
+    defaults: { _controller: 'GedBundle:File:edit'}
+
 #file_remove:
 #    path: /{id}/remove
 #    defaults: { _controller: 'GedBundle:File:remove' }

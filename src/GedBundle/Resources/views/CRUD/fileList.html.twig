@@ -38,7 +38,7 @@
                                 </thead>
                                 <tbody>
                                 {% for file in files %}
-                                    <tr role="row">
+                                    <tr role="row" {% if file.onHold == true %} class="warning" {% endif %}>
                                         {% if file_actions|length > 0 %}
                                             <td class="file_checkbox_field">
                                                 <input type="checkbox" class="minimal" name="idx[]" value={{ file.id }}>

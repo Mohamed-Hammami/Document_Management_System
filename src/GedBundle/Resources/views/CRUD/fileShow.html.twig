@@ -45,7 +45,7 @@
                                     <i class="fa fa-fw fa-file"></i></i>Content</a>
                             </li>
                             <li id="file_tab"><a data-toggle="tab" href="#edit" id="edit_link">
-                                    <i class="fa fa-fw fa-file"></i>Edit</a>
+                                    <i class="fa fa-fw fa-edit"></i>Edit</a>
                             </li>
                             <li id="permission_tab"><a data-toggle="tab" href="#permission" id="permission_link">
                                     <i class="fa fa-fw fa-users"></i>Permissions</a></li>
@@ -67,7 +67,7 @@
             </div>
             {# Displaying File's Edit #}
             <div id="edit" class="tab-pane fade"  style="margin-top: 15px">
-                {{ include('GedBundle:CRUD:fileEdit.html.twig')}}
+                {{ render(controller('GedBundle:File:edit', { 'id': file_id })) }}
             </div>
             {# Displaying Permission #}
             <div id="permission" class="tab-pane fade"  style="margin-top: 15px">

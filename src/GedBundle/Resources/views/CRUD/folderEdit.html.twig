@@ -1,0 +1,30 @@
+
+<div class="col-xs-12">
+    <div class="row">
+        <div class="box">
+            <form action="{{ path('folder_edit', {'id': id}) }}" method="post"{{form_enctype(form) }}>
+            <div class="box-body">
+                <div class="modal-body">
+                    <div class="form-group">
+                        {{ form_label(form.name) }}
+                        {{ form_errors(form.name) }}
+                        {{ form_widget(form.name) }}
+                    </div>
+                    <div class="form-group">
+                        {{ form_label(form.description) }}
+                        {{ form_errors(form.description) }}
+                        {{ form_widget(form.description) }}
+                    </div>
+                </div>
+            </div>
+            <div class="box-footer">
+                <div class="pull-left">
+                    {{ form_widget(form.edit) }}
+                    {{ form_widget(form.cancel) }}
+                </div>
+                {{ form_rest(form) }}
+            </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -104,6 +104,8 @@ stof_doctrine_extensions:
             tree:          true
             blameable:     true
             timestampable: true
+    class:
+         blameable: GedBundle\EventListener\MyBlameableListener
 
 services:
     app.twig_extension:

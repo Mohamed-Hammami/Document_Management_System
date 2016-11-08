@@ -34,3 +34,7 @@ ged_bundle_routes:
 fos_js_routing:
     resource: "@FOSJsRoutingBundle/Resources/config/routing/routing.xml"
 
+#logout route
+route:
+    path: /logout
+

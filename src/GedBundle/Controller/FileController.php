@@ -73,6 +73,52 @@ class FileController extends Controller
 
     }
 
+    public function editAction(Request $request, $id)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $fileRepository =  $em->getRepository('GedBundle:File');
+
+        if( !$file = $fileRepository->find($id) )
+        {
+            throw $this->createNotFoundException(sprintf("there's no file with %id id", $id));
+        }
+
+        $form = $this->createForm(FileType::class, $file, array('edit' => true));
+        $form->add('edit', 'submit', array(
+            'label' => 'edit',
+            'attr' => array(
+                'class' => 'btn btn-primary'
+            )))
+            ->add('cancel', 'reset', array(
+                'label' => 'cancel',
+                'attr' => array(
+                    'class' => 'btn btn-primary'
+                )))
+        ;
+
+        $form->handleRequest($request);
+        if( $form->isValid() )
+        {
+            if ( !$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY') )
+            {
+                throw $this->createAccessDeniedException('You have to be authenticated to edit a file');
+            }
+
+            $em->flush();
+
+            return $this->redirect($this->generateUrl('file_show', array('id' => ($file->getId()))));
+        }
+
+        return $this->render(
+            '@Ged/CRUD/fileEdit.html.twig',
+            array(
+                'form' => $form->createView(),
+                'id' => $id,
+            )
+        );
+
+    }
+
     public function showAction(Request $request, $id)
     {
         $em = $this->getDoctrine()->getManager();
@@ -119,6 +165,7 @@ class FileController extends Controller
 
         return $this->render('@Ged/CRUD/fileShow.html.twig', array(
 
+            'file_id'  => $id,
             'path'     => $path,
             'file'     => $file,
             'comments' => $comments,
@@ -187,12 +234,11 @@ class FileController extends Controller
         }
     }
 
-
-
     public function downloadVersionAction(Version $version)
     {
 
         $helper = $this->container->get('vich_uploader.templating.helper.uploader_helper');
         $path = $helper->asset($version, '$fileContent');
     }
+
 }

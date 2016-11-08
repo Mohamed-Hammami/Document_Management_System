@@ -67,4 +67,17 @@ class FolderRepository extends NestedTreeRepository
         return $qb->getQuery()
             ->getOneOrNullResult();
     }
+
+    public function findFolder($id)
+    {
+        $qb = $this->createQueryBuilder('f')
+            ->setParameter('id', $id)
+            ->where('f.id = :id')
+            ->select('f.id')
+            ->addSelect('f.name');
+
+
+        return $qb->getQuery()
+            ->getResult();
+    }
 }

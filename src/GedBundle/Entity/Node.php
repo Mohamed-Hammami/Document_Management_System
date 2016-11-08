@@ -54,6 +54,30 @@ abstract class Node
      */
     protected $updated;
 
+
+    /**
+     * @var bool
+     *
+     * @ORM\Column(name="onHold", type="boolean", nullable=true)
+     */
+    protected $onHold;
+
+    /**
+     * @return boolean
+     */
+    public function isOnHold()
+    {
+        return $this->onHold;
+    }
+
+    /**
+     * @param boolean $onHold
+     */
+    public function setOnHold($onHold)
+    {
+        $this->onHold = $onHold;
+    }
+
     /**
      * Get id
      *

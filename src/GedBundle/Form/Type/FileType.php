@@ -38,6 +38,7 @@ class FileType extends AbstractType
             )))
             ->add('version', VersionType::class,
                 array('required' => false,
+                        'disabled' => $options['edit']? true: false,
                         'mapped' => false,
                         'label' => 'First version'
                 ));
@@ -47,8 +48,10 @@ class FileType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults( array(
-           'data_class' => 'GedBundle\Entity\File'
+           'data_class' => 'GedBundle\Entity\File',
+            'edit' => false,
         ));
     }
+
 
 }

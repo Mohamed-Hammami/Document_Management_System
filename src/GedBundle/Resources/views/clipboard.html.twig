@@ -1,0 +1,83 @@
+<ul class="sidebar-menu">
+
+    <li class="header">CLIPBOARD</li>
+    <li class="treeview">
+        <div style="margin: 10px 10px; border-radius: 3px">
+            <div class="box box-default box-solid">
+                <div class="box-header with-border ">
+                    <h3 class="box-title">Folders</h3>
+
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" id="remove_cutFolders">
+                            <i class="fa fa-fw fa-trash"></i>
+                        </button>
+                        <button type="button" class="btn btn-box-tool" id="paste_folders">
+                            <i class="fa fa-fw fa-paste"></i>
+                        </button>
+                    </div>
+                    <!-- /.box-tools -->
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body" id="cutFolder_div">
+                    {% if app.session.get('cutFolders') is null %}
+                        <span class="text-muted">No folders in the selection</span>
+                    {% else %}
+                        {% for folder in app.session.get('cutFolders') %}
+                            <button type="button" class="btn btn-default btn-block">
+                                <div class="pull-left">
+                                    <i class="fa fa-fw fa-folder"></i>
+                                    <em>{{ folder.name|capitalize }}</em>
+                                </div>
+                                <div class="pull-right">
+                                    <a href="#"><i class="fa fa-fw fa-remove"></i></a>
+                                </div>
+                            </button>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                <!-- /.box-body -->
+            </div>
+        </div>
+    </li>
+    <li class="treeview">
+        <div style="margin: 10px 10px; border-radius: 3px">
+            <div class="box box-default box-solid">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Files</h3>
+
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" id="remove_cutFiles">
+                            <i class="fa fa-fw fa-trash"></i>
+                        </button>
+                        <button type="button" class="btn btn-box-tool" id="paste_files">
+                            <i class="fa fa-fw fa-paste"></i>
+                        </button>
+                    </div>
+                    <!-- /.box-tools -->
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body" id="cutFile_div">
+                    {% if app.session.get('cutFiles') is null %}
+                        <span class="text-muted">No files in the selection</span>
+                    {% else %}
+                        {% for file in app.session.get('cutFiles') %}
+                            <button type="button" class="btn btn-default btn-block">
+                                <div class="pull-left">
+                                    <i class="fa fa-fw fa-file"></i>
+                                    <em>{{ file.name|capitalize }}</em>
+                                </div>
+                                <div class="pull-right">
+                                    <a href="#"><i class="fa fa-fw fa-remove"></i></a>
+                                </div>
+                            </button>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                <!-- /.box-body -->
+            </div>
+        </div>
+    </li>
+</ul>
+
+
+

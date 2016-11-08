@@ -8,9 +8,12 @@ use GedBundle\Utils\FieldDescription;
 use GedBundle\Entity\File;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\Finder\Exception\AccessDeniedException;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use GedBundle\Utils\BatchActionDescription;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use GedBundle\Form\Type\FolderType;
@@ -20,8 +23,8 @@ class FolderController extends Controller
 
     private $flashBagTypes = array('success', 'warning', 'info', 'danger');
 
-    private $folderActionsValues = array("Delete", "Modify");
-    private $fileActionsValues = array("Delete", "Modify");
+    private $folderActionsValues = array("Delete", "Modify", "Move");
+    private $fileActionsValues = array("Delete", "Modify", "Move");
 
     private $folderHeader = array();
     private $folderMappedFields = array();
@@ -32,9 +35,6 @@ class FolderController extends Controller
     private $fileActions = array();
 
 
-    /**
-     * @return array
-     */
     public function getFolderHeader()
     {
         return $this->folderHeader;
@@ -71,20 +71,15 @@ class FolderController extends Controller
         $currentFolder = $folderRepository->find($id);
 
         $path = $folderRepository->getPath($currentFolder);
-        dump($path);
 
         if( !$currentFolder )
         {
             throw new ResourceNotFoundException;
         }
 
-        dump($folderRepository->getChildren());
-
         $files = $fileRepository->findFileUser($id);
         $children = $folderRepository->findFolderChildrenUser($id);
         $path = $folderRepository->getPath($currentFolder);
-
-        dump($folderRepository->getPath($folderRepository->find($id)));
 
         $this->addFolderHeader('Name', 'text');
         $this->addFolderHeader('Description', 'text');
@@ -115,7 +110,10 @@ class FolderController extends Controller
         $this->addFileMappedField('updatedBy');
 
         $this->addFolderAction( new BatchActionDescription('delete', false));
+        $this->addFolderAction( new BatchActionDescription('move', false));
+
         $this->addFileAction(new BatchActionDescription('delete', false));
+        $this->addFileAction(new BatchActionDescription('move', false));
 
         return $this->render('@Ged/CRUD/folder.html.twig', array(
 
@@ -138,6 +136,7 @@ class FolderController extends Controller
 
 
     }
+
 
     public function createAction(Request $request, $id)
     {
@@ -167,7 +166,7 @@ class FolderController extends Controller
 
             if ( !$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY') )
             {
-                throw $this->createAccessDeniedException('You have to be authenticated to create a file');
+                throw $this->createAccessDeniedException('You have to be authenticated to create a folder');
             }
             $user = $this->get('security.token_storage')->getToken()->getUser();
 
@@ -183,6 +182,54 @@ class FolderController extends Controller
 
         return $this->render(
             '@Ged/CRUD/folderCreate.html.twig',
+            array(
+                'form' => $form->createView(),
+                'id' => $id,
+            )
+        );
+    }
+
+    public function editAction(Request $request, $id)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $folderRepository =  $em->getRepository('GedBundle:Folder');
+
+
+        if ( !$folder = $folderRepository->find($id) )
+            throw new NotFoundHttpException( sprintf('There is no folder with %d id', $id));
+
+
+        $form = $this->createForm(FolderType::class, $folder);
+        $form->add('edit', 'submit', array(
+            'label' => 'edit',
+            'attr' => array(
+                'class' => 'btn btn-primary'
+            )))
+            ->add('cancel', 'reset', array(
+                'label' => 'cancel',
+                'attr' => array(
+                    'class' => 'btn btn-primary'
+            )));
+
+
+        $form->handleRequest($request);
+
+        if( $form->isValid() )
+        {
+
+            if ( !$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY') )
+            {
+                throw $this->createAccessDeniedException('You have to be authenticated to edit a folder');
+            }
+
+            $em->flush();
+
+            return $this->redirect($this->generateUrl('folder_show', array('id' => ($folder->getId()))));
+
+        }
+
+        return $this->render(
+            '@Ged/CRUD/folderEdit.html.twig',
             array(
                 'form' => $form->createView(),
                 'id' => $id,
@@ -222,86 +269,55 @@ class FolderController extends Controller
         $this->fileActions[] = $action;
     }
 
-    /**
-     * @return array
-     */
     public function getFolderMappedFields()
     {
         return $this->folderMappedFields;
     }
 
-    /**
-     * @param array $folderMappedFields
-     */
     public function setFolderMappedFields($folderMappedFields)
     {
         $this->folderMappedFields = $folderMappedFields;
     }
 
-    /**
-     * @return array
-     */
     public function getFolderActions()
     {
         return $this->folderActions;
     }
 
-    /**
-     * @param array $folderActions
-     */
     public function setFolderActions($folderActions)
     {
         $this->folderActions = $folderActions;
     }
 
-    /**
-     * @return array
-     */
     public function getFileHeader()
     {
         return $this->fileHeader;
     }
 
-    /**
-     * @param array $fileHeader
-     */
     public function setFileHeader($fileHeader)
     {
         $this->fileHeader = $fileHeader;
     }
 
-    /**
-     * @return array
-     */
     public function getFileMappedFields()
     {
         return $this->fileMappedFields;
     }
 
-    /**
-     * @param array $fileMappedFields
-     */
     public function setFileMappedFields($fileMappedFields)
     {
         $this->fileMappedFields = $fileMappedFields;
     }
 
-    /**
-     * @return array
-     */
     public function getFileActions()
     {
         return $this->fileActions;
     }
 
-    /**
-     * @param array $fileActions
-     */
     public function setFileActions($fileActions)
     {
         $this->fileActions = $fileActions;
     }
-
 
     public function folderBatchAction(Request $request = null)
     {
@@ -358,8 +374,6 @@ class FolderController extends Controller
             throw new \RuntimeException(sprintf('A `%s::%s` method must be callable', get_class($this), $finalAction));
         }
 
-        dump($data);
-
         return call_user_func(array($this, $finalAction), $data, $id, $request);
 
     }
@@ -368,7 +382,7 @@ class FolderController extends Controller
     {
         // Control security with $this->admin->checkAccess do it below !!!
 
-        // I have also to add a model manager exception
+        // I also have to add a model manager exception
 
         $folderRepository = $this->getDoctrine()->getRepository('GedBundle:Folder');
 
@@ -376,7 +390,6 @@ class FolderController extends Controller
             {
                 foreach( $data['idx'] as $value )
                 {
-                    dump($value);
                     $this->removeFolder($value);
                 }
 
@@ -399,6 +412,54 @@ class FolderController extends Controller
 
     }
 
+    public function batchFolderMove(array $data, $id, Request $request = null)
+    {
+        // I didnt implement security check yet !!!
+
+        $em = $this->getDoctrine()->getEntityManager();
+        $folderRepository = $em->getRepository('GedBundle:Folder');
+
+        if( $folders = $this->get('session')->get('cutFolders') )
+        {
+            foreach( $folders as $folder )
+            {
+                $folder = $folderRepository->find($folder->getId());
+                $folder->setOnHold(false);
+            }
+            $folders = array();
+
+        } else
+        {
+            $folders = array();
+        }
+
+        if( !$data['all_elements'] )
+        {
+            foreach( $data['idx'] as $value )
+            {
+                $folder = $folderRepository->find($value);
+                array_push($folders, $folder);
+                $folder->setOnHold(true);
+            }
+
+        } else
+        {
+            $folder = $folderRepository->find($id);
+            $children = $folderRepository->getChildren($folder, true);
+            foreach( $children as $child)
+            {
+                array_push($folders, $child);
+                $child->setOnHold(true);
+            }
+        }
+
+        $this->get('session')->set('cutFolders', $folders);
+        $em->flush();
+
+        return new RedirectResponse(
+            $this->generateUrl('folder_show', array('id' => $id)));
+
+    }
     public function fileBatchAction(Request $request = null)
     {
         // Checks for the form method
@@ -430,7 +491,6 @@ class FolderController extends Controller
             $data        = $request->request->all();
         }
 
-        dump($data);
 
         if( !in_array($this->camelize($action), $this->fileActionsValues) )
         {
@@ -439,8 +499,6 @@ class FolderController extends Controller
 
         // at least one item must be checked
         $nonRelevent = (count($idx) < 1 && !$allElements);
-
-        dump($nonRelevent);
 
         if( $nonRelevent )
         {
@@ -457,7 +515,6 @@ class FolderController extends Controller
             throw new \RuntimeException(sprintf('A `%s::%s` method must be callable', get_class($this), $finalAction));
         }
 
-        dump($data);
 
         return call_user_func(array($this, $finalAction), $data, $id, $request);
 
@@ -494,11 +551,53 @@ class FolderController extends Controller
 
     }
 
-    /**
-     * @param string $property
-     *
-     * @return string
-     */
+    public function batchFileMove(array $data, $id, Request $request = null)
+    {
+
+        // I didnt implement security check yet !!!
+        $em = $this->getDoctrine()->getEntityManager();
+        $fileRepository = $this->getDoctrine()->getRepository('GedBundle:File');
+
+
+        if( $files = $this->get('session')->get('cutFiles') )
+        {
+            foreach( $files as $file )
+            {
+                $file = $fileRepository->find($file->getId());
+                $file->setOnHold(false);
+            }
+            $files = array();
+
+        } else {
+            $files = array();
+        }
+
+        if( !$data['all_elements'] )
+        {
+            foreach( $data['idx'] as $value )
+            {
+                $file = $fileRepository->find($value);
+                array_push($files, $file);
+                $file->setOnHold(true);
+            }
+
+        } else
+        {
+            $files = $fileRepository->findFileByFolder($id);
+            foreach( $files as $file)
+            {
+                $file->setOnHold(true);
+            }
+        }
+
+        $this->get('session')->set('cutFiles', $files);
+        $em->flush();
+
+        return new RedirectResponse(
+            $this->generateUrl('folder_show', array('id' => $id)));
+
+    }
+
     public function camelize($property)
     {
         return Container::camelize($property);
@@ -539,6 +638,11 @@ class FolderController extends Controller
             throw new ResourceNotFoundException( sprintf('There is no folder with %d id', $folderId));
         }
 
+        if( !$file->isOnHold() )
+        {
+            throw new AccessDeniedException(sprintf("You can't delete an on holde file"));
+        }
+
         $folder->removeFile($file);
 
         $versions = $versionRepository->findVersionsByFile($fileId);
@@ -574,17 +678,203 @@ class FolderController extends Controller
 
         if( !($folder = $folderRepository->find($folderId)) )
         {
-            $this->createNotFoundException(sprintf("There's no folder with %d id"), $folderId);
+            throw $this->createNotFoundException(sprintf("There's no folder with %d id"), $folderId);
+        }
+
+        if( $folder->isOnHold() )
+        {
+            throw $this->createAccessDeniedException(sprintf("You can't delete an on holder folder"));
         }
 
 
         $filesId = $fileRepository->findFileIdByFolderId($folderId);
 
-        dump($filesId);
+
         foreach( $filesId as $fileId )
             $this->removeFile($fileId['id'], $folderId);
 
         $em->remove($folder);
         $em->flush();
+    }
+
+    public function pasteFoldersAction(Request $request, $parentId)
+    {
+        // security check needed
+
+        $em = $this->getDoctrine()->getEntityManager();
+        $folderRepository = $em->getRepository('GedBundle:Folder');
+
+        $childIds = $request->get('childIds');
+        $sourceId = $request->get('sourceId');
+
+
+
+        if( !($parentFolder = $folderRepository->find($parentId)) )
+        {
+            throw $this->createNotFoundException(sprintf("There's no folder with %d id"), $parentId);
+        }
+
+        if( !($sourceFolder = $folderRepository->find($sourceId)) )
+        {
+            throw $this->createNotFoundException(sprintf("There's no folder with %d id"), $parentId);
+        }
+
+
+        foreach( $childIds as $childId )
+        {
+            if( !($childFolder = $folderRepository->find($childId)) )
+            {
+                throw $this->createNotFoundException(sprintf("There's no folder with %d id"), $childId);
+            }
+
+            if( $childId == $parentId )
+            {
+                throw $this->createAccessDeniedException(sprintf("You can't paste the folders here"));
+            }
+
+            $childrenFolders = $folderRepository->children($childFolder);
+
+            // Performance problem here
+
+            foreach( $childrenFolders as $child )
+            {
+                if( $child->getId() == $parentId )
+                {
+                    throw $this->createAccessDeniedException(sprintf("You can't paste the folders here"));
+                }
+            }
+
+            $this->pasteFolder($parentFolder, $sourceFolder, $childFolder);
+        }
+
+        $em->flush();
+        $this->get('session')->remove('cutFolders');
+        $response = new JsonResponse();
+        return $response->setData( array('status' => 'success'));
+    }
+
+    private function pasteFolder($parent, $source, $child)
+    {
+
+        // Optimisation problem if I test for names
+
+        if( $parent->getId() == $source->getId() )
+            $child->setOnHold(false);
+        else {
+
+            $child->setParent($parent);
+            $child->setOnHold(false);
+        }
+
+        return true;
+
+    }
+
+    public function resetFoldersAction(Request $request)
+    {
+        // security check needed
+
+        $foldersIds = $request->get('cutFolders');
+
+        dump($foldersIds);
+
+        $em = $this->getDoctrine()->getEntityManager();
+        $folderRepository = $em->getRepository('GedBundle:Folder');
+
+        foreach( $foldersIds as $folderId )
+        {
+            if( !($folder = $folderRepository->find($folderId)) )
+            {
+                throw $this->createNotFoundException(sprintf("There's no folder with %d id"), $folderId);
+            }
+
+            $folder->setOnHold(false);
+        }
+
+        $em->flush();
+        $this->get('session')->remove('cutFolders');
+        $response = new JsonResponse();
+        return $response->setData( array('status' => 'success'));
+
+    }
+
+    public function pasteFilesAction(Request $request, $parentId)
+    {
+        // security check needed
+
+        $em = $this->getDoctrine()->getEntityManager();
+        $folderRepository = $em->getRepository('GedBundle:Folder');
+        $fileRepository = $em->getRepository('GedBundle:File');
+
+        $fileIds = $request->get('fileIds');
+        $sourceId = $request->get('sourceId');
+
+
+        if( !($parentFolder = $folderRepository->find($parentId)) )
+        {
+            throw $this->createNotFoundException(sprintf("There's no folder with %d id"), $parentId);
+        }
+
+        if( !($sourceFolder = $folderRepository->find($sourceId)) )
+        {
+            throw $this->createNotFoundException(sprintf("There's no folder with %d id"), $parentId);
+        }
+
+        foreach( $fileIds as $fileId )
+        {
+            if( !($file = $fileRepository->find($fileId)) )
+            {
+                throw $this->createNotFoundException(sprintf("There's no file with %d id"), $fileId);
+            }
+
+            $this->pasteFile($parentFolder, $sourceFolder, $file);
+        }
+
+        $em->flush();
+        $this->get('session')->remove('cutFiles');
+        $response = new JsonResponse();
+        return $response->setData( array('status' => 'success'));
+
+
+    }
+
+    public function pasteFile($folder, $source, $file)
+    {
+
+        if( $folder->getId() == $source->getId() )
+            $file->setOnHold(false);
+        else
+        {
+
+            $source->removeFile($file);
+            $file->setFolder($folder);
+            $file->setOnHold(false);
+        }
+    }
+
+    public function resetFilesAction(Request $request)
+    {
+        // security check needed
+
+        $filesIds = $request->get('cutFiles');
+
+        $em = $this->getDoctrine()->getEntityManager();
+        $fileRepository = $em->getRepository('GedBundle:File');
+
+        foreach( $filesIds as $fileId )
+        {
+            if( !($file = $fileRepository->find($fileId)) )
+            {
+                throw $this->createNotFoundException(sprintf("There's no file with %d id"), $fileId);
+            }
+
+            $file->setOnHold(false);
+        }
+
+        $em->flush();
+        $this->get('session')->remove('cutFiles');
+        $response = new JsonResponse();
+        return $response->setData( array('status' => 'success'));
+
     }
 }

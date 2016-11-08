@@ -27,6 +27,20 @@ class FileRepository extends EntityRepository
 
     }
 
+    public function findFileByFolder($id)
+    {
+
+        $qb = $this->createQueryBuilder('fi')
+            ->select('fi')
+            ->leftJoin('fi.folder', 'fo')
+            ->where('fo.id = :id')
+            ->setParameter('id', $id);
+
+        return $qb->getQuery()
+            ->getResult();
+
+    }
+
     public function findFileUser($id)
     {
         $qb = $this->createQueryBuilder('fi')

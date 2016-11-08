@@ -5,3 +5,33 @@ folder_show:
 folder_create:
     path: /{id}/create
     defaults: { _controller: 'GedBundle:Folder:create'}
+
+folder_edit:
+    path: /{id}/edit
+    defaults: { _controller: 'GedBundle:Folder:edit'}
+
+folder_paste:
+    path: /{parentId}/pasteFolder
+    defaults: { _controller: 'GedBundle:Folder:pasteFolders'}
+    options:
+        expose: true
+
+folder_reset_paste:
+    path: /resetFolder
+    defaults: { _controller: 'GedBundle:Folder:resetFolders' }
+    options:
+        expose: true
+
+file_paste:
+    path: /{parentId}/pasteFile
+    defaults: { _controller: 'GedBundle:Folder:pasteFiles'}
+    options:
+        expose: true
+
+file_reset_paste:
+    path: /resetFile
+    defaults: { _controller: 'GedBundle:Folder:resetFiles'}
+    options:
+        expose: true
+
+

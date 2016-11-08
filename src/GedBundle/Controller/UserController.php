@@ -164,7 +164,7 @@ class UserController extends Controller
 
         $form = $this->createForm(AddUserType::class, $user1, array( 'edit' => true ));
         $form->add('create', 'submit', array(
-            'label' => 'Edit',
+            'label' => 'edit',
             'attr' => array(
                 'class' => 'btn btn-primary'
             )))
