@@ -1,0 +1,292 @@
+{% extends '@Ged/default_layout.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href='{{ asset('bundles/ged/AdminLTE2/plugins/iCheck/all.css') }}'>
+    <link rel="stylesheet" href="{{ asset('bundles/ged/Jquery-bar-rating/css/fontawesome-stars.css') }}">
+
+{% endblock %}
+
+{% block page_title %}
+{% endblock %}
+
+{% block page_subtitle%}
+{% endblock %}
+
+{% block page_content %}
+
+    <div class="row" style="margin: auto">
+
+        <div class="col-xs-12">
+
+            <div class="box">
+                <div class="box-header with-border">
+                    <h3 class="box-title"><i class="fa fa-fw fa-folder-open"></i>Folders</h3>
+
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                        </button>
+                    </div>
+                    <!-- /.box-tools -->
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+
+
+                    <table id="folders_table" class="table table-condensed table-hover" role="grid" aria-describedby="folders">
+                        <thead>
+                        <tr role="row">
+                                <th>Name</th>
+                                <th>Description</th>
+                                <th>Rating</th>
+                                <th>Created at</th>
+                                <th>Updated at</th>
+                            <th class="nosort"></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for folder in folders %}
+                            <tr role="row"  id="{{ folder.folder.id }}">
+                                {% spaceless %}
+                                    <td>
+                                        <a href={{ path('folder_show', {'id':folder.folder.id}) }}>
+                                            {{ folder.folder.name }}
+                                        </a>
+                                    </td>
+                                    <td>
+                                        {% if folder.folder.description is null %}
+                                            <span class="text-muted">no content</span>
+                                        {% else %}
+                                            {{ folder.folder.description }}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <select class="folder-rate">
+                                            <option value="1" {% if folder.rating == 1 %} selected="selected" {% endif %}>1</option>
+                                            <option value="2" {% if folder.rating == 2 %} selected="selected" {% endif %}>2</option>
+                                            <option value="3" {% if folder.rating == 3 %} selected="selected" {% endif %}>3</option>
+                                            <option value="4" {% if folder.rating == 4 %} selected="selected" {% endif %}>4</option>
+                                            <option value="5" {% if folder.rating == 5 %} selected="selected" {% endif %}>5</option>
+                                        </select>
+                                    </td>
+                                    <td>{{ folder.folder.created|date }}</td>
+                                    <td>{{ folder.folder.updated|date }}</td>
+                                    <td>
+                                        <a href="#" class="remove-folder">
+                                            <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                                        </a>
+                                    </td>
+                                {% endspaceless %}
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <!-- /.box-body -->
+            </div>
+            <!-- /.box -->
+
+        </div>
+
+        <div class="col-xs-12">
+
+            <div class="box">
+                <div class="box-header with-border">
+                    <h3 class="box-title"><i class="fa fa-fw fa-file"></i>Files</h3>
+
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                        </button>
+                    </div>
+                    <!-- /.box-tools -->
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <table id="files_table" class="table table-condensed table-hover" role="grid" aria-describedby="files">
+                        <thead>
+                        <tr role="row">
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>Rating</th>
+                            <th>Created at</th>
+                            <th>Updated at</th>
+                            <th class="nosort"></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for file in files %}
+                            <tr role="row"  id="{{ file.file.id }}">
+                                {% spaceless %}
+                                    <td>
+                                        <a href={{ path('file_show', {'id':file.file.id}) }}>
+                                            {{ file.file.name }}
+                                        </a>
+                                    </td>
+                                    <td>
+                                        {% if file.file.description is null %}
+                                            <span class="text-muted">no content</span>
+                                        {% else %}
+                                            {{ file.file.description }}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <select class="file-rate">
+                                            <option value="1">1</option>
+                                            <option value="2">2</option>
+                                            <option value="3">3</option>
+                                            <option value="4">4</option>
+                                            <option value="5">5</option>
+                                        </select>
+                                    </td>
+                                    <td>{{ file.file.created|date }}</td>
+                                    <td>{{ file.file.updated|date }}</td>
+                                    <td>
+                                        <a href="#" class="remove-file">
+                                            <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                                        </a>
+
+                                    </td>
+                                {% endspaceless %}
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <!-- /.box-body -->
+            </div>
+            <!-- /.box -->
+
+        </div>
+
+
+    </div>
+
+
+{% endblock %}
+
+{% block javascripts %}
+
+    {{ parent() }}
+    <script src="{{ asset('bundles/fosjsrouting/js/router.js') }}"></script>
+    <script src="{{ path('fos_js_routing_js', { callback: 'fos.Router.setData' }) }}"></script>
+    <script src="{{ asset('bundles/ged/Jquery-bar-rating/js/jquery.barrating.min.js') }}"></script>
+
+{% endblock %}
+
+{% block javascripts_inline %}
+
+    {{ parent() }}
+
+    <script>
+
+        // dataTables for folders_table & files_table
+
+        $(function(){
+
+
+            $("#folders_table").DataTable({
+                'aoColumnDefs': [{
+                    'bSortable': false,
+                    'aTargets': ['nosort']
+                }],
+                "paging": true,
+                "ordering": true,
+                "bInfo" : false
+
+            });
+
+             $("#files_table").DataTable({
+                'aoColumnDefs': [{
+                    'bSortable': false,
+                    'aTargets': ['nosort']
+                }],
+                "paging": true,
+                "ordering": true,
+                "bInfo" : false
+            });
+
+            // remove link control
+
+            $('.remove-folder').click(function(){
+                var folder_id = $(this).closest("tr").attr("id");
+
+                $.ajax({
+                    type: 'post',
+                    url: Routing.generate('Workspace_remove_folder', { id: folder_id }),
+                    beforeSend: function(){
+                    },
+                    success: function(data){
+                        console.log(data.status);
+                    }
+                });
+
+                $(this).closest("tr").remove();
+
+            });
+
+            $('.remove-file').click(function(){
+                var file_id = $(this).closest("tr").attr("id");
+
+                $.ajax({
+                    type: 'post',
+                    url: Routing.generate('Workspace_remove_file', { id: file_id }),
+                    beforeSend: function(){
+                    },
+                    success: function(data){
+                        console.log(data.status);
+                    }
+                });
+
+
+                $(this).closest("tr").remove();
+
+            });
+
+        });
+
+        $(function(){
+            $('.folder-rate').barrating({
+                theme: 'fontawesome-stars',
+                allowEmpty: null,
+                deselectable: true,
+                onSelect: function(value, text, event) {
+                    var folder_id = $(event.target).closest("tr").attr("id");
+
+                    $.ajax({
+                        type:'post',
+                        url: Routing.generate('Workspace_rate_folder', {id: folder_id }),
+                        data: { rating: value},
+                        beforeSend: function(){
+                        },
+                        success: function(data){
+                            console.log(data.status);
+                        }
+                    })
+                }
+            });
+
+            $('.file-rate').barrating({
+                theme: 'fontawesome-stars',
+                allowEmpty: null,
+                deselectable: true,
+                onSelect: function(value, text, event) {
+                    var file_id = $(event.target).closest("tr").attr("id");
+
+                    $.ajax({
+                        type:'post',
+                        url: Routing.generate('Workspace_rate_file', {id: file_id }),
+                        data: { rating: value },
+                        beforeSend: function(){
+                        },
+                        success: function(data){
+                            console.log(data.status);
+                        }
+                    })
+                }
+            });
+
+        });
+
+
+    </script>
+{% endblock %}

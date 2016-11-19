@@ -7,6 +7,7 @@
 {% block stylesheets%}
     {{ parent() }}
     {#<link rel="stylesheet" href="{{ asset('bundles/ged/AdminLTE2/plugins/select2/select2.min.css') }}">#}
+    <link rel="stylesheet" href="{{ asset('bundles/ged/Jquery-autocomplete/css/jquery-ui.theme.min.css') }}">
 {% endblock %}
 
 {% block page_subtitle%}
@@ -51,6 +52,22 @@
                                     <i class="fa fa-fw fa-users"></i>Permissions</a></li>
                         </ul>
                     </div>
+                    <div class="navbar-collapse" >
+                        <ul class="nav navbar-nav navbar-right">
+                            {% if is_granted('ROLE_ADMIN') %}
+                                {% if file.locked %}
+                                    <a href="#" id="lock_file" state="locked">
+                                        <i class="fa fa-lock fa-3x"></i>
+                                    </a>
+                                {% else %}
+                                    <a href="#" id="lock_file" state="unlocked">
+                                        <i class="fa fa-unlock fa-3x"></i>
+                                    </a>
+                                {% endif %}
+
+                            {% endif %}
+                        </ul>
+                    </div>
                 </div>
             </nav>
         </div>
@@ -87,12 +104,16 @@
     {{ parent() }}
     <script src="{{ asset('bundles/fosjsrouting/js/router.js') }}"></script>
     <script src="{{ path('fos_js_routing_js', { callback: 'fos.Router.setData' }) }}"></script>
+    <script src="{{ asset('bundles/ged/Jquery-autocomplete/js/jquery-ui.min.js') }}"></script>
     {#<script src="{{ asset('bundles/ged/AdminLTE2/plugins/select2/select2.full.min.js') }}"></script>#}
     {#<script src="{{ asset('bundles/tetranzselect2entity/js/select2entity.js') }}"></script>#}
+
 
 {% endblock %}
 
 {% block  javascripts_inline%}
+
+    {{ parent() }}
 
     <script>
 
@@ -100,6 +121,40 @@
         var user_id = "{{ user.id }}";
         var img = "{{ asset(user.avatar) }}";
         $("document").ready( function(){
+
+
+//          Lock button
+            var lock_file =  $("#lock_file");
+            lock_file.click( function(){
+                if( lock_file.attr("state") == "locked"  )
+                {
+                    $.ajax({
+                        type: 'post',
+                        url: Routing.generate('file_unlock', { id:file_id}),
+                        success: function(data){
+                            console.log(data.status);
+                            lock_file.attr("state", "unlocked");
+                            lock_file.empty();
+                            lock_file.append(" <i class='fa fa-unlock fa-3x'></i>");
+                            $(".add_version").empty().append("<i class='fa fa-plus-circle'></i> Add new");
+                            $(".add_version").attr("href", "{{ path('version_create', {id: file.id}) }}");
+                        }
+                    })
+                } else if ( $("#lock_file").attr("state") == "unlocked" )
+                {
+                    $.ajax({
+                        type: 'post',
+                        url: Routing.generate('file_lock', { id:file_id}),
+                        success: function(data){
+                            console.log(data.status);
+                            lock_file.attr("state", "locked");
+                            lock_file.empty();
+                            lock_file.append(" <i class='fa fa-lock fa-3x'></i>");
+                            $(".add_version").empty().append("<i class='fa fa-lock'></i> Add new");
+                        }
+                    })
+                }
+            });
 
 //          Tags events
 
@@ -119,7 +174,7 @@
                             var $element = $("<span/>").addClass("tag label label-info")
                                     .append($("<span/>").addClass("tag_name").append(data.tag))
                                     .append($("<a/>").append($("<i:>")
-                                            .addClass("remove-tag glyphicon glyphicon-remove-sign glyphicon-white")));
+                                            .addClass("remove-tag fa fa-fw fa-remove")));
                             $(".tags_content").append($element);
                         },
                     });
@@ -145,6 +200,12 @@
                     },
                 });
             }))
+
+            {#$('#input_tag').autocomplete({#}
+            {#source : "{{ path('tag_suggest') }}",#}
+            {#minLength: 2,#}
+
+            {#});#}
 
 //          Comments events
 
@@ -182,7 +243,6 @@
                                     $("#comments-output").prepend(t);
                                 }
 
-                                console.log(img)
 
                             }
                         });

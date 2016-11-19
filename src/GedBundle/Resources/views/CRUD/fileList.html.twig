@@ -34,11 +34,12 @@
                                             {% endspaceless %}
                                         </th>
                                     {% endfor %}
+                                        <th class="nosort"></th>
                                 </tr>
                                 </thead>
                                 <tbody>
                                 {% for file in files %}
-                                    <tr role="row" {% if file.onHold == true %} class="warning" {% endif %}>
+                                    <tr role="row" {% if file.onHold == true %} class="warning" {% endif %} id="{{ file.id }}">
                                         {% if file_actions|length > 0 %}
                                             <td class="file_checkbox_field">
                                                 <input type="checkbox" class="minimal" name="idx[]" value={{ file.id }}>
@@ -61,12 +62,23 @@
                                                             </span>
                                                         </a>
                                                     {% elseif file[field] is null %}
-                                                        <span class="text-muted">No content</span>
+                                                        <span class="text-muted">no content</span>
                                                     {% else %}
                                                         {{ file[field] }}
                                                     {% endif %}
                                                 </td>
                                             {%  endfor %}
+                                            <td>
+                                                {% if file.id in workspaceFiles %}
+                                                    <a href="#" class="remove_file_workspace">
+                                                        <i style="color: gold" class="fa fa-fw fa-star fa-lg"></i>
+                                                    </a>
+                                                {% else %}
+                                                    <a href="#" class="add_file_workspace">
+                                                        <i style="color: gold" class="fa fa-fw fa-star-o fa-lg"></i>
+                                                    </a>
+                                                {% endif %}
+                                            </td>
                                         {% endspaceless %}
                                     </tr>
                                 {% endfor %}

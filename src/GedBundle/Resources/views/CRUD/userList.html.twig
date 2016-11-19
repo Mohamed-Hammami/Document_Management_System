@@ -22,6 +22,7 @@
                             <th>Surname</th>
                             <th >Email</th>
                             <th>Registration Date</th>
+                            <th class="nosort"></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -42,6 +43,11 @@
                                 <td>{{ user.surname }}</td>
                                 <td>{{ user.email }}</td>
                                 <td>{{ user.registrationDate|date }}</td>
+                                <td>
+                                    <a href="{{ path('mail_compose_to', {to: user.email}) }}">
+                                        <i class="fa fa-fw fa-envelope"></i>
+                                    </a>
+                                </td>
                             </tr>
                         {% endfor %}
                     </tbody>

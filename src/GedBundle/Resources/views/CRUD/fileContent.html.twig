@@ -32,6 +32,24 @@
         margin-bottom: 2px;
     }
 
+    .chip {
+        display: inline-block;
+        padding: 0 25px;
+        height: 50px;
+        font-size: 16px;
+        line-height: 50px;
+        border-radius: 25px;
+        background-color: #f1f1f1;
+    }
+
+    .chip img {
+        float: left;
+        margin: 0 10px 0 -25px;
+        height: 50px;
+        width: 50px;
+        border-radius: 50%;
+    }
+
 
 </style>
 
@@ -39,7 +57,7 @@
 {# Displaying File's content #}
 <div class="col-xs-12">
     <div class="row">
-        <div class="col-xs-8">
+        <div class="col-xs-7">
             <div class="box">
                 {% if versions|length > 0 %}
                     <div class="box-header">
@@ -47,11 +65,17 @@
                         <div  class = "pull-right">
                             <span class="progress-description">
                                 {#I need to add security control#}
-                                <a data-toggle="modal" data-target="#versionCreate" class="sonata-action-element"
-                                   href="{{ path('version_create', {id: file.id}) }}">
-                                    <i class="fa fa-plus-circle"></i>
-                                    Add new
-                                </a>
+                                {% if file.locked %}
+                                    <a  data-toggle="modal" data-target="#versionCreate" class="sonata-action-element add_version">
+                                        <i class="fa fa-fw fa-lock"></i>Add new
+                                    </a>
+                                {% else %}
+                                    <a  data-toggle="modal" data-target="#versionCreate" class=" sonata-action-element add_version"
+                                        href="{{ path('version_create', {id: file.id}) }}">
+                                        <i class="fa fa-plus-circle"></i>
+                                        Add new
+                                    </a>
+                                {% endif %}
                             </span>
                         </div>
 
@@ -67,8 +91,10 @@
                                     <th></th>
                                 </tr>
                                 {% for version in versions %}
-                                    <tr>
-                                        <th>#{{ loop.index }}</th>
+                                    {% if version == versions|last %}
+                                    <tr class="bg-light-blue-active">
+                                    {% endif %}
+                                        <th><i class="fa fa-fw fa-circle"></i>{{ loop.index }}</th>
                                         <th>
                                             {{ version.created|date }}
                                         </th>
@@ -103,11 +129,18 @@
                             </div>
                             <span class="progress-description">
                                 {#I need to add security control#}
-                                <a data-toggle="modal" data-target="#versionCreate" class="sonata-action-element"
-                                   href="{{ path('version_create', {id: file.id}) }}">
-                                    <i class="fa fa-plus-circle"></i>
-                                    Add new
-                                </a>
+                                {% if file.locked %}
+                                    <a  data-toggle="modal" data-target="#versionCreate" class="sonata-action-element add_version" >
+                                        <i class="fa fa-fw fa-lock"></i>
+                                        Add new
+                                    </a>
+                                {% else %}
+                                    <a  data-toggle="modal" data-target="#versionCreate" class=" sonata-action-element add_version"
+                                        href="{{ path('version_create', {id: file.id}) }}">
+                                        <i class="fa fa-plus-circle"></i>
+                                        Add new
+                                    </a>
+                                {% endif %}
                             </span>
                         </div>
                     </div>
@@ -159,7 +192,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-xs-4">
+        <div class="col-xs-5">
             <div class="box">
                 <div class="box-body ">
                     <div class="panel panel-default">
@@ -168,21 +201,34 @@
                         </div>
                         <div class="panel-body">
                             {% for crt in creators %}
-                                <span class="badge">
-                            <i class="fa fa-fw fa-user"></i>{{ crt.username }}
-                        </span>
+                                <div class="chip">
+                                    {% if crt.avatar %}
+                                        <img src="{{ asset(crt.avatar) }}" alt="Person" width="96" height="96">
+                                    {% else %}
+                                        <img src="{{ asset('bundles/avanzuadmintheme/img/avatar.png') }}" alt="Person" width="96" height="96">
+                                    {% endif  %}
+                                    <a href="#">{{ crt.username }}</a>
+                                    <a href="{{ path('mail_compose_to', {to: crt.email}) }}" class="closebtn"  id="send_mail">
+                                        <i class="fa fa-fw fa-envelope"></i>
+                                    </a>
+                                </div>
                             {% endfor %}
                         </div>
                     </div>
+                </div>
+            </div>
+            <div class="box">
+                <div class="box-body ">
                     <div class="panel panel-default">
                         {{ include('GedBundle:CRUD:tags.html.twig',
                         {'file':    file,
-                        'path':     path,
-                        'tags':     tags,}
+                            'path':     path,
+                            'tags':     tags,}
                         )}}
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
     <div class="row">
@@ -209,7 +255,7 @@
                     {% if comments|length > 0 %}
                         {% for comment in comments %}
                             <div class="box-comment">
-                                {% if comment.createdBy.avatar is defined %}
+                                {% if comment.createdBy.avatar is not null %}
                                     <img class="img-circle img-sm" src="{{ asset(comment.createdBy.avatar) }}" alt="User Image">
                                 {% else %}
                                     <img class="img-circle img-sm" src="{{  asset('bundles/avanzuadmintheme/img/avatar.png') }}" alt="User Image">
@@ -217,7 +263,7 @@
                                 <div class="comment-text">
                                     <span class="username">
                                         {{ comment.createdBy.username }}
-                                        <span class="text-muted pull-right">{{ comment.created |date("H:i  F m") }}</span>
+                                        <span class="text-muted pull-right">{{ comment.created|date }}</span>
                                     </span>
                                     {{ comment.content }}
                                 </div>

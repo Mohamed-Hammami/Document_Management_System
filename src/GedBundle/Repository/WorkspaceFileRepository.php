@@ -12,4 +12,17 @@ use Doctrine\ORM\EntityRepository;
  */
 class WorkspaceFileRepository extends EntityRepository
 {
+
+    public function findFilesByWorkspace($id)
+    {
+        $qb = $this->createQueryBuilder('wf')
+                ->leftJoin('wf.workspace', 'w')
+                ->leftJoin('wf.file', 'f')
+                ->setParameter('id', $id)
+                ->where('w.id = :id')
+                ->addSelect('f');
+
+        return $qb->getQuery()->getResult();
+    }
+
 }

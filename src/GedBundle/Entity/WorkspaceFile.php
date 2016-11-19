@@ -26,7 +26,7 @@ class WorkspaceFile
     /**
      * @ORM\Id
      * @ORM\ManyToOne(targetEntity="File", inversedBy="workspaces")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      *
      */
     private $file;

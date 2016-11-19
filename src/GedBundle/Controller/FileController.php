@@ -5,6 +5,7 @@ namespace GedBundle\Controller;
 use GedBundle\Entity\File;
 use GedBundle\Entity\Version;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -66,7 +67,7 @@ class FileController extends Controller
         return $this->render(
             '@Ged/CRUD/fileCreate.html.twig',
             array(
-                'form' => $form->createView(),
+                'form' => $form,
                 'id' => $id,
             )
         );
@@ -155,13 +156,12 @@ class FileController extends Controller
 
         $ids = $groupFileRepository->findGroupIds($id);
         $groups = $groupeRepository->findFreeGroups($id);
-        dump($groupeRepository->findAll());
-        dump($ids);
-        dump($groups);
 
 
         $path = $this->buildPath($folder, $file);
         $creators = $versionCreators + $fileCreators;
+
+        dump($user);
 
         return $this->render('@Ged/CRUD/fileShow.html.twig', array(
 
@@ -180,6 +180,11 @@ class FileController extends Controller
 
     public function addNewVersion(Version $version, File $file, $user)
     {
+        if( $file->isLocked() )
+        {
+            throw $this->createAccessDeniedException(sprintf('You cant add a new version to a locked file'));
+        }
+
         $this->denyAccessUnlessGranted('edit', $file);
 
         $version->setFileName($file->getName().'_0');
@@ -239,6 +244,48 @@ class FileController extends Controller
 
         $helper = $this->container->get('vich_uploader.templating.helper.uploader_helper');
         $path = $helper->asset($version, '$fileContent');
+    }
+
+    public function lockAction(Request $request, $id)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        $fileRepository = $em->getRepository('GedBundle:File');
+
+        if( !$file = $fileRepository->find($id) )
+        {
+            throw new ResourceNotFoundException( sprintf('There is no file with %d id', $id));
+        }
+
+        $this->denyAccessUnlessGranted('control', $file);
+        $file->setLocked(true);
+
+        $em->flush();
+
+        $response = new JsonResponse();
+        return $response->setData(array('status' => 'success'));
+
+    }
+
+    public function unlockAction(Request $request, $id)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        $fileRepository = $em->getRepository('GedBundle:File');
+
+        if( !$file = $fileRepository->find($id) )
+        {
+            throw new ResourceNotFoundException( sprintf('There is no file with %d id', $id));
+        }
+
+        $this->denyAccessUnlessGranted('control', $file);
+        $file->setLocked(false);
+
+        $em->flush();
+
+        $response = new JsonResponse();
+        return $response->setData(array('status' => 'success'));
+
     }
 
 }

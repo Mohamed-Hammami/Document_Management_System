@@ -1,0 +1,13 @@
+
+mail_compose:
+    path: /compose
+    defaults: { _controller: 'GedBundle:Mailer:compose' }
+
+mail_compose_to:
+    path: /{to}/compose
+    defaults: { _controller: 'GedBundle:Mailer:composeTo' }
+
+mail_send:
+    path: /send
+    defaults: { _controller: 'GedBundle:Mailer:send' }
+

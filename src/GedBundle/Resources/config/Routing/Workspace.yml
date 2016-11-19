@@ -1,0 +1,55 @@
+
+Workspace_show:
+    path: /show
+    defaults: { _controller: 'GedBundle:Workspace:show' }
+
+Workspace_set:
+    path: /{userId}/setWorkspace
+    defaults: { _controller: 'GedBundle:Workspace:setWorkspace'}
+
+Workspace_add_file:
+    path: /{id}/addFile
+    defaults: { _controller: 'GedBundle:Workspace:addFile'}
+    options:
+            expose: true
+
+Workspace_remove_file:
+    path: /{id}/removeFile
+    defaults: { _controller: 'GedBundle:Workspace:removeFile' }
+    options:
+            expose: true
+
+Workspace_add_folder:
+    path: /{id}/addFolder
+    defaults: { _controller: 'GedBundle:Workspace:addFolder'}
+    options:
+            expose: true
+
+Workspace_remove_folder:
+    path: /{id}/removeFolder
+    defaults: { _controller: 'GedBundle:Workspace:removeFolder' }
+    options:
+            expose: true
+
+Workspace_rate_file:
+    path: /{id}/rateFile
+    defaults: { _controller: 'GedBundle:Workspace:rateFile'}
+    options:
+            expose: true
+
+Workspace_rate_folder:
+    path: /{id}/rateFolder
+    defaults: { _controller: 'GedBundle:Workspace:rateFolder'}
+    options:
+            expose: true
+
+Workspace_save_memo:
+    path: /setMemo
+    defaults: { _controller: 'GedBundle:Workspace:saveMemo'}
+    options:
+           expose: true
+Workspace_reset_memo:
+    path: /resetMemo
+    defaults: { _controller: 'GedBundle:Workspace:resetMemo'}
+    options:
+           expose: true

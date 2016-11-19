@@ -40,6 +40,9 @@
 {% endblock %}
 
 {% block javascripts_inline %}
+
+    {{ parent() }}
+
     <script>
         $(function(){
             var path =  window.location.pathname.split('/');

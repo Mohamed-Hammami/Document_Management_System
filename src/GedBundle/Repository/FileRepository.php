@@ -56,6 +56,30 @@ class FileRepository extends EntityRepository
                     ->getArrayResult();
     }
 
+    public function findWorkspaceFile($wk, $f)
+    {
+        $qb = $this->createQueryBuilder('f')
+            ->from('GedBundle:WorkspaceFile', 'wf')
+            ->Join('wf.file', 'foo')
+            ->where('f.folder = :id')
+            ->andWhere('foo.id = f.id')
+            ->andWhere('wf.workspace = :wk')
+            ->select('f.id')
+            ->setParameter('id', $f)
+            ->setParameter('wk', $wk)
+        ;
+
+        $result =  $qb->getQuery()->getResult();
+        $fileIds = array();
+        foreach( $result as $id )
+        {
+            array_push($fileIds, $id['id']);
+        }
+
+        return $fileIds;
+
+    }
+
     public function findCreators($id)
     {
         $qb = $this->_em->createQueryBuilder()
@@ -81,6 +105,32 @@ class FileRepository extends EntityRepository
 
         return $qb->getQuery()
             ->getScalarResult();
+    }
+
+    public function searchFileByTag($tag)
+    {
+        $qb = $this->createQueryBuilder('f')
+                ->leftJoin('f.tags', 'tg')
+                ->setParameter('term', '%'.$tag.'%')
+                ->where('tg.name LIKE :term')
+                ->distinct('f.id');
+
+        return $qb->getQuery()->getResult();
+    }
+
+    public function searchByName($name)
+    {
+        $qb = $this->createQueryBuilder('f')
+                ->setParameter('term', '%'.$name.'%')
+                ->where('f.name LIKE :term')
+                ->leftJoin('f.createdBy', 'crt')
+                ->leftJoin('f.updatedBy', 'upd')
+                ->addSelect('crt')
+                ->addSelect('upd');
+
+        return $qb->getQuery()->getResult();
+
+
     }
 
 }

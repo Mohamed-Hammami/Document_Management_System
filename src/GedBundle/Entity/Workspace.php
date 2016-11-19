@@ -49,6 +49,13 @@ class Workspace
      */
     private $user;
 
+    /**
+     * @var string
+     *
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $memo;
+
 
     /**
      * Get id
@@ -108,12 +115,12 @@ class Workspace
         $this->folders = $folders;
     }
 
-    public function addFile($file)
+    public function addFile(WorkspaceFile $file)
     {
         $this->files[] = $file;
     }
 
-    public function removeFile($file)
+    public function removeFile(WorkspaceFile $file)
     {
         $this->files->removeElement($file);
     }
@@ -127,6 +134,24 @@ class Workspace
     {
         $this->folders->removeElement($folder);
     }
+
+    /**
+     * @return string
+     */
+    public function getMemo()
+    {
+        return $this->memo;
+    }
+
+    /**
+     * @param string $memo
+     */
+    public function setMemo($memo)
+    {
+        $this->memo = $memo;
+    }
+
+
 
     public function __construct()
     {

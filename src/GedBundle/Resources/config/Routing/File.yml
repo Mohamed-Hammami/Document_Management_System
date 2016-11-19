@@ -14,3 +14,15 @@ file_edit:
 #file_remove:
 #    path: /{id}/remove
 #    defaults: { _controller: 'GedBundle:File:remove' }
+
+file_lock:
+    path: /{id}/fileLock
+    defaults: { _controller: 'GedBundle:File:lock' }
+    options:
+        expose: true
+
+file_unlock:
+    path: /{id}/fileLock
+    defaults: { _controller: 'GedBundle:File:unlock' }
+    options:
+        expose: true

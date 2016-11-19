@@ -100,6 +100,12 @@ class File extends Node
     protected $workspaces;
 
 
+    /**
+     * @var bool
+     *
+     * @ORM\Column(name="locked", type="boolean", nullable=true)
+     */
+    protected $locked;
 
     /**
      * Get id
@@ -310,12 +316,12 @@ class File extends Node
     }
 
 
-    public function addWorkspace($workspace)
+    public function addWorkspace(WorkspaceFile $workspace)
     {
         $this->workspaces[] = $workspace;
     }
 
-    public function removeWorkspace($workspace)
+    public function removeWorkspace(WorkspaceFile $workspace)
     {
         $this->workspaces->removeElement($workspace);
     }
@@ -325,6 +331,24 @@ class File extends Node
         return $this->getName();
     }
 
+    /**
+     * @return boolean
+     */
+    public function isLocked()
+    {
+        return $this->locked;
+    }
+
+    /**
+     * @param boolean $locked
+     */
+    public function setLocked($locked)
+    {
+        $this->locked = $locked;
+    }
+
+
+
     public function __construct()
     {
         $this->tags = new ArrayCollection();
@@ -333,6 +357,7 @@ class File extends Node
         $this->comments = new ArrayCollection();
         $this->workspaces = new ArrayCollection();
         $this->setOnHold(false);
+        $this->setLocked(false);
     }
 
 

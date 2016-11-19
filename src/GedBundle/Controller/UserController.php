@@ -244,7 +244,7 @@ class UserController extends Controller
 
         $em = $this->getDoctrine()->getEntityManager();
         $workspace = new Workspace();
-        $user->setWorkspace($workspace);
+        $workspace->setUser($user);
         $em->persist($workspace);
         $em->flush();
 

@@ -6,6 +6,10 @@ ged_bundle_folder:
     resource: '@GedBundle/Resources/config/Routing/Folder.yml'
     prefix: /folder
 
+ged_bundle_workspace:
+    resource: '@GedBundle/Resources/config/Routing/Workspace.yml'
+    prefix: /workspace
+
 ged_bundle_version:
     resource: '@GedBundle/Resources/config/Routing/Version.yml'
     prefix: /version
@@ -33,4 +37,12 @@ ged_bundle_permission:
 ged_bundle_batch:
     resource: '@GedBundle/Resources/config/Routing/Batch.yml'
     prefix: /batch
+
+ged_bundle_search:
+    resource: '@GedBundle/Resources/config/Routing/Search.yml'
+    prefix: /search
+
+ged_bundle_mail:
+    resource: '@GedBundle/Resources/config/Routing/Mail.yml'
+    prefix: /mail
 

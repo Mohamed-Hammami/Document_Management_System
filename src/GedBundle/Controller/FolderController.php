@@ -45,6 +45,8 @@ class FolderController extends Controller
 
     // I have to test on the existence of folder id $id
 
+
+
         $em = $this->getDoctrine()->getManager();
 
         $fileRepository = $this
@@ -56,6 +58,7 @@ class FolderController extends Controller
             ->getDoctrine()
             ->getManager()
             ->getRepository('GedBundle:Folder');
+
 
         if( $id == 0)
         {
@@ -80,6 +83,15 @@ class FolderController extends Controller
         $files = $fileRepository->findFileUser($id);
         $children = $folderRepository->findFolderChildrenUser($id);
         $path = $folderRepository->getPath($currentFolder);
+
+        if(  $user = $token = $this->get('security.token_storage')->getToken()->getUser() )
+        {
+            $workspaceFolders = $folderRepository->findWorkspaceFolder($user->getWorkspace()->getId(), $id);
+            $workspaceFiles   = $fileRepository->findWorkspaceFile($user->getWorkspace()->getId(), $id);
+        } else {
+            $workspaceFolders = array();
+            $workspaceFiles = array();
+        }
 
         $this->addFolderHeader('Name', 'text');
         $this->addFolderHeader('Description', 'text');
@@ -115,6 +127,9 @@ class FolderController extends Controller
         $this->addFileAction(new BatchActionDescription('delete', false));
         $this->addFileAction(new BatchActionDescription('move', false));
 
+        dump($workspaceFolders);
+        dump($workspaceFiles);
+
         return $this->render('@Ged/CRUD/folder.html.twig', array(
 
             'folder_id'      => $id,
@@ -122,6 +137,9 @@ class FolderController extends Controller
 
             'children'       => $children,
             'files'          => $files,
+
+            'workspaceFolders' => $workspaceFolders,
+            'workspaceFiles'   => $workspaceFiles,
 
             'folder_headers' => $this->folderHeader,
             'folder_fields'  => $this->folderMappedFields,
@@ -136,7 +154,6 @@ class FolderController extends Controller
 
 
     }
-
 
     public function createAction(Request $request, $id)
     {
@@ -460,6 +477,7 @@ class FolderController extends Controller
             $this->generateUrl('folder_show', array('id' => $id)));
 
     }
+
     public function fileBatchAction(Request $request = null)
     {
         // Checks for the form method
@@ -638,9 +656,9 @@ class FolderController extends Controller
             throw new ResourceNotFoundException( sprintf('There is no folder with %d id', $folderId));
         }
 
-        if( !$file->isOnHold() )
+        if( $file->isOnHold() )
         {
-            throw new AccessDeniedException(sprintf("You can't delete an on holde file"));
+            throw new AccessDeniedException(sprintf("You can't delete an on hold file"));
         }
 
         $folder->removeFile($file);

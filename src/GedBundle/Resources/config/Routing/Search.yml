@@ -1,0 +1,4 @@
+search_result:
+    path: /result
+    defaults: { _controller: 'GedBundle:Search:result'}
+

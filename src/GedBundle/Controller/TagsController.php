@@ -104,6 +104,23 @@ class TagsController extends Controller
         return $response->setData(array('result' => true));
     }
 
+    public function suggestionsAction(Request $request)
+    {
+        // Add security control Later ...
+
+        $em = $this->getDoctrine()->getManager();
+        $tagRepository = $em->getRepository('GedBundle:Tag');
+
+        $tags = $tagRepository->findAllTags();
+
+        dump(json_encode($tags));
+
+        $response = new JsonResponse();
+
+        return $response->setData(json_encode($tags));
+
+    }
+
     public function inputControl($input)
     {
         $result = explode(' ', $input);

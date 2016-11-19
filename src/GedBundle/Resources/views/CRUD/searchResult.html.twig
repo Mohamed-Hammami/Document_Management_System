@@ -1,0 +1,209 @@
+{% extends '@Ged/default_layout.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href='{{ asset('bundles/ged/AdminLTE2/plugins/iCheck/all.css') }}'>
+
+{% endblock %}
+
+
+{% block page_title %}
+    <i class="fa fa-fw fa-search"></i>Search result for <em class="text-muted">{{ term }}</em>...
+{% endblock %}
+
+{% block page_subtitle%}
+{% endblock %}
+
+{% block page_content %}
+
+    <div class="row" style="margin: auto">
+
+        {# Displaying Files #}
+        <div class="col-xs-12">
+            <div class="row">
+                {% block list_file_table %}
+                    <div class="box">
+                        {% if files|length > 0 %}
+                            <div class="box-header">
+                                <h3 class="box-title"><i class="fa fa-fw fa-file"></i>Files</h3>
+                            </div>
+                            <div class="box-body">
+                                <table id="files_table" class="table table-condensed table-hover" role="grid" aria-describedby="files">
+                                    <thead>
+                                    <tr role="row">
+                                        {% for field_description in file_headers %}
+                                            <th>
+                                                {% spaceless %}
+                                                    {{ field_description.label }}
+                                                {% endspaceless %}
+                                            </th>
+                                        {% endfor %}
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for file in files %}
+                                        <tr role='row' {% if file.onHold == true %} class='warning' {% endif %} id="{{ file.id }}">
+                                            {% spaceless %}
+                                                {% for  field in file_fields %}
+                                                    <td>
+                                                        {% if attribute(file, field).timestamp is defined  %}
+                                                            {{ attribute(file, field)|date }}
+                                                        {% elseif field == 'name'  %}
+                                                            <a href={{ path('file_show', {'id':file.id}) }}>
+                                                                {{ attribute(file, field) }}
+                                                            </a>
+                                                        {% elseif field == 'createdBy' or field == 'updatedBy' %}
+                                                            <a href={{ path('user_show', {'userid':attribute(attribute(file, field),'id')}) }}>
+                                                            <span class='badge'>
+                                                                <i class='fa fa-fw fa-user'></i>
+                                                                {{ attribute(attribute(file, field),'usernameCanonical') }}
+                                                            </span>
+                                                            </a>
+                                                        {% elseif attribute(file, field) is null %}
+                                                            <span class='text-muted'>no content</span>
+                                                        {% else %}
+                                                            {{ attribute(file, field) }}
+                                                        {% endif %}
+                                                    </td>
+                                                {%  endfor %}
+                                            {% endspaceless %}
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="box-footer">
+                            </div>
+                        {% else %}
+                            <div class="box-body">
+                                <div class="info-box">
+                                    <span class="info-box-icon bg-aqua"><i class="fa fa-fw fa-file-o"></i></span>
+                                    <div class="info-box-content">
+                                        <h3>
+                                            <span class="text-muted">{{ 'NO FILES' }}</span>
+                                        </h3>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endblock %}
+            </div>
+        </div>
+
+        {# Displaying Folders #}
+        <div class="col-xs-12">
+            <div class="row">
+                {% block list_folder_table %}
+                    <div class="box">
+                        {% if folders|length > 0 %}
+                            <div class="box-header">
+                                <h3 class="box-title"><i class="fa fa-fw fa-folder-open"></i>Folders</h3>
+                            </div>
+                            <div class="box-body">
+                                <table id="folders_table" class="table table-condensed table-hover" role="grid" aria-describedby="folders">
+                                    <thead>
+                                    <tr role="row">
+                                        {% for field_description in folder_headers %}
+                                            <th>
+                                                {% spaceless %}
+                                                    {{ field_description.label }}
+                                                {% endspaceless %}
+                                            </th>
+                                        {% endfor %}
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for folder in folders %}
+                                        <tr role='row' {% if folder.onHold == true %} class='warning' {% endif %} id="{{ folder.id }}">
+                                            {% spaceless %}
+                                                {% for  field in folder_fields %}
+                                                    <td>
+                                                        {% if attribute(folder, field).timestamp is defined  %}
+                                                            {{ attribute(folder, field)|date }}
+                                                        {% elseif field == 'name'  %}
+                                                            <a href={{ path('folder_show', {'id':folder.id}) }}>
+                                                                {{ attribute(folder, field) }}
+                                                            </a>
+                                                        {% elseif field == 'createdBy' or field == 'updatedBy' %}
+                                                            <a href={{ path('user_show', {'userid':attribute(attribute(folder, field),'id')}) }}>
+                                                            <span class='badge'>
+                                                                <i class='fa fa-fw fa-user'></i>
+                                                                {{ attribute(attribute(folder, field),'usernameCanonical') }}
+                                                            </span>
+                                                            </a>
+                                                        {% elseif attribute(folder, field) is null %}
+                                                            <span class='text-muted'>no content</span>
+                                                        {% else %}
+                                                            {{ attribute(folder, field) }}
+                                                        {% endif %}
+                                                    </td>
+                                                {%  endfor %}
+                                            {% endspaceless %}
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="box-footer">
+                            </div>
+                        {% else %}
+                            <div class="box-body">
+                                <div class="info-box">
+                                    <span class="info-box-icon bg-aqua"><i class="fa fa-fw fa-folder-open-o"></i></span>
+                                    <div class="info-box-content">
+                                        <h3>
+                                        <span class="text-muted">{{ 'NO FOLDERS' }}</span>
+                                        </h3>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endblock %}
+            </div>
+        </div>
+
+    </div>
+
+
+{% endblock %}
+
+{% block javascripts %}
+
+    {{ parent() }}
+
+{% endblock %}
+
+{% block javascripts_inline %}
+
+    {{ parent() }}
+
+    <script>
+
+        // dataTables for folders_table & files_table
+        $(function(){
+            $("#folders_table").DataTable({
+                'aoColumnDefs': [{
+                    'bSortable': false,
+                    'aTargets': ['nosort']
+                }],
+                "paging": true,
+                "ordering": true,
+                "bInfo" : false,
+
+            });
+
+            $("#files_table").DataTable({
+                'aoColumnDefs': [{
+                    'bSortable': false,
+                    'aTargets': ['nosort']
+                }],
+                "paging": true,
+                "ordering": true,
+                "bInfo" : false,
+            })
+        });
+
+    </script>
+{% endblock %}

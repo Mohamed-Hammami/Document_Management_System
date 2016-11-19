@@ -23,7 +23,7 @@
                                 <td>{{ group.g_label }}</td>
                                 <td>{{ group.number }}
                                 <th>
-                                    <button class="btn btn-default remove-group"><span class="glyphicon glyphicon-trash"></span></button>
+                                    <a href="#" class="remove-group"><span class="glyphicon glyphicon-trash"></span></a>
                                 </th>
                             </tr>
                         {% endfor %}
@@ -68,24 +68,24 @@
     {{ parent() }}
 
     <script>
-    $(function(){
-    $('.remove-group').click(function(){
-    var group_id = $(this).closest("tr").attr("id");
+        $(function(){
+            $('.remove-group').click(function(){
+                var group_id = $(this).closest("tr").attr("id");
 
-    $.ajax({
-    type: 'post',
-    url: Routing.generate('group_remove', { groupid: group_id }),
-    beforeSend: function(){
-    },
-    success: function(data){
-    console.log(data.status);
-    }
-    });
+                $.ajax({
+                    type: 'post',
+                    url: Routing.generate('group_remove', { groupid: group_id }),
+                    beforeSend: function(){
+                    },
+                    success: function(data){
+                    console.log(data.status);
+                    }
+                });
 
-    $(this).closest("tr").remove();
+                $(this).closest("tr").remove();
 
-    });
-    });
+            });
+        });
     </script>
 
 {% endblock %}

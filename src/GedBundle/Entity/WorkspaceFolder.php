@@ -112,5 +112,12 @@ class WorkspaceFolder
         $workspace->addFolder($this);
     }
 
+    public function __construct(Workspace $workspace, Folder $folder )
+    {
+        $this->folder = $folder;
+        $this->workspace = $workspace;
+        $folder->addWorkspace($this);
+        $workspace->addFolder($this);
+    }
 
 }

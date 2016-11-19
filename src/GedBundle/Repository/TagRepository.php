@@ -35,4 +35,14 @@ class TagRepository extends EntityRepository
         return $qb->getQuery()
                     ->getResult();
     }
+
+    public function findAllTags()
+    {
+        $qb = $this->createQueryBuilder('t')
+                ->select('t.name as value')
+                ->addSelect('t.name as data')
+                ->distinct();
+
+        return $qb->getQuery()->getResult();
+    }
 }

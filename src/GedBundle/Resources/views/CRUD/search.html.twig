@@ -1,0 +1,85 @@
+{% extends '@Ged/default_layout.html.twig' %}
+{% form_theme form 'GedBundle:Form:fields.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href='{{ asset('bundles/ged/AdminLTE2/plugins/iCheck/all.css') }}'>
+
+{% endblock %}
+
+
+{% block page_title %}
+{% endblock %}
+
+{% block page_subtitle%}
+{% endblock %}
+
+{% block page_content %}
+
+    <div class="row" style="margin: auto">
+
+        <div class="col-xs-12">
+
+            <div class="box">
+                <div class="box-header with-border">
+                    <h3 class="box-title"><i class="fa fa-fw fa-search"></i>Search</h3>
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+
+                    <form class="form-inline">
+                        <div class="input-group">
+                            <div class="form-group">
+                                {{ form_errors(form.text) }}
+                                {{ form_widget(form.text) }}
+                            </div>
+                            <span class="input-group-btn" id="search">
+                                {{ form_widget(form.search, {'label': '<i class="fa fa-fw fa-search"></i>'}) }}
+                            </span>
+                            <div class="form-group">
+                                {{ form_errors(form.text) }}
+                                {{ form_widget(form.options) }}
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title">Loading state</h3>
+                </div>
+                <div class="box-body" >
+                    <div class="grid-item--height7">
+
+                    </div>
+                </div>
+                <!-- /.box-body -->
+                <!-- Loading (remove the following to stop the loading)-->
+                <div class="overlay">
+                    <i class="fa fa-refresh fa-spin fa-5x fa-fw"></i>
+                </div>
+                <!-- end loading -->
+            </div>
+
+        </div>
+
+    </div>
+
+
+{% endblock %}
+
+{% block javascripts %}
+
+    {{ parent() }}
+
+{% endblock %}
+
+{% block javascripts_inline %}
+
+    {{ parent() }}
+
+    <script>
+
+    </script>
+{% endblock %}

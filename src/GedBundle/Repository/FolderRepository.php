@@ -80,4 +80,42 @@ class FolderRepository extends NestedTreeRepository
         return $qb->getQuery()
             ->getResult();
     }
+
+    public function findWorkspaceFolder($wk, $fo)
+    {
+        $qb = $this->createQueryBuilder('fo')
+            ->from('GedBundle:WorkspaceFolder', 'wf')
+            ->Join('wf.folder', 'foo')
+            ->leftJoin('fo.parent', 'pa')
+            ->where('pa.id = :id')
+            ->andWhere('foo.id = fo.id')
+            ->andWhere('wf.workspace = :wk')
+            ->select('fo.id')
+            ->setParameter('id', $fo)
+            ->setParameter('wk', $wk)
+        ;
+
+        $result =  $qb->getQuery()->getResult();
+        $folderIds = array();
+        foreach( $result as $id )
+        {
+            array_push($folderIds, $id['id']);
+        }
+
+        return $folderIds;
+
+    }
+
+    public function searchByName($name)
+    {
+        $qb = $this->createQueryBuilder('f')
+                    ->setParameter('term', '%'.$name.'%')
+                    ->where('f.name LIKE :term')
+                    ->leftJoin('f.createdBy', 'crt')
+                    ->leftJoin('f.updatedBy', 'upd')
+                    ->addSelect('crt')
+                    ->addSelect('upd');
+
+        return $qb->getQuery()->getResult();
+    }
 }

@@ -34,11 +34,13 @@
                                             {% endspaceless %}
                                         </th>
                                     {% endfor %}
+                                        <th class="nosort">
+                                        </th>
                                 </tr>
                                 </thead>
                                 <tbody>
                                 {% for child in children %}
-                                    <tr role='row' {% if child.onHold == true %} class='warning' {% endif %}>
+                                    <tr role='row' {% if child.onHold == true %} class='warning' {% endif %} id="{{ child.id }}">
                                         {% if folder_actions|length > 0 %}
                                             <td class='folder_checkbox_field'>
                                                 <input type='checkbox' class='minimal' name='idx[]' value={{ child.id }}>
@@ -67,6 +69,17 @@
                                                     {% endif %}
                                                 </td>
                                             {%  endfor %}
+                                                <td>
+                                                    {% if child.id in workspaceFolders %}
+                                                        <a href="#" class="remove_folder_workspace">
+                                                            <i style="color: gold" class="fa fa-fw fa-star fa-lg"></i>
+                                                        </a>
+                                                    {% else %}
+                                                        <a href="#" class="add_folder_workspace">
+                                                            <i style="color: gold" class="fa fa-fw fa-star-o fa-lg"></i>
+                                                        </a>
+                                                    {% endif %}
+                                                </td>
                                         {% endspaceless %}
                                     </tr>
                                 {% endfor %}

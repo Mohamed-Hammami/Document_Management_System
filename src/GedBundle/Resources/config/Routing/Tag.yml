@@ -12,3 +12,11 @@ tag_drop:
     options:
         expose:
             true
+
+tag_suggest:
+    path: /suggest
+    defaults: { _controller: 'GedBundle:Tags:suggestions' }
+    options:
+          expose:
+              true
+

@@ -1,6 +1,206 @@
 {% extends 'AvanzuAdminThemeBundle:layout:base-layout.html.twig' %}
 
+{% block stylesheets %}
+    {{ parent() }}
+{% endblock %}
+
 {% block title %}
     DMS
 {% endblock %}
 
+{% block avanzu_sidebar %}
+    {{ parent() }}
+    <ul class="sidebar-menu">
+        {% include('@Ged/clipboard.html.twig') %}
+        {% include('@Ged/memo.html.twig') %}
+    </ul>
+{% endblock %}
+
+{% block javascripts %}
+
+    {{ parent() }}
+    <script src="{{ asset('bundles/fosjsrouting/js/router.js') }}"></script>
+    <script src="{{ path('fos_js_routing_js', { callback: 'fos.Router.setData' }) }}"></script>
+
+{% endblock %}
+
+
+{% block javascripts_inline %}
+    <script>
+        // SideBar Search
+        jQuery(document).ready(function ($) {
+
+            $("#search-btn").click(function(){
+                console.log('click');
+
+                var term = $("#search-input").val();
+                if( term != null )
+                {
+                    console.log('search');
+
+                    $.ajax({
+                        type: 'post',
+                        url: Routing.generate('search_result'),
+                        data: { term: term},
+                        beforeSend: function(){
+                        },
+                        success: function(){
+
+                        }
+                    });
+                }
+            });
+
+        });
+
+        // Controls for clipboard buttons
+
+        jQuery(document).ready(function ($) {
+
+            $("#remove_cutFolders").click(function(){
+
+                var cutFolders = [];
+                {% for folder in app.session.get("cutFolders") %}
+                cutFolders.push({{ folder.id }});
+                {% endfor %}
+
+                {% if app.session.get('cutFolders')  is not null %}
+
+                $.ajax({
+                    type: 'post',
+                    url: Routing.generate('folder_reset_paste'),
+                    data: { cutFolders:  cutFolders},
+                    beforeSend: function(){
+                    },
+                    success: function(data){
+                        console.log(data.status)
+                    }
+                });
+
+                $("#cutFolder_div").empty().prepend("<span class='text-muted'>No folders in the selection</span>");
+                // ugly code !!!
+                {% if app.session.get('cutFolders') is not null %}
+                var id = {{ (app.session.get("cutFolders")|first).parent.id }};
+                {% endif %}
+                if ( id == {{ folder_id }} )
+                {
+                    $(".warning").removeAttr("class");
+                }
+
+                {% endif %}
+
+            });
+
+            $("#remove_cutFiles").click(function(){
+
+                var cutFiles = [];
+                {% for file in app.session.get("cutFiles") %}
+                cutFiles.push({{ file.id }});
+                {% endfor %}
+
+                {% if app.session.get('cutFiles') is not null %}
+                $.ajax({
+                    type: 'post',
+                    url: Routing.generate('file_reset_paste'),
+                    data: { cutFiles:  cutFiles},
+                    beforeSend: function(){
+                    },
+                    success: function(data){
+                        console.log(data.status)
+                    }
+                });
+
+                $("#cutFile_div").empty().prepend("<span class='text-muted'>No files in the selection</span>");
+                {% if app.session.get('cutFiles') is not null %}
+                var id = {{ (app.session.get("cutFiles")|first).folder.id }};
+                {% endif %}
+                console.log(id);
+                if ( id == {{ folder_id }} )
+                {
+                    $(".warning").removeAttr("class");
+                }
+                {% endif %}
+            });
+
+            $("#paste_folders").click(function(){
+
+                var cutFolders = [];
+                {% for folder in app.session.get("cutFolders") %}
+                cutFolders.push({{ folder.id }});
+                {% endfor %}
+
+                {% if ((app.session.get('cutFolders') is not null) and ( folder_id is defined )) %}
+
+                $.ajax({
+                    type: 'post',
+                    url: Routing.generate('folder_paste', {parentId: {{ folder_id }}}),
+                    data: { sourceId: {{ (app.session.get('cutFolders')|first).parent.id}}, childIds: cutFolders },
+                    beforeSend: function(){
+                    },
+                    success: function(data){
+                        console.log(data.status);
+                        location.reload();
+                    }
+
+                });
+                {% endif %}
+            });
+
+            $("#paste_files").click(function(){
+
+                var cutFiles = [];
+                {% for file in app.session.get("cutFiles") %}
+                cutFiles.push({{ file.id }});
+                {% endfor %}
+
+                {% if ((app.session.get('cutFiles') is not null) and ( folder_id is defined )) %}
+
+                $.ajax({
+                    type: 'post',
+                    url: Routing.generate('file_paste', {parentId: {{ folder_id }}}),
+                    data: { sourceId: {{ (app.session.get('cutFiles')|first).folder.id}}, fileIds: cutFiles },
+                    beforeSend: function(){
+                    },
+                    success: function(data){
+                        console.log(data.status);
+                        location.reload();
+                    }
+
+                });
+                {% endif %}
+            });
+
+        });
+
+        // Memo
+
+        jQuery(document).ready(function($){
+            $("#save_memo").click(function(){
+                var memo = $("#memo").val();
+                if( memo )
+                {
+                    $.ajax({
+                        type: 'post',
+                        url: Routing.generate('Workspace_save_memo'),
+                        data: { memo: memo },
+                        success: function(data){
+                            console.log(data.status)
+                        }
+                    })
+                }
+            });
+
+            $("#reset_memo").click(function(){
+                $.ajax({
+                    type: 'post',
+                    url: Routing.generate('Workspace_reset_memo'),
+                    success: function(data){
+                        console.log(data.status)
+                    }
+                });
+
+                $("#memo").empty();
+            });
+        });
+    </script>
+{% endblock %}

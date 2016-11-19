@@ -1,0 +1,28 @@
+
+    <li class="header">TOOLS</li>
+    <li class="treeview">
+        <div style="margin: 10px 10px; border-radius: 3px">
+            <div class="box box-default box-solid">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Personal Memo</h3>
+                    <!-- tools box -->
+                    <div class="pull-right box-tools">
+                        <button type="button" class="btn btn-box-tool" id="reset_memo">
+                            <i class="fa fa-fw fa-remove"></i>
+                        </button>
+                        <button type="button" class="btn btn-box-tool" id="save_memo">
+                            <i class="fa fa-fw fa-save"></i>
+                        </button>
+                    </div>
+                    <!-- /. tools -->
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <form>
+                        <textarea id="memo" class="form-control" rows="3" placeholder="Enter your notes here..." style="font-size: 12px; line-height: 12px; font-style: italic;">{% if app.session.get('memo') is not null %}{{ app.session.get('memo') }}{% endif %}</textarea>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </li>

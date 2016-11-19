@@ -14,12 +14,18 @@ class DefaultController extends Controller
     public function indexAction(Request $request)
     {
 
-        $em = $this->getDoctrine()->getManager();
-        $rep = $em->getRepository('GedBundle:GroupeFile');
+        if ( !$user = $this->get('security.token_storage')->getToken()->getUser())
+        {
+            throw $this->createAccessDeniedException(sprintf('You need to be authenticated'));
+        }
 
-        $query = $rep->findGroupFileByFile(1);
+        $em = $this->getDoctrine()->getEntityManager();
+        $workspaceRepository = $em->getRepository('GedBundle:Workspace');
 
-        dump($query);
+        $workspace = $workspaceRepository->findOneBy(array('user' => $user));
+        $memo =  $workspace->getMemo();
+
+        $this->get('session')->set('memo', $memo);
 
         return $this->render('GedBundle:Default:index.html.twig');
     }

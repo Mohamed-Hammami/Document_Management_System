@@ -12,4 +12,20 @@ use Doctrine\ORM\EntityRepository;
  */
 class WorkspaceFolderRepository extends EntityRepository
 {
+
+    public function findFoldersByWorkspace($id)
+    {
+        $qb = $this->createQueryBuilder('wf')
+            ->leftJoin('wf.workspace', 'w')
+            ->leftJoin('wf.folder', 'f')
+            ->setParameter('id', $id)
+            ->where('w.id = :id')
+            ->addSelect('f');
+
+        return $qb->getQuery()->getResult();
+    }
+
+
+
+
 }

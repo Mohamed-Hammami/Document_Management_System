@@ -1,10 +1,5 @@
 {% extends '@Ged/default_layout.html.twig' %}
 
-{% block avanzu_sidebar %}
-    {{ parent() }}
-    {% include('@Ged/clipboard.html.twig') %}
-{% endblock %}
-
 {% block stylesheets %}
     {{ parent() }}
     <link rel="stylesheet" href='{{ asset('bundles/ged/AdminLTE2/plugins/iCheck/all.css') }}'>
@@ -133,8 +128,10 @@
 {% endblock %}
 
 {% block javascripts_inline %}
-    <script>
 
+    {{ parent() }}
+
+    <script>
         // dataTables for folders_table & files_table
         $(function(){
             $("#folders_table").DataTable({
@@ -225,126 +222,74 @@
         });
         {% endblock %}
 
+        // Controls for workspace buttons
 
-        // Controls for clipboard buttons
-
-        jQuery(document).ready(function ($) {
-
-            $("#remove_cutFolders").click(function(){
-
-                var cutFolders = [];
-                {% for folder in app.session.get("cutFolders") %}
-                    cutFolders.push({{ folder.id }});
-                {% endfor %}
-
-                {% if app.session.get('cutFolders')  is not null %}
-
-                    $.ajax({
-                        type: 'post',
-                        url: Routing.generate('folder_reset_paste'),
-                        data: { cutFolders:  cutFolders},
-                        beforeSend: function(){
-                        },
-                        success: function(data){
-                            console.log(data.status)
-                        }
-                    });
-
-                    $("#cutFolder_div").empty().prepend("<span class='text-muted'>No folders in the selection</span>");
-                    // ugly code !!!
-                    {% if app.session.get('cutFolders') is not null %}
-                    var id = {{ (app.session.get("cutFolders")|first).parent.id }};
-                    {% endif %}
-                    if ( id == {{ folder_id }} )
-                    {
-                        $(".warning").removeAttr("class");
-                    }
-
-                {% endif %}
-
-            });
-
-            $("#remove_cutFiles").click(function(){
-
-                var cutFiles = [];
-                {% for file in app.session.get("cutFiles") %}
-                    cutFiles.push({{ file.id }});
-                {% endfor %}
-
-                {% if app.session.get('cutFiles') is not null %}
-                    $.ajax({
-                        type: 'post',
-                        url: Routing.generate('file_reset_paste'),
-                        data: { cutFiles:  cutFiles},
-                        beforeSend: function(){
-                        },
-                        success: function(data){
-                            console.log(data.status)
-                        }
-                    });
-
-                    $("#cutFile_div").empty().prepend("<span class='text-muted'>No files in the selection</span>");
-                    {% if app.session.get('cutFiles') is not null %}
-                    var id = {{ (app.session.get("cutFiles")|first).folder.id }};
-                    {% endif %}
-                    console.log(id);
-                    if ( id == {{ folder_id }} )
-                    {
-                        $(".warning").removeAttr("class");
-                    }
-                {% endif %}
-            });
-
-            $("#paste_folders").click(function(){
-
-                var cutFolders = [];
-                {% for folder in app.session.get("cutFolders") %}
-                    cutFolders.push({{ folder.id }});
-                {% endfor %}
-
-                {% if app.session.get('cutFolders') is not null %}
-
-                    $.ajax({
-                        type: 'post',
-                        url: Routing.generate('folder_paste', {parentId: {{ folder_id }}}),
-                        data: { sourceId: {{ (app.session.get('cutFolders')|first).parent.id}}, childIds: cutFolders },
-                        beforeSend: function(){
-                        },
-                        success: function(data){
-                            console.log(data.status)
-                            location.reload();
-                        }
-
-                    })
-                {% endif %}
-            });
-
-            $("#paste_files").click(function(){
-
-                var cutFiles = [];
-                {% for file in app.session.get("cutFiles") %}
-                cutFiles.push({{ file.id }});
-                {% endfor %}
-
-                {% if app.session.get('cutFiles') is not null %}
+        $(function(){
+            $(".remove_folder_workspace").click(function(){
+                var folderId = $(this).closest("tr").attr("id");
 
                 $.ajax({
                     type: 'post',
-                    url: Routing.generate('file_paste', {parentId: {{ folder_id }}}),
-                    data: { sourceId: {{ (app.session.get('cutFiles')|first).folder.id}}, fileIds: cutFiles },
+                    url: Routing.generate('Workspace_remove_folder', {id: folderId}),
                     beforeSend: function(){
                     },
                     success: function(data){
                         console.log(data.status)
-                        location.reload();
                     }
+                });
 
-                })
-                {% endif %}
+                $(this).children(".fa").switchClass("fa-star", "fa-star-o");
+            });
+
+            $(".add_folder_workspace").click(function(){
+                var folderId = $(this).closest("tr").attr("id");
+
+                $.ajax({
+                    type: 'post',
+                    url: Routing.generate('Workspace_add_folder', {id: folderId}),
+                    beforeSend: function(){
+                    },
+                    success: function(data){
+                        console.log(data.status)
+                    }
+                });
+
+                $(this).children(".fa").switchClass("fa-star-o", "fa-star");
+            });
+
+            $(".add_file_workspace").click(function(){
+                var fileId = $(this).closest("tr").attr("id");
+
+                $.ajax({
+                    type: 'post',
+                    url: Routing.generate('Workspace_add_file', {id: fileId}),
+                    beforeSend: function(){
+                    },
+                    success: function(data){
+                        console.log(data.status)
+                    }
+                });
+
+                $(this).children(".fa").switchClass("fa-star-o", "fa-star");
+            });
+
+            $(".remove_file_workspace").click(function(){
+                var fileId = $(this).closest("tr").attr("id");
+
+                $.ajax({
+                    type: 'post',
+                    url: Routing.generate('Workspace_remove_file', {id: fileId}),
+                    beforeSend: function(){
+                    },
+                    success: function(data){
+                        console.log(data.status)
+                    }
+                });
+
+                $(this).children(".fa").switchClass("fa-star", "fa-star-o");
             });
 
         });
-
 
     </script>
 {% endblock %}
