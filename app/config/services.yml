@@ -19,5 +19,18 @@ services:
         public: false
 
     ged_bundle.logout_handler:
-       class: GedBundle\Security\LogoutHandler
-       arguments: [ @doctrine.orm.entity_manager ]
+        class: GedBundle\Security\LogoutHandler
+        arguments: [ @doctrine.orm.entity_manager ]
+
+    ged_bundle.notifier:
+        class: GedBundle\Utils\Notifier
+        arguments: [@mailer, @templating]
+
+    ged_bundle.notification_listener:
+        class: GedBundle\EventListener\NotificationListener
+        arguments: [@ged_bundle.notifier, @doctrine.orm.entity_manager]
+        tags:
+            - { name: kernel.event_listener, event: gedBundle.add_version, method: notifyAddVersion }
+            - { name: kernel.event_listener, event: gedBundle.remove_version, method: notifyRemoveVersion }
+            - { name: kernel.event_listener, event: gedBundle.remove_file, method: notifyRemoveFile }
+            - { name: kernel.event_listener, event: gedBundle.remove_folder, method: notifyRemoveFolder }

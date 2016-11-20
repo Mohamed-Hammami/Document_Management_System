@@ -115,6 +115,8 @@ class WorkspaceFolder
     public function __construct(Workspace $workspace, Folder $folder )
     {
         $this->folder = $folder;
+        $this->notification = 0;
+        $this->rating = 1;
         $this->workspace = $workspace;
         $folder->addWorkspace($this);
         $workspace->addFolder($this);

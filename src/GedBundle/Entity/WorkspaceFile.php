@@ -117,6 +117,8 @@ class WorkspaceFile
     public function __construct(Workspace $workspace, File $file )
     {
         $this->file = $file;
+        $this->rating = 1;
+        $this->notification = 0;
         $this->workspace = $workspace;
         $file->addWorkspace($this);
         $workspace->addFile($this);

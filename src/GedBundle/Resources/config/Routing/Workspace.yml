@@ -53,3 +53,27 @@ Workspace_reset_memo:
     defaults: { _controller: 'GedBundle:Workspace:resetMemo'}
     options:
            expose: true
+
+Workspace_notify_file:
+    path: /{id}/notifyFile
+    defaults: { _controller: 'GedBundle:Workspace:notifyFile' }
+    options:
+          expose: true
+
+Workspace_unnotify_file:
+    path: /{id}/untifyFile
+    defaults: { _controller: 'GedBundle:Workspace:unnotifyFile' }
+    options:
+          expose: true
+
+Workspace_notify_folder:
+    path: /{id}/notifyFolder
+    defaults: { _controller: 'GedBundle:Workspace:notifyFolder' }
+    options:
+          expose: true
+
+Workspace_unnotify_folder:
+    path: /{id}/untifyFolder
+    defaults: { _controller: 'GedBundle:Workspace:unnotifyFolder' }
+    options:
+          expose: true

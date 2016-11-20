@@ -25,7 +25,18 @@ class WorkspaceFolderRepository extends EntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    public function findSubscribedEmail($id)
+    {
+        $qb = $this->createQueryBuilder('wf')
+            ->setParameter('id', $id)
+            ->where('wf.folder = :id')
+            ->andWhere('wf.notification > 0')
+            ->leftJoin('wf.workspace', 'w')
+            ->leftJoin('w.user', 'u')
+            ->addSelect('u.email');
 
+        return $qb->getQuery()->getResult();
+    }
 
 
 }

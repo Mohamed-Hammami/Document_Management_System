@@ -3,6 +3,8 @@
 namespace GedBundle\Controller;
 
 use GedBundle\Entity\Version;
+use GedBundle\Event\AddVersionEvent;
+use GedBundle\Event\NotificationEvents;
 use GedBundle\Form\Type\VersionType;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,6 +27,11 @@ class VersionController extends Controller
         if( !$file = $fileRepository->find($id) )
         {
             throw new ResourceNotFoundException( sprintf('There is no file with %d id', $id));
+        }
+
+        if( $file->isLocked() )
+        {
+            throw $this->createAccessDeniedException(sprintf('You cant add a new version to a locked file'));
         }
 
         $this->denyAccessUnlessGranted('edit', $file);
@@ -57,6 +64,10 @@ class VersionController extends Controller
 
             $em->persist($version);
             $em->persist($file);
+
+
+            $event = new AddVersionEvent($file, $user);
+            $this->get('event_dispatcher')->dispatch(NotificationEvents::onAddVersion, $event);
 
             $em->flush();
 

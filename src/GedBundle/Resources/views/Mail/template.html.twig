@@ -1,0 +1,8 @@
+<p style="font-family: 'Courier New', Courier, monospace">
+    <strong>This email was sent from <em>{{ user.name }} {{ user.surname }}</em> using DMS mailer</strong><br>
+    <strong>You can contact him at <a href="mailto:{{ user.email }}" target="_top"><em>{{ user.email }}</em></a> </strong><br>
+</p>
+
+<p>
+    {{ text|raw }}
+</p>

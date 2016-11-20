@@ -10,4 +10,6 @@ mail_compose_to:
 mail_send:
     path: /send
     defaults: { _controller: 'GedBundle:Mailer:send' }
+    options:
+        expose: true
 

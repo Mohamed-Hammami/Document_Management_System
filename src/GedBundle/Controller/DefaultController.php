@@ -27,6 +27,11 @@ class DefaultController extends Controller
 
         $this->get('session')->set('memo', $memo);
 
+        $workspaceFileRepository = $em->getRepository('GedBundle:WorkspaceFile');
+        $log = $workspaceFileRepository->findSubscribedEmail(9);
+
+        dump($log[0]['email']);
+
         return $this->render('GedBundle:Default:index.html.twig');
     }
 }

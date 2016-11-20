@@ -207,7 +207,7 @@
                                     {% else %}
                                         <img src="{{ asset('bundles/avanzuadmintheme/img/avatar.png') }}" alt="Person" width="96" height="96">
                                     {% endif  %}
-                                    <a href="#">{{ crt.username }}</a>
+                                    <a href="#" style="font-size: 12px">{{ crt.name }} {{ crt.surname }}</a>
                                     <a href="{{ path('mail_compose_to', {to: crt.email}) }}" class="closebtn"  id="send_mail">
                                         <i class="fa fa-fw fa-envelope"></i>
                                     </a>

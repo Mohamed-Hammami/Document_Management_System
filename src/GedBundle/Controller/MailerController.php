@@ -49,17 +49,23 @@ class MailerController extends Controller
             throw $this->createAccessDeniedException(sprintf("You need to be authentified to send a mail"));
         }
 
-        $source = $user->getEmail();
-
         $text = $request->get('text');
         $destination = $request->get('destination');
         $subject = $request->get('subject');
 
         $message = \Swift_Message::newInstance()
             ->setSubject($subject)
-            ->setFrom($source)
             ->setTo($destination)
-            ->setBody($text)
+            ->setFrom("dmsservermail@gmail.com")
+            ->setBody(
+                $this->renderView(
+                    'GedBundle:Mail:template.html.twig',
+                    array(
+                        'user' => $user,
+                        'text' => $text,
+                    )
+                )
+            )
             ->setContentType('text/html');
 
         if( $this->get('mailer')->send($message) )

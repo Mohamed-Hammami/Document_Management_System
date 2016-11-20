@@ -4,6 +4,9 @@ namespace GedBundle\Controller;
 
 
 use GedBundle\Entity\Folder;
+use GedBundle\Event\NotificationEvents;
+use GedBundle\Event\RemoveFileEvent;
+use GedBundle\Event\RemoveFolderEvent;
 use GedBundle\Utils\FieldDescription;
 use GedBundle\Entity\File;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -661,6 +664,11 @@ class FolderController extends Controller
             throw new AccessDeniedException(sprintf("You can't delete an on hold file"));
         }
 
+        $user = $this->get('security.token_storage')->getToken()->getUser();
+
+        $event = new RemoveFileEvent($file, $user);
+        $this->get('event_dispatcher')->dispatch(NotificationEvents::onRemoveFile, $event);
+
         $folder->removeFile($file);
 
         $versions = $versionRepository->findVersionsByFile($fileId);
@@ -710,6 +718,11 @@ class FolderController extends Controller
 
         foreach( $filesId as $fileId )
             $this->removeFile($fileId['id'], $folderId);
+
+        $user = $this->get('security.token_storage')->getToken()->getUser();
+
+        $event = new RemoveFolderEvent($folder, $user);
+        $this->get('event_dispatcher')->dispatch(NotificationEvents::onRemoveFolder, $event);
 
         $em->remove($folder);
         $em->flush();

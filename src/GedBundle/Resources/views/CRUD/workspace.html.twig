@@ -4,10 +4,67 @@
     {{ parent() }}
     <link rel="stylesheet" href='{{ asset('bundles/ged/AdminLTE2/plugins/iCheck/all.css') }}'>
     <link rel="stylesheet" href="{{ asset('bundles/ged/Jquery-bar-rating/css/fontawesome-stars.css') }}">
+    <style>
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 52px;
+            height: 27px;
+        }
 
+        .switch input {display:none;}
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
+
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+
+        input:focus + .slider {
+            box-shadow: 0 0 1px #2196F3;
+        }
+
+        input:checked + .slider:before {
+            -webkit-transform: translateX(26px);
+            -ms-transform: translateX(26px);
+            transform: translateX(26px);
+        }
+
+        /* Rounded sliders */
+        .slider.round {
+            border-radius: 34px;
+        }
+
+        .slider.round:before {
+            border-radius: 50%;
+        }
+    </style>
 {% endblock %}
 
 {% block page_title %}
+    <i class="fa fa-fw fa-lg fa-desktop"></i>Workspace
 {% endblock %}
 
 {% block page_subtitle%}
@@ -16,77 +73,6 @@
 {% block page_content %}
 
     <div class="row" style="margin: auto">
-
-        <div class="col-xs-12">
-
-            <div class="box">
-                <div class="box-header with-border">
-                    <h3 class="box-title"><i class="fa fa-fw fa-folder-open"></i>Folders</h3>
-
-                    <div class="box-tools pull-right">
-                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
-                        </button>
-                    </div>
-                    <!-- /.box-tools -->
-                </div>
-                <!-- /.box-header -->
-                <div class="box-body">
-
-
-                    <table id="folders_table" class="table table-condensed table-hover" role="grid" aria-describedby="folders">
-                        <thead>
-                        <tr role="row">
-                                <th>Name</th>
-                                <th>Description</th>
-                                <th>Rating</th>
-                                <th>Created at</th>
-                                <th>Updated at</th>
-                            <th class="nosort"></th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {% for folder in folders %}
-                            <tr role="row"  id="{{ folder.folder.id }}">
-                                {% spaceless %}
-                                    <td>
-                                        <a href={{ path('folder_show', {'id':folder.folder.id}) }}>
-                                            {{ folder.folder.name }}
-                                        </a>
-                                    </td>
-                                    <td>
-                                        {% if folder.folder.description is null %}
-                                            <span class="text-muted">no content</span>
-                                        {% else %}
-                                            {{ folder.folder.description }}
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        <select class="folder-rate">
-                                            <option value="1" {% if folder.rating == 1 %} selected="selected" {% endif %}>1</option>
-                                            <option value="2" {% if folder.rating == 2 %} selected="selected" {% endif %}>2</option>
-                                            <option value="3" {% if folder.rating == 3 %} selected="selected" {% endif %}>3</option>
-                                            <option value="4" {% if folder.rating == 4 %} selected="selected" {% endif %}>4</option>
-                                            <option value="5" {% if folder.rating == 5 %} selected="selected" {% endif %}>5</option>
-                                        </select>
-                                    </td>
-                                    <td>{{ folder.folder.created|date }}</td>
-                                    <td>{{ folder.folder.updated|date }}</td>
-                                    <td>
-                                        <a href="#" class="remove-folder">
-                                            <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-                                        </a>
-                                    </td>
-                                {% endspaceless %}
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                <!-- /.box-body -->
-            </div>
-            <!-- /.box -->
-
-        </div>
 
         <div class="col-xs-12">
 
@@ -110,6 +96,7 @@
                             <th>Rating</th>
                             <th>Created at</th>
                             <th>Updated at</th>
+                            <th class="nosort">Notify me</th>
                             <th class="nosort"></th>
                         </tr>
                         </thead>
@@ -141,6 +128,16 @@
                                     <td>{{ file.file.created|date }}</td>
                                     <td>{{ file.file.updated|date }}</td>
                                     <td>
+                                        <label class="switch">
+                                            {% if file.notification == 1 %}
+                                                <input type="checkbox" class="notify-file"  checked>
+                                            {% else %}
+                                                <input type="checkbox" class="notify-file">
+                                            {% endif %}
+                                            <span class="slider round" ></span>
+                                        </label>
+                                    </td>
+                                    <td>
                                         <a href="#" class="remove-file">
                                             <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
                                         </a>
@@ -158,6 +155,87 @@
 
         </div>
 
+        <div class="col-xs-12">
+
+            <div class="box">
+                <div class="box-header with-border">
+                    <h3 class="box-title"><i class="fa fa-fw fa-folder-open"></i>Folders</h3>
+
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                        </button>
+                    </div>
+                    <!-- /.box-tools -->
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+
+
+                    <table id="folders_table" class="table table-condensed table-hover" role="grid" aria-describedby="folders">
+                        <thead>
+                        <tr role="row">
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>Rating</th>
+                            <th>Created at</th>
+                            <th>Updated at</th>
+                            <th class="nosort">Notify me</th>
+                            <th class="nosort"></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for folder in folders %}
+                            <tr role="row"  id="{{ folder.folder.id }}">
+                                {% spaceless %}
+                                    <td>
+                                        <a href={{ path('folder_show', {'id':folder.folder.id}) }}>
+                                            {{ folder.folder.name }}
+                                        </a>
+                                    </td>
+                                    <td>
+                                        {% if folder.folder.description is null %}
+                                            <span class="text-muted">no content</span>
+                                        {% else %}
+                                            {{ folder.folder.description }}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <select class="folder-rate">
+                                            <option value="1" {% if folder.rating == 1 %} selected="selected" {% endif %}>1</option>
+                                            <option value="2" {% if folder.rating == 2 %} selected="selected" {% endif %}>2</option>
+                                            <option value="3" {% if folder.rating == 3 %} selected="selected" {% endif %}>3</option>
+                                            <option value="4" {% if folder.rating == 4 %} selected="selected" {% endif %}>4</option>
+                                            <option value="5" {% if folder.rating == 5 %} selected="selected" {% endif %}>5</option>
+                                        </select>
+                                    </td>
+                                    <td>{{ folder.folder.created|date }}</td>
+                                    <td>{{ folder.folder.updated|date }}</td>
+                                    <td>
+                                        <label class="switch">
+                                            {% if folder.notification == 1 %}
+                                                <input type="checkbox" class="notify-folder"  checked>
+                                            {% else %}
+                                                <input type="checkbox" class="notify-folder">
+                                            {% endif %}
+                                            <span class="slider round" ></span>
+                                        </label>
+                                    </td>
+                                    <td>
+                                        <a href="#" class="remove-folder">
+                                            <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                                        </a>
+                                    </td>
+                                {% endspaceless %}
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <!-- /.box-body -->
+            </div>
+            <!-- /.box -->
+
+        </div>
 
     </div>
 
@@ -203,6 +281,62 @@
                 "paging": true,
                 "ordering": true,
                 "bInfo" : false
+            });
+
+            // notify link control
+
+            $('.notify-file').change(function(){
+
+                var file_id;
+
+               if( $(this).is(":checked") )
+               {
+                   file_id = $(this).closest("tr").attr("id");
+                   $.ajax({
+                      type: 'post',
+                       url: Routing.generate('Workspace_notify_file', { id: file_id }),
+                       success: function(data){
+                           console.log(data.status);
+                       }
+                   });
+               } else {
+                   file_id = $(this).closest("tr").attr("id");
+                   $.ajax({
+                       type: 'post',
+                       url: Routing.generate('Workspace_unnotify_file', { id: file_id }),
+                       success: function(data){
+                           console.log(data.status);
+                       }
+                   });
+
+               }
+            });
+
+            $('.notify-folder').change(function(){
+
+                var folder_id;
+
+                if( $(this).is(":checked") )
+                {
+                    folder_id = $(this).closest("tr").attr("id");
+                    $.ajax({
+                        type: 'post',
+                        url: Routing.generate('Workspace_notify_folder', { id: folder_id }),
+                        success: function(data){
+                            console.log(data.status);
+                        }
+                    });
+                } else {
+                    folder_id = $(this).closest("tr").attr("id");
+                    $.ajax({
+                        type: 'post',
+                        url: Routing.generate('Workspace_unnotify_folder', { id: folder_id }),
+                        success: function(data){
+                            console.log(data.status);
+                        }
+                    });
+
+                }
             });
 
             // remove link control

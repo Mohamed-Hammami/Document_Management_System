@@ -180,10 +180,7 @@ class FileController extends Controller
 
     public function addNewVersion(Version $version, File $file, $user)
     {
-        if( $file->isLocked() )
-        {
-            throw $this->createAccessDeniedException(sprintf('You cant add a new version to a locked file'));
-        }
+
 
         $this->denyAccessUnlessGranted('edit', $file);
 

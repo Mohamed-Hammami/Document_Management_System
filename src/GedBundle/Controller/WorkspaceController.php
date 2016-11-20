@@ -253,12 +253,120 @@ class WorkspaceController extends Controller
 
     public function notifyFileAction(Request $request, $id)
     {
+        if ( !$user = $this->get('security.token_storage')->getToken()->getUser())
+        {
+            throw $this->createAccessDeniedException(sprintf('You need to be authenticated to subscribe to a file'));
+        }
 
+        $em = $this->getDoctrine()->getEntityManager();
+        $workspaceRepository = $em->getRepository('GedBundle:Workspace');
+        $workspaceFileRepository = $em->getRepository('GedBundle:WorkspaceFile');
+        $fileRepository = $em->getRepository('GedBundle:File');
+        $workspace = $user->getWorkspace();
+
+        if( !$file = $fileRepository->find($id) )
+        {
+            throw $this->createNotFoundException(sprintf("there's no file with %d id", $id));
+        }
+
+        if( !$workspaceFile = $workspaceFileRepository->findOneBy(array('file' => $file, 'workspace' => $workspace)))
+        {
+            throw $this->createNotFoundException(sprintf("there's no workspaceFle with %d file's id and %d workspace's  id", $id, $workspace->getId()));
+        }
+
+        $workspaceFile->setNotification(1);
+        $em->flush();
+
+        $response = new JsonResponse();
+        return $response->setData(array('status' => 'success'));
+    }
+
+    public function unnotifyFileAction(Request $request, $id)
+    {
+        if ( !$user = $this->get('security.token_storage')->getToken()->getUser())
+        {
+            throw $this->createAccessDeniedException(sprintf('You need to be authenticated to subscribe to a file'));
+        }
+
+        $em = $this->getDoctrine()->getEntityManager();
+        $workspaceRepository = $em->getRepository('GedBundle:Workspace');
+        $workspaceFileRepository = $em->getRepository('GedBundle:WorkspaceFile');
+        $fileRepository = $em->getRepository('GedBundle:File');
+        $workspace = $user->getWorkspace();
+
+        if( !$file = $fileRepository->find($id) )
+        {
+            throw $this->createNotFoundException(sprintf("there's no file with %d id", $id));
+        }
+
+        if( !$workspaceFile = $workspaceFileRepository->findOneBy(array('file' => $file, 'workspace' => $workspace)))
+        {
+            throw $this->createNotFoundException(sprintf("there's no workspaceFle with %d file's id and %d workspace's  id", $id, $workspace->getId()));
+        }
+
+        $workspaceFile->setNotification(0);
+        $em->flush();
+
+        $response = new JsonResponse();
+        return $response->setData(array('status' => 'success'));
     }
 
     public function notifyFolderAction(Request $request, $id)
     {
+        if ( !$user = $this->get('security.token_storage')->getToken()->getUser())
+        {
+            throw $this->createAccessDeniedException(sprintf('You need to be authenticated subscribe to a folder'));
+        }
 
+        $em = $this->getDoctrine()->getEntityManager();
+        $workspaceFolderRepository = $em->getRepository('GedBundle:WorkspaceFolder');
+        $folderRepository = $em->getRepository('GedBundle:Folder');
+        $workspace = $user->getWorkspace();
+
+        if( !$folder = $folderRepository->find($id) )
+        {
+            throw $this->createNotFoundException(sprintf("there's no folder with %d id", $id));
+        }
+
+        if( !$workspaceFolder = $workspaceFolderRepository->findOneBy(array('folder' => $folder, 'workspace' => $workspace)))
+        {
+            throw $this->createNotFoundException(sprintf("there's no workspaceFle with %d folder's id and %d workspace's  id", $id, $workspace->getId()));
+        }
+
+        $workspaceFolder->setNotification(1);
+        $em->flush();
+
+        $response = new JsonResponse();
+        return $response->setData(array('status' => 'success'));
+    }
+
+    public function unnotifyFolderAction(Request $request, $id)
+    {
+        if ( !$user = $this->get('security.token_storage')->getToken()->getUser())
+        {
+            throw $this->createAccessDeniedException(sprintf('You need to be authenticated subscribe to a folder'));
+        }
+
+        $em = $this->getDoctrine()->getEntityManager();
+        $workspaceFolderRepository = $em->getRepository('GedBundle:WorkspaceFolder');
+        $folderRepository = $em->getRepository('GedBundle:Folder');
+        $workspace = $user->getWorkspace();
+
+        if( !$folder = $folderRepository->find($id) )
+        {
+            throw $this->createNotFoundException(sprintf("there's no folder with %d id", $id));
+        }
+
+        if( !$workspaceFolder = $workspaceFolderRepository->findOneBy(array('folder' => $folder, 'workspace' => $workspace)))
+        {
+            throw $this->createNotFoundException(sprintf("there's no workspaceFle with %d folder's id and %d workspace's  id", $id, $workspace->getId()));
+        }
+
+        $workspaceFolder->setNotification(0);
+        $em->flush();
+
+        $response = new JsonResponse();
+        return $response->setData(array('status' => 'success'));
     }
 
     public function setWorkspaceAction(Request $request, $userId)
