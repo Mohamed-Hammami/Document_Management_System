@@ -35,7 +35,7 @@ twig:
     debug:            "%kernel.debug%"
     strict_variables: "%kernel.debug%"
     globals:
-            admin_skin: skin-blue
+            admin_skin: %skin%
     form_themes:
             - 'TetranzSelect2EntityBundle:Form:fields.html.twig'
 
@@ -123,7 +123,7 @@ vich_uploader:
     mappings:
         file_version:
             uri_prefix:         /files/versions
-            upload_destination: %kernel.root_dir%/../web/files/versions
+            upload_destination: %upload_path%
 
             delete_on_remove: true
 

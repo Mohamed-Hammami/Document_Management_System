@@ -107,6 +107,19 @@ class FileRepository extends EntityRepository
             ->getScalarResult();
     }
 
+    public function searchFileByUser($user)
+    {
+        $qb = $this->createQueryBuilder('f')
+                ->leftJoin('f.createdBy', 'cr')
+                ->leftJoin('f.updatedBy', 'up')
+                ->setParameter('term', '%'.$user.'%')
+                ->where('cr.username LIKE :term')
+                ->orWhere('up.username LIKE :term')
+                ->distinct('f.id');
+
+        return $qb->getQuery()->getResult();
+    }
+
     public function searchFileByTag($tag)
     {
         $qb = $this->createQueryBuilder('f')
@@ -130,7 +143,14 @@ class FileRepository extends EntityRepository
 
         return $qb->getQuery()->getResult();
 
+    }
 
+    public function findOnHold()
+    {
+        $qb = $this->createQueryBuilder('f')
+                ->where('f.onHold = true');
+
+        return $qb->getQuery()->getResult();
     }
 
 }

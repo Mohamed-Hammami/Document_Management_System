@@ -24,7 +24,7 @@ fos_user_security:
 #  ged_bundle custom routes
 ged_bundle_home:
     defaults: { _controller: 'GedBundle:Default:index'}
-    path: /
+    path: /ged
 
 ged_bundle_routes:
     resource: '@GedBundle/Resources/config/routing.yml'

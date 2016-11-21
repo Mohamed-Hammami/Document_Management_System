@@ -2,3 +2,7 @@ search_result:
     path: /result
     defaults: { _controller: 'GedBundle:Search:result'}
 
+search_advanced:
+    path: /advanced
+    defaults: { _controller: 'GedBundle:Search:search' }
+

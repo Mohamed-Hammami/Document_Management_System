@@ -1,20 +1,36 @@
 <!DOCTYPE html>
-<html>
+<html >
 <head>
-    <meta charset="UTF-8" />
-</head>
-<body>
-{% for type, messages in app.session.flashBag.all %}
-    {% for message in messages %}
-        <div class="{{ type }}">
-            {{ message|trans({}, 'FOSUserBundle') }}
-        </div>
-    {% endfor %}
-{% endfor %}
+    <meta charset="UTF-8">
+    <title>DmS Login</title>
 
-<div>
-    {% block fos_user_content %}
-    {% endblock fos_user_content %}
-</div>
-</body>
+
+    <link rel='stylesheet prefetch' href='http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/smoothness/jquery-ui.css'>
+
+    <link rel="stylesheet" href="{{ asset('bundles/ged/Login-form/css/style.css') }}">
+
+
+</head>
+
+<body>
+    <link href='http://fonts.googleapis.com/css?family=Ubuntu:500' rel='stylesheet' type='text/css'>
+
+    {% for type, messages in app.session.flashBag.all %}
+        {% for message in messages %}
+            <div class="{{ type }}">
+                {{ message|trans({}, 'FOSUserBundle') }}
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    <div class="login">
+        <div class="login-header">
+            <h1>Login</h1>
+        </div>
+        <div class="login-form">
+            {% block fos_user_content %}
+            {% endblock fos_user_content %}
+        </div>
+    </div>
+<script src="{{ asset('bundles/avanzuadmintheme/static/'~app.environment~'/scripts/admin-lte-all.js') }}"></script>
 </html>

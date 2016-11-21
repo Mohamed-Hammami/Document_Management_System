@@ -96,11 +96,9 @@ class SearchController extends Controller
 
     public function searchAction(Request $request)
     {
-        $folders = array();
-        $files = array();
 
         $form = $this->createFormBuilder()
-                    ->add('text', TextType::class, array(
+                    ->add('input', TextType::class, array(
                         'attr' => array(
                             'class' => 'form-control',
                             'placeholder' => 'Search...',
@@ -110,16 +108,16 @@ class SearchController extends Controller
                             'class' => 'form-control',
                         ),
                         'choices' => array(
-                            'Name',
-                            'Tag',
-                            'Contributors',
-                            'Type',
-                            'Nature'
+                            'Name' => 'Name',
+                            'Tag' => 'Tag',
+                            'Creators' => 'Creators',
+//                            'Type' => 'Type',
+//                            'Nature' => 'Nature',
                         )
                     ))
                     ->add('search', 'submit', array(
                         'attr' => array(
-                            'class' => 'btn btn-flat'
+                            'class' => 'btn btn-primary'
                         )))
                     ->getForm();
 
@@ -127,26 +125,83 @@ class SearchController extends Controller
 
         if ($form->isSubmitted() && $form->isValid()) {
 
-            $data = $form->getData();
+            $term = $form->get('input')->getData();
+            $choice = $form->get('options')->getData();
 
-            dump($data);
+            $folders = array();
+            $files  = array();
 
-            return $this->redirect($this->generateUrl('search_show'));
+            switch( $choice )
+            {
+                case 'Name':
+                    $this->searchByName($term, $files, $folders);
+                    break;
+                case 'Tag':
+                    $files = $this->searchByTag($term);
+                    break;
+                case 'Creators':
+                    $this->searchByCreators($term, $files, $folders);
+                    break;
+//                case 'Type':
+//                case 'Nature':
+            }
+
+
+            $this->addFolderHeader('Name', 'text');
+            $this->addFolderHeader('Description', 'text');
+            $this->addFolderHeader('Created at', 'datetime');
+            $this->addFolderHeader('Updated at', 'datetime');
+            $this->addFolderHeader('Created by', 'string');
+            $this->addFolderHeader('Last updated by', 'string');
+
+            $this->addFolderMappedField('name');
+            $this->addFolderMappedField('description');
+            $this->addFolderMappedField('created');
+            $this->addFolderMappedField('updated');
+            $this->addFolderMappedField('createdBy');
+            $this->addFolderMappedField('updatedBy');
+
+            $this->addFileHeader('Name', 'text');
+            $this->addFileHeader('Description', 'text');
+            $this->addFileHeader('Created at', 'datetime');
+            $this->addFileHeader('Updated at', 'datetime');
+            $this->addFileHeader('Created by', 'string');
+            $this->addFileHeader('Last updated by', 'string');
+
+            $this->addFileMappedField('name');
+            $this->addFileMappedField('description');
+            $this->addFileMappedField('created');
+            $this->addFileMappedField('updated');
+            $this->addFileMappedField('createdBy');
+            $this->addFileMappedField('updatedBy');
+
+            dump( $term );
+
+            return $this->render(
+                'GedBundle:CRUD:searchResult.html.twig',
+                array(
+
+                    'term' => $term,
+
+                    'files' => $files,
+                    'folders' => $folders,
+
+                    'folder_headers' => $this->folderHeader,
+                    'folder_fields'  => $this->folderMappedFields,
+
+                    'file_headers'   => $this->fileHeader,
+                    'file_fields'    => $this->fileMappedFields,
+                )
+            );
+
         }
 
         return $this->render(
-            'GedBundle::search-form.html.twig',
+            'GedBundle:CRUD:search.html.twig',
             array(
                 'form' => $form->createView(),
-                'folders' => $folders,
-                'files' => $files,
             )
         );
-
-    }
-
-    public function searchByTagAction()
-    {
 
     }
 
@@ -154,7 +209,7 @@ class SearchController extends Controller
     {
         if ( !$user = $this->get('security.token_storage')->getToken()->getUser())
         {
-            throw $this->createAccessDeniedException(sprintf('You need to be authenticated to do search'));
+            throw $this->createAccessDeniedException(sprintf('You need to be authenticated to do a search'));
         }
 
         $name = $request->get("name");
@@ -170,8 +225,49 @@ class SearchController extends Controller
 
     }
 
-    public function searchByContributorsAction()
+    public function searchByTag($term)
     {
+        if ( !$user = $this->get('security.token_storage')->getToken()->getUser())
+        {
+            throw $this->createAccessDeniedException(sprintf('You need to be authenticated to do a search'));
+        }
+
+        $fileRepository = $this->getDoctrine()->getRepository('GedBundle:File');
+
+        $files = $fileRepository->searchFileByTag($term);
+
+        return $files;
+    }
+
+    public function searchByCreators($term, &$files, &$folders)
+    {
+        if ( !$user = $this->get('security.token_storage')->getToken()->getUser())
+        {
+            throw $this->createAccessDeniedException(sprintf('You need to be authenticated to do a search'));
+        }
+
+
+        $folderRepository = $this->getDoctrine()->getRepository('GedBundle:Folder');
+        $fileRepository = $this->getDoctrine()->getRepository('GedBundle:File');
+
+        $files = $fileRepository->searchFileByUser($term);
+        $folders = $folderRepository->searchFolderByUser($user);
+
+    }
+
+    public function searchByName($term, &$files, &$folders)
+    {
+        if ( !$user = $this->get('security.token_storage')->getToken()->getUser())
+        {
+            throw $this->createAccessDeniedException(sprintf('You need to be authenticated to do a search'));
+        }
+
+
+        $folderRepository = $this->getDoctrine()->getRepository('GedBundle:Folder');
+        $fileRepository = $this->getDoctrine()->getRepository('GedBundle:File');
+
+        $files = $fileRepository->searchByName($term);
+        $folders = $folderRepository->searchByName($term);
 
     }
 

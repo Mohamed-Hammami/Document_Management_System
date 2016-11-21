@@ -439,6 +439,7 @@ class FolderController extends Controller
         $em = $this->getDoctrine()->getEntityManager();
         $folderRepository = $em->getRepository('GedBundle:Folder');
 
+
         if( $folders = $this->get('session')->get('cutFolders') )
         {
             foreach( $folders as $folder )
@@ -579,7 +580,6 @@ class FolderController extends Controller
         $em = $this->getDoctrine()->getEntityManager();
         $fileRepository = $this->getDoctrine()->getRepository('GedBundle:File');
 
-
         if( $files = $this->get('session')->get('cutFiles') )
         {
             foreach( $files as $file )
@@ -712,6 +712,11 @@ class FolderController extends Controller
             throw $this->createAccessDeniedException(sprintf("You can't delete an on holder folder"));
         }
 
+        if( $folder->getLevel() == 0 )
+        {
+            throw $this->createAccessDeniedException(sprintf("You can't delete the root folder"));
+        }
+
 
         $filesId = $fileRepository->findFileIdByFolderId($folderId);
 
@@ -836,6 +841,7 @@ class FolderController extends Controller
         $em = $this->getDoctrine()->getEntityManager();
         $folderRepository = $em->getRepository('GedBundle:Folder');
         $fileRepository = $em->getRepository('GedBundle:File');
+
 
         $fileIds = $request->get('fileIds');
         $sourceId = $request->get('sourceId');

@@ -106,6 +106,19 @@ class FolderRepository extends NestedTreeRepository
 
     }
 
+    public function searchFolderByUser($user)
+    {
+        $qb = $this->createQueryBuilder('f')
+            ->leftJoin('f.createdBy', 'cr')
+            ->leftJoin('f.updatedBy', 'up')
+            ->setParameter('term', '%'.$user.'%')
+            ->where('cr.username LIKE :term')
+            ->orWhere('up.username LIKE :term')
+            ->distinct('f.id');
+
+        return $qb->getQuery()->getResult();
+    }
+
     public function searchByName($name)
     {
         $qb = $this->createQueryBuilder('f')
@@ -115,6 +128,14 @@ class FolderRepository extends NestedTreeRepository
                     ->leftJoin('f.updatedBy', 'upd')
                     ->addSelect('crt')
                     ->addSelect('upd');
+
+        return $qb->getQuery()->getResult();
+    }
+
+    public function findOnHold()
+    {
+        $qb = $this->createQueryBuilder('f')
+            ->where('f.onHold = true');
 
         return $qb->getQuery()->getResult();
     }

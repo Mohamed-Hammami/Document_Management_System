@@ -37,8 +37,12 @@
         <header class="main-header">
             {% block avanzu_logo %}
                 <a href="#" class="logo">
-                    <!-- Add the class icon to your logo image or logo icon to add the margining -->
-                    {{ block('title') }}
+                    <span class="logo-mini">
+                        {{ block('title') }}
+                    </span>
+                    <span class="logo-lg">
+                        <img src="{{ asset('bundles/ged/Custom/img/logo101.png') }}" class="img-responsive">
+                    </span>
                 </a>
             {% endblock %}
             <!-- Header Navbar: style can be found in header.less -->
@@ -51,10 +55,10 @@
                 <div>
                     <ul class="nav navbar-nav">
                         <li><a class="navbar-brand" href="#"><i class="fa fa-fw fa-lg  fa-home"></i>Home</a></li>
-                        <li><a class="navbar-brand" href="#"><i class="fa fa-fw fa-lg fa-desktop"></i> Workspace</a></li>
-                        <li><a class="navbar-brand" href="#"><i class="fa fa-fw fa-lg fa-envelope"></i> Email</a></li>
+                        <li><a class="navbar-brand" href="{{ path('Workspace_show') }}"><i class="fa fa-fw fa-lg fa-desktop"></i> Workspace</a></li>
+                        <li><a class="navbar-brand" href="{{ path('mail_compose') }}"><i class="fa fa-fw fa-lg fa-envelope"></i> Email</a></li>
                         {% if is_granted('ROLE_ADMIN') %}
-                            <li><a class="navbar-brand" href="#"><i class="fa fa-fw fa-lg fa-users"></i> Users</a></li>
+                            <li><a class="navbar-brand" href="{{ path('user_list') }}"><i class="fa fa-fw fa-lg fa-users"></i> Users</a></li>
                         {% endif %}
                         <li><a class="navbar-brand" href="#"><i class="fa fa-fw fa-lg  fa-cog"></i> Settings</a></li>
                     </ul>
@@ -64,10 +68,13 @@
                     <div class="navbar-custom-menu">
                         <ul class="nav navbar-nav">
                             {% block avanzu_navbar %}
-                                {#{{ render(controller('AvanzuAdminThemeBundle:Navbar:messages')) }}#}
-                                {#{{ render(controller('AvanzuAdminThemeBundle:Navbar:notifications')) }}#}
-                                {#{{ render(controller('AvanzuAdminThemeBundle:Navbar:tasks')) }}#}
-                                <li><a href="#"><i class="fa fa-fw fa-lg fa-search"></i> Search</a></li>
+                                <li>
+                                    <a data-toggle="modal"
+                                       data-target="#search"
+                                       href="{{ path('search_advanced') }}">
+                                        <i class="fa fa-fw fa-lg fa-search"></i>
+                                        Search</a>
+                                </li>
                                 {{ render(controller('AvanzuAdminThemeBundle:Navbar:user')) }}
                             {% endblock %}
                         </ul>
@@ -124,6 +131,25 @@
 
     </div>
 <!-- ./wrapper -->
+
+    {# Folder create modal#}
+
+    <div id="search" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Search</h4>
+                </div>
+                <div class="modal-body">
+                    Loading...
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 {# ------------------------------------------------------------------------------------------------------ JAVASCRIPTS #}
 {% block javascripts %}

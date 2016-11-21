@@ -120,8 +120,7 @@ class UserController extends Controller
 
             if ( $file = $user->getAvatar() ) {
                 $fileName = md5($user->getUsername().md5(uniqid()));
-                $fileDir = $this->container
-                        ->getParameter('kernel.root_dir') . '/../web/user';
+                $fileDir = $this->getParameter('avatar_path');
                 $file->move($fileDir, $fileName);
                 $user->setAvatar('user/'.$fileName);
             }
@@ -184,8 +183,7 @@ class UserController extends Controller
 
             if ( $file = $form->get('avatarEdit')->getViewData() ) {
                 $fileName = md5($user2->getUsername().md5(uniqid()));
-                $fileDir = $this->container
-                        ->getParameter('kernel.root_dir') . '/../web/user';
+                $fileDir = $this->getParameter('avatar_path');
                 $file->move($fileDir, $fileName);
                 $user2->setAvatar('user/'.$fileName);
             }
