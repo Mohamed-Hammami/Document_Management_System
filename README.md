@@ -1,5 +1,5 @@
-Document Managment System
-========================
+Document Management System
+==========================
 
 A web application that manages, tracks, and store documents online, it also keeps record of different files versions
 
