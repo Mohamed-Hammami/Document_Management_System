@@ -45,7 +45,7 @@ class Workspace
      * @var User
      *
      *
-     * @ORM\OneToOne(targetEntity="User", inversedBy="workspace")
+     * @ORM\OneToOne(targetEntity="User", inversedBy="workspace", cascade={"persist"})
      */
     private $user;
 

@@ -107,7 +107,7 @@
                                             {{ version.size|humanSize }}
                                         </th>
                                         <th>
-                                            <a href="{{ vich_uploader_asset(version, 'fileContent') }}" download="">
+                                            <a href="{{ path('version_download', {id: version.id}) }}" download="">
                                                 <i class="fa fa-fw fa-download"></i>
                                             </a>
                                         </th>

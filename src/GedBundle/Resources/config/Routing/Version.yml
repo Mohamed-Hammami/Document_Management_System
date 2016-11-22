@@ -2,3 +2,7 @@
 version_create:
     path: /{id}/create
     defaults: { _controller: 'GedBundle:Version:create' }
+
+version_download:
+    path: /{id}/download
+    defaults: { _controller: 'GedBundle:File:downloadVersion'}

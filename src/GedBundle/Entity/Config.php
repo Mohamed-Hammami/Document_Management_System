@@ -26,7 +26,7 @@ class Config
      *
      * @var int
      *
-     * @ORM\Column(name="rootId", type="integer")
+     * @ORM\Column(name="rootId", type="integer", nullable=true)
      */
     private $rootId;
 
@@ -41,14 +41,14 @@ class Config
     /**
      * @var string
      *
-     * @ORM\Column(name="language", type="string", length=255)
+     * @ORM\Column(name="language", type="string", length=255, nullable=true)
      */
     private $language;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="skin", type="string", length=255)
+     * @ORM\Column(name="skin", type="string", length=255, nullable=true)
      */
     private $skin;
 

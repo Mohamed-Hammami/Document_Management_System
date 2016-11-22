@@ -20,26 +20,31 @@ class DefaultController extends Controller
         }
 
         $em = $this->getDoctrine()->getEntityManager();
-//        $configRepository = $em->getRepository('GedBundle:Config');
-//
-//        $config = $configRepository->find(0);
-//
-//        if( $config->isFirstTime() )
-//        {
-//
-//            $root = new Folder();
-//            $root->setName("Root Folder");
-//            $root->setDescription('The root folder');
-//            $config->setRootId($root->getId());
-//
-//            $em->persist($root);
-//
-//            $config->setSkin("skin-blue");
-//            $config->setLanguage("en");
-//            $config->setFirstTime(false);
-//
-//            $em->flush();
-//        }
+        $configRepository = $em->getRepository('GedBundle:Config');
+
+        $configs = $configRepository->findAll();
+        foreach($configs as $config)
+            $config;
+
+        dump($config);
+
+        if( $config->isFirstTime() )
+        {
+
+            $root = new Folder();
+            $root->setName("Root Folder");
+            $root->setDescription('The root folder');
+
+            $em->persist($root);
+            $em->flush();
+
+            dump($root);
+
+            $config->setRootId($root->getId());
+            $config->setSkin("skin-blue");
+            $config->setLanguage("en");
+            $config->setFirstTime(false);
+        }
 
         $workspaceRepository = $em->getRepository('GedBundle:Workspace');
         $fileRepository = $em->getRepository('GedBundle:File');
@@ -65,8 +70,10 @@ class DefaultController extends Controller
 
         $this->get('session')->set('memo', $memo);
 
-        return $this->render('GedBundle:Default:index.html.twig');
+//        return $this->render('GedBundle:Default:index.html.twig');
 
-//        return $this->redirectToRoute('folder_show', array('id' => $config->getRootId()));
+        dump($config);
+
+        return $this->redirectToRoute('folder_show', array('id' => $config->getRootId()));
     }
 }

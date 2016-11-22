@@ -5,9 +5,11 @@ namespace GedBundle\Controller;
 use GedBundle\Entity\File;
 use GedBundle\Entity\Version;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use GedBundle\Form\Type\FileType;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
@@ -67,7 +69,7 @@ class FileController extends Controller
         return $this->render(
             '@Ged/CRUD/fileCreate.html.twig',
             array(
-                'form' => $form,
+                'form' => $form->createView(),
                 'id' => $id,
             )
         );
@@ -236,11 +238,54 @@ class FileController extends Controller
         }
     }
 
-    public function downloadVersionAction(Version $version)
+    public function downloadVersionAction(Request $request, $id)
     {
 
-        $helper = $this->container->get('vich_uploader.templating.helper.uploader_helper');
-        $path = $helper->asset($version, '$fileContent');
+        if ( !$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY') )
+        {
+            throw $this->createAccessDeniedException('You have to be authenticated to view a file');
+        }
+
+        $em = $this->getDoctrine()->getManager();
+
+        $versionRepository = $em->getRepository('GedBundle:Version');
+        $fileRepository = $em->getRepository('GedBundle:File');
+
+
+        if( !$version = $versionRepository->find($id) )
+        {
+            throw new ResourceNotFoundException( sprintf('There is no version with %d id', $id));
+        }
+
+        if( !$file = $fileRepository->find($version->getFile()) )
+        {
+            throw new ResourceNotFoundException( sprintf('There is no file with %d id', $id));
+        }
+
+
+        $this->denyAccessUnlessGranted('view', $file);
+
+
+        $filename = $this->getParameter('upload_path').'/'.$version->getFileName();
+
+        $handler = new \Symfony\Component\HttpFoundation\File\File($filename);
+
+        $header_content_type = $handler->getMimeType();
+	    $header_content_length = $handler->getSize();
+
+        $headers = array(
+            'Content-Disposition' => 'attachment; filename="' . $version->getFileName(),
+            'Cache-Control' => 'must-revalidate',
+            'Pragma' => 'public',
+        );
+
+        $headers = array_merge($headers, array(
+            'Content-Type' => $header_content_type,
+            'Content-Length' => $header_content_length
+        ));
+
+        return new Response(file_get_contents($filename), 200, $headers);
+
     }
 
     public function lockAction(Request $request, $id)
