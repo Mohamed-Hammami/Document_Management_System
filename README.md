@@ -87,8 +87,25 @@ Customize the paramters in `parameters.yml`:
 Screenshots
 -----------
 
+Login Interface
+
 ![login](https://cloud.githubusercontent.com/assets/19515339/20526696/77e9e2d0-b0c5-11e6-8b26-726418282f12.PNG)
 
+Home Interface
+
+![home](https://cloud.githubusercontent.com/assets/19515339/20526778/e1bc475c-b0c5-11e6-87f0-17b19e48577b.PNG)
+
+Workspace Interface
+
+![workspace](https://cloud.githubusercontent.com/assets/19515339/20526790/f0ee6b10-b0c5-11e6-9821-6b9594a443e9.PNG)
+
+File Interface
+
+![file](https://cloud.githubusercontent.com/assets/19515339/20526734/a5776bdc-b0c5-11e6-8bf9-cd9b69ef542c.PNG)
+
+Users Interface
+
+![users](https://cloud.githubusercontent.com/assets/19515339/20526803/ffcb88de-b0c5-11e6-8993-32f0e449dd22.PNG)
 
 Authors
 --------------  
