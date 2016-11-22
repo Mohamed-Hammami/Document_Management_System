@@ -51,10 +51,7 @@ Installation & Configuration
     
 You have to load some fixtures before the first use
     
-    ```
     php app/console doctrine:fixtures:load
-    
-    ```
     
 Customize the paramters in `parameters.yml`:
 
