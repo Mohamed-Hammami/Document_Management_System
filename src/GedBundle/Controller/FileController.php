@@ -288,6 +288,57 @@ class FileController extends Controller
 
     }
 
+    public function viewVersionAction(Request $request, $id)
+    {
+
+        if ( !$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY') )
+        {
+            throw $this->createAccessDeniedException('You have to be authenticated to view a file');
+        }
+
+        $em = $this->getDoctrine()->getManager();
+
+        $versionRepository = $em->getRepository('GedBundle:Version');
+        $fileRepository = $em->getRepository('GedBundle:File');
+
+
+        if( !$version = $versionRepository->find($id) )
+        {
+            throw new ResourceNotFoundException( sprintf('There is no version with %d id', $id));
+        }
+
+        if( !$file = $fileRepository->find($version->getFile()) )
+        {
+            throw new ResourceNotFoundException( sprintf('There is no file with %d id', $id));
+        }
+
+
+        $this->denyAccessUnlessGranted('view', $file);
+
+
+        $filename = $this->getParameter('upload_path').'/'.$version->getFileName();
+
+        $handler = new \Symfony\Component\HttpFoundation\File\File($filename);
+
+        $header_content_type = $handler->getMimeType();
+        $header_content_length = $handler->getSize();
+
+        $headers = array(
+            'Content-Disposition' => 'inline; filename="' . $version->getFileName(),
+            'Cache-Control' => 'must-revalidate',
+            'Pragma' => 'public',
+        );
+
+        $headers = array_merge($headers, array(
+            'Content-Type' => $header_content_type,
+            'Content-Length' => $header_content_length
+        ));
+
+        return new Response(file_get_contents($filename), 200, $headers);
+
+    }
+
+
     public function lockAction(Request $request, $id)
     {
         $em = $this->getDoctrine()->getManager();

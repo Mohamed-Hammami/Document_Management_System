@@ -4,6 +4,11 @@
     <i class="fa fa-fw fa-lg fa-users"></i>Users
 {% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href='{{ asset('bundles/ged/AdminLTE2/plugins/iCheck/all.css') }}'>
+{% endblock %}
+
 {% block page_subtitle%}
 {% endblock %}
 
@@ -55,6 +60,7 @@
     {{ parent() }}
     <script src="{{ asset('bundles/fosjsrouting/js/router.js') }}"></script>
     <script src="{{ path('fos_js_routing_js', { callback: 'fos.Router.setData' }) }}"></script>
+    <script src="{{ asset('bundles/ged/AdminLTE2/plugins/iCheck/icheck.js') }}"></script>
 
 {% endblock %}
 
@@ -102,6 +108,10 @@
                         break;
                     }
             }
+
+            $('input[type="checkbox"].minimal').iCheck({
+                checkboxClass: 'icheckbox_minimal-aero'
+            });
 
 
 

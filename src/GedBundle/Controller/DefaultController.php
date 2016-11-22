@@ -26,7 +26,6 @@ class DefaultController extends Controller
         foreach($configs as $config)
             $config;
 
-        dump($config);
 
         if( $config->isFirstTime() )
         {
@@ -38,7 +37,6 @@ class DefaultController extends Controller
             $em->persist($root);
             $em->flush();
 
-            dump($root);
 
             $config->setRootId($root->getId());
             $config->setSkin("skin-blue");
@@ -68,11 +66,11 @@ class DefaultController extends Controller
         $workspace = $workspaceRepository->findOneBy(array('user' => $user));
         $memo =  $workspace->getMemo();
 
+        $this->get('session')->set('config', $config);
         $this->get('session')->set('memo', $memo);
 
 //        return $this->render('GedBundle:Default:index.html.twig');
 
-        dump($config);
 
         return $this->redirectToRoute('folder_show', array('id' => $config->getRootId()));
     }

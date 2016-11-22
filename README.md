@@ -23,6 +23,8 @@ Bundles used in this application
   * TetranzSelect2EntityBundle
   
   * Bootstrap & Jquery in the view part
+  
+  * DoctrineFixturesBundle
 
 Implemented Features
 --------------
@@ -43,6 +45,51 @@ Implemented Features
   
   * Mailing et notification features
   
+Installation & Configuration
+----------------------------
+
+    You have to load some fixtures before the first use
+    
+    ```
+    php app/console doctrine:fixtures:load
+    ```
+    
+    Customize the paramters in `parameters.yml`:
+    
+    *  mailer_user: server email address 
+    *  mailer_password: server email password
+    *  upload_path: the files upload path *must be outside web folder**
+    *  avatar_path: the users' avatars *must be inside web folder*
+    
+    ```
+    # parameters.yml
+    parameters:
+        database_host: 127.0.0.1
+        database_port: null
+        database_name: DMS_DB
+        database_user: root
+        database_password: null
+    
+        mailer_transport: smtp
+        mailer_encryption: ssl
+        mailer_auth_mode:  login
+        mailer_host: smtp.gmail.com
+        mailer_user: ****************
+        mailer_password: ****************
+    
+        secret: ThisTokenIsNotSoSecretChangeIt
+    
+        upload_path: ****************
+        avatar_path: ****************
+        skin: skin-blue
+    ```
+    
+
+Screenshots
+-----------
+
+
+
 Authors
 --------------  
 

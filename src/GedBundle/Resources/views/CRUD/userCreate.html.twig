@@ -42,6 +42,12 @@
                                 {{ form_widget(form.email) }}
                             </div>
                             <div class="form-group col-xs-10">
+
+                                    {{ form_errors(form.admin) }}
+                                    {{ form_widget(form.admin) }}
+
+                            </div>
+                            <div class="form-group col-xs-10">
                                 <fieldset>
                                     {{ form_label(form.plainPassword) }}
                                     {{ form_errors(form.plainPassword) }}

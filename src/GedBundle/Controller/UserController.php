@@ -98,7 +98,15 @@ class UserController extends Controller
                 'label' => 'cancel',
                 'attr' => array(
                     'class' => 'btn btn-primary'
-                )));
+                )))
+            ->add('admin', 'checkbox', array(
+                'mapped' => false,
+                'label' => 'Admin',
+                'required' => false,
+                'attr' => array(
+                    'class' => 'minimal'
+                )
+            ));
 
         $form->handleRequest($request);
         if( $form->isValid() )
@@ -114,7 +122,16 @@ class UserController extends Controller
                 throw new HttpException(409, 'Username already taken');
             }
 
-            $user->setRoles(array("ROLE_USER"));
+            $admin = $form["admin"]->getData();
+
+            if( $admin )
+            {
+                $user->setRoles(array("ROLE_ADMIN"));
+            } else
+            {
+                $user->setRoles(array("ROLE_USER"));
+            }
+
             $user->setEnabled(true);
             $user->setRegistrationDate(new \DateTime('now'));
 

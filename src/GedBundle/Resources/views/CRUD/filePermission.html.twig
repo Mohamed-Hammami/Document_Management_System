@@ -68,8 +68,8 @@
                                 </div>
                             <span class="progress-description">
                                 {#I need to add security control#}
-                                <a data-toggle="modal" data-target="#folderCreate" class="sonata-action-element"
-                                   href="{{ path('folder_create', {id: file.id}) }}">
+                                <a data-toggle="modal" data-target="#permissionAdd" class="sonata-action-element"
+                                   href="{{ path('file_permission_add', {id: file.id}) }}">
                                     <i class="fa fa-plus-circle"></i>
                                     Add new
                                 </a>

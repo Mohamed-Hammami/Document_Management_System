@@ -257,6 +257,49 @@
 
     <script>
 
+        $(function(){
+            $('.folder-rate').barrating({
+                theme: 'fontawesome-stars',
+                allowEmpty: null,
+                deselectable: true,
+                onSelect: function(value, text, event) {
+                    var folder_id = $(event.target).closest("tr").attr("id");
+
+                    $.ajax({
+                        type:'post',
+                        url: Routing.generate('Workspace_rate_folder', {id: folder_id }),
+                        data: { rating: value},
+                        beforeSend: function(){
+                        },
+                        success: function(data){
+                            console.log(data.status);
+                        }
+                    })
+                }
+            });
+
+            $('.file-rate').barrating({
+                theme: 'fontawesome-stars',
+                allowEmpty: null,
+                deselectable: true,
+                onSelect: function(value, text, event) {
+                    var file_id = $(event.target).closest("tr").attr("id");
+
+                    $.ajax({
+                        type:'post',
+                        url: Routing.generate('Workspace_rate_file', {id: file_id }),
+                        data: { rating: value },
+                        beforeSend: function(){
+                        },
+                        success: function(data){
+                            console.log(data.status);
+                        }
+                    })
+                }
+            });
+
+        });
+
         // dataTables for folders_table & files_table
 
         $(function(){
@@ -273,15 +316,18 @@
 
             });
 
+
              $("#files_table").DataTable({
                 'aoColumnDefs': [{
                     'bSortable': false,
                     'aTargets': ['nosort']
                 }],
+
                 "paging": true,
                 "ordering": true,
                 "bInfo" : false
             });
+
 
             // notify link control
 
@@ -374,49 +420,6 @@
 
                 $(this).closest("tr").remove();
 
-            });
-
-        });
-
-        $(function(){
-            $('.folder-rate').barrating({
-                theme: 'fontawesome-stars',
-                allowEmpty: null,
-                deselectable: true,
-                onSelect: function(value, text, event) {
-                    var folder_id = $(event.target).closest("tr").attr("id");
-
-                    $.ajax({
-                        type:'post',
-                        url: Routing.generate('Workspace_rate_folder', {id: folder_id }),
-                        data: { rating: value},
-                        beforeSend: function(){
-                        },
-                        success: function(data){
-                            console.log(data.status);
-                        }
-                    })
-                }
-            });
-
-            $('.file-rate').barrating({
-                theme: 'fontawesome-stars',
-                allowEmpty: null,
-                deselectable: true,
-                onSelect: function(value, text, event) {
-                    var file_id = $(event.target).closest("tr").attr("id");
-
-                    $.ajax({
-                        type:'post',
-                        url: Routing.generate('Workspace_rate_file', {id: file_id }),
-                        data: { rating: value },
-                        beforeSend: function(){
-                        },
-                        success: function(data){
-                            console.log(data.status);
-                        }
-                    })
-                }
             });
 
         });

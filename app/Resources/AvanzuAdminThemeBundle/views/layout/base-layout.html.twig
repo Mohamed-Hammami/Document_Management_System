@@ -15,14 +15,16 @@
     {# -------------------------------------------------------------------------------------------------- STYLESHEETS #}
     {% block stylesheets %}
         <link rel="stylesheet" href="{{ asset('bundles/avanzuadmintheme/static/'~ app.environment ~'/styles/admin-lte-all.css') }}" />
+        <link href="{{ asset('bundles/ged/Pace/theme/black/pace-theme-minimal.css') }}" rel="stylesheet" />
     {% endblock %}
 
-
     <link rel="icon" type="image/x-icon" href="{{ asset('bundles/ged/Custom/img/logo102.ico') }}" />
+
 
     {# --------------------------------------------------------------------------------------------- JAVASCRIPTS_HEAD #}
     {%  block javascripts_head %}
         <script type="text/javascript" src="{{ asset('bundles/avanzuadmintheme/static/'~app.environment~'/scripts/modernizr.js') }}"></script>
+        <script src="{{ asset('bundles/ged/Pace/pace.min.js') }}"></script>
         <!--[if lt IE 9]>
 
         <![endif]-->
@@ -54,7 +56,7 @@
 
                 <div>
                     <ul class="nav navbar-nav">
-                        <li><a class="navbar-brand" href="#"><i class="fa fa-fw fa-lg  fa-home"></i>Home</a></li>
+                        <li><a class="navbar-brand" href="{{ path('folder_show', {id: app.session.get('config').getRootId()}) }}"><i class="fa fa-fw fa-lg  fa-home"></i>Home</a></li>
                         <li><a class="navbar-brand" href="{{ path('Workspace_show') }}"><i class="fa fa-fw fa-lg fa-desktop"></i> Workspace</a></li>
                         <li><a class="navbar-brand" href="{{ path('mail_compose') }}"><i class="fa fa-fw fa-lg fa-envelope"></i> Email</a></li>
                         {% if is_granted('ROLE_ADMIN') %}
@@ -120,6 +122,33 @@
         </div>
         <!-- /.content-wrapper -->
 
+
+        {# Folder create modal#}
+
+        <div id="search" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Search</h4>
+                    </div>
+                    <div class="modal-body">
+                        Loading...
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        {% block javascripts %}
+
+            <script src="{{ asset('bundles/avanzuadmintheme/static/'~app.environment~'/scripts/admin-lte-all.js') }}"></script>
+
+        {% endblock %}
+
     {% block avanzu_admin_footer %}
         <footer class="main-footer">
             <div class="pull-right hidden-xs">
@@ -132,31 +161,9 @@
     </div>
 <!-- ./wrapper -->
 
-    {# Folder create modal#}
-
-    <div id="search" class="modal fade" role="dialog">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title">Search</h4>
-                </div>
-                <div class="modal-body">
-                    Loading...
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
 
 {# ------------------------------------------------------------------------------------------------------ JAVASCRIPTS #}
-{% block javascripts %}
 
-    <script src="{{ asset('bundles/avanzuadmintheme/static/'~app.environment~'/scripts/admin-lte-all.js') }}"></script>
-
-{% endblock %}
 
 {# ----------------------------------------------------------------------------------------------- JAVASCRIPTS_INLINE #}
 {% block javascripts_inline %}

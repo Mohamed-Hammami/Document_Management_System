@@ -89,6 +89,7 @@
                                     <th>Created by</th>
                                     <th>Size</th>
                                     <th></th>
+                                    <th></th>
                                 </tr>
                                 {% for version in versions %}
                                     {% if version == versions|last %}
@@ -105,6 +106,11 @@
                                         </th>
                                         <th>
                                             {{ version.size|humanSize }}
+                                        </th>
+                                        <th>
+                                            <a target="_blank" href="{{ path('version_view', {id: version.id}) }}" download="">
+                                                <i class="fa fa-fw fa-eye"></i>
+                                            </a>
                                         </th>
                                         <th>
                                             <a href="{{ path('version_download', {id: version.id}) }}" download="">
@@ -241,7 +247,7 @@
                 </div>
                 <div class="box-body box-comment-post">
                     <form action="#" method="post">
-                        {% if user.avatar is defined %}
+                        {% if user.avatar is not null %}
                         <img class="img-circle img-sm" src="{{ asset(user.avatar) }}" alt="User Image">
                         {% else %}
                             <img class="img-circle img-sm" src="{{  asset('bundles/avanzuadmintheme/img/avatar.png') }}" alt="User Image">
