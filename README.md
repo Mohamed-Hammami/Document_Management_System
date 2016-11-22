@@ -48,18 +48,19 @@ Implemented Features
 Installation & Configuration
 ----------------------------
 
-    You have to load some fixtures before the first use
+    
+You have to load some fixtures before the first use
     
     ```
     php app/console doctrine:fixtures:load
     ```
     
-    Customize the paramters in `parameters.yml`:
-    
-    *  mailer_user: server email address 
-    *  mailer_password: server email password
-    *  upload_path: the files upload path *must be outside web folder**
-    *  avatar_path: the users' avatars *must be inside web folder*
+Customize the paramters in `parameters.yml`:
+
+*  mailer_user: server email address 
+*  mailer_password: server email password
+*  upload_path: the files upload path *must be outside web folder*
+*  avatar_path: the users' avatars *must be inside web folder*
     
     ```
     # parameters.yml
